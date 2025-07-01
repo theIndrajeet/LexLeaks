@@ -18,8 +18,8 @@ def create_admin():
         # Load environment variables
         load_dotenv('backend-api/.env')
         
-        from backend_api.app.database import SessionLocal, engine
-        from backend_api.app import models
+        from app.database import SessionLocal, engine
+        from app import models
         
         print("🚀 Setting up LexLeaks Admin User")
         print("=" * 40)
@@ -42,7 +42,6 @@ def create_admin():
             # Demo credentials - CHANGE THESE AFTER FIRST LOGIN!
             demo_username = "admin"
             demo_password = "LexLeaks2024!"  # Strong demo password
-            demo_email = "admin@lexleaks.demo"
             
             print(f"👤 Creating admin user with demo credentials...")
             
@@ -53,8 +52,8 @@ def create_admin():
             # Create admin user
             admin_user = models.User(
                 username=demo_username,
-                email=demo_email,
-                hashed_password=hashed_password
+                hashed_password=hashed_password,
+                is_admin=True
             )
             
             db.add(admin_user)
@@ -66,7 +65,6 @@ def create_admin():
             print("🔐 DEMO LOGIN CREDENTIALS:")
             print(f"   Username: {demo_username}")
             print(f"   Password: {demo_password}")
-            print(f"   Email: {demo_email}")
             print("=" * 40)
             print("⚠️  IMPORTANT: Change these credentials after first login!")
             print("🌐 Login at: http://localhost:3000/admin/login")

@@ -7,7 +7,6 @@ import re
 # User Schemas
 class UserBase(BaseModel):
     username: str = Field(..., min_length=3, max_length=50)
-    email: Optional[str] = None
 
 
 class UserCreate(UserBase):
@@ -16,6 +15,7 @@ class UserCreate(UserBase):
 
 class UserResponse(UserBase):
     id: int
+    is_admin: bool
     created_at: datetime
     
     class Config:
