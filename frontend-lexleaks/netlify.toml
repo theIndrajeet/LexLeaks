@@ -1,22 +1,22 @@
-# Netlify configuration for Next.js app
+# Netlify configuration for LexLeaks Frontend (Next.js)
 
 [build]
+  # Build command for Next.js
   command = "npm run build"
-  # Don't specify publish directory - let the Next.js plugin handle it
+  
+  # Next.js plugin will handle the publish directory automatically
+  # No need to specify publish = ".next"
 
 [build.environment]
+  # Your Google Cloud Run backend API URL
   NEXT_PUBLIC_API_URL = "https://lexleaks-api-563011146464.asia-south1.run.app"
+  
+  # Node version (optional but recommended)
+  NODE_VERSION = "18"
 
-# Essential for Next.js on Netlify
+# Essential plugin for Next.js on Netlify
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-
-# Redirects for client-side routing
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-  conditions = {Role = ["admin"]}
 
 # Headers for security
 [[headers]]
@@ -25,4 +25,12 @@
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     X-XSS-Protection = "1; mode=block"
-    Referrer-Policy = "strict-origin-when-cross-origin" 
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# Redirect www to non-www (optional - adjust domain when you have it)
+# [[redirects]]
+#   from = "https://www.yourdomain.com/*"
+#   to = "https://yourdomain.com/:splat"
+#   status = 301
+#   force = true 
