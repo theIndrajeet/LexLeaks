@@ -18,7 +18,7 @@
   /* Dark mode styles with vintage sepia tones */
   .dark body {
     background-color: #1a1612; /* Dark sepia background */
-    color: #d4c5b9; /* Light sepia text */
+    color: #f5f2ed; /* Off-white/cream text for better visibility */
   }
 
   /* Custom scrollbar */
@@ -87,7 +87,7 @@
   }
 
   .dark .brand-text {
-    color: #d4c5b9; /* Light sepia text */
+    color: #f5f2ed; /* Off-white text for better contrast */
   }
 
   .brand-button {
@@ -132,7 +132,7 @@
   }
 
   .dark .case-file {
-    color: #9a8c7f;
+    color: #c5b8a8; /* Lighter sepia for better visibility */
   }
 
   .article-title {
@@ -144,7 +144,7 @@
   }
 
   .dark .article-title {
-    color: #e8ddd4;
+    color: #faf8f5; /* Bright off-white for article titles */
   }
 
   .article-excerpt {
@@ -154,7 +154,7 @@
   }
 
   .dark .article-excerpt {
-    color: #b5a598;
+    color: #e8ddd4; /* Light cream for excerpts */
   }
 
   .read-more {
@@ -190,7 +190,7 @@
   }
 
   .dark .main-title {
-    color: #e8ddd4;
+    color: #faf8f5; /* Brighter off-white for titles */
   }
 
   .main-subtitle {
@@ -201,7 +201,7 @@
   }
 
   .dark .main-subtitle {
-    color: #b5a598;
+    color: #d4c5b9; /* Light sepia for subtitles */
   }
 
   /* Navigation styles */
@@ -216,7 +216,7 @@
   }
 
   .dark .nav-link {
-    color: #b5a598;
+    color: #d4c5b9; /* Light sepia for nav links */
   }
 
   .nav-link:hover {
@@ -240,6 +240,10 @@
     font-family: 'Inconsolata', monospace;
     font-size: 0.75rem;
     color: #6b7280;
+  }
+
+  .dark .footer-text {
+    color: #b5a598; /* Lighter footer text in dark mode */
   }
 
   /* Article card styles */
@@ -394,5 +398,56 @@
 
   .parallax-element {
     transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  /* Prose styles for article content */
+  .prose {
+    color: #3d3d3d;
+  }
+
+  .dark .prose {
+    color: #f5f2ed; /* Off-white for article body text */
+  }
+
+  .dark .prose h1,
+  .dark .prose h2,
+  .dark .prose h3,
+  .dark .prose h4 {
+    color: #faf8f5; /* Bright off-white for headings */
+  }
+
+  .dark .prose strong {
+    color: #faf8f5; /* Bright for emphasis */
+  }
+
+  .dark .prose a {
+    color: #d4766f; /* Light burgundy for links */
+  }
+
+  .dark .prose blockquote {
+    color: #e8ddd4; /* Light cream for quotes */
+    border-left-color: #d4766f;
+  }
+
+  /* Error and success states in dark mode */
+  .dark .text-gray-600 {
+    color: #d4c5b9 !important;
+  }
+
+  .dark .text-gray-500 {
+    color: #c5b8a8 !important;
+  }
+
+  .dark .text-gray-400 {
+    color: #b5a598 !important;
+  }
+
+  .dark .text-gray-300 {
+    color: #e8ddd4 !important;
+  }
+
+  /* Loading skeleton in dark mode */
+  .dark .loading-skeleton {
+    background: linear-gradient(90deg, #2a251f 25%, #3a342c 50%, #2a251f 75%);
   }
 }
