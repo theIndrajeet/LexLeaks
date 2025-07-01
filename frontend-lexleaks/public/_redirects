@@ -1,0 +1,10 @@
+# CMS subdomain redirects
+https://cms.lexleaks.com              https://lexleaks.com/admin/dashboard    301!
+https://cms.lexleaks.com/*            https://lexleaks.com/admin/:splat       301!
+
+# WWW to non-WWW redirect
+https://www.lexleaks.com/*            https://lexleaks.com/:splat             301!
+
+# Optional: Redirect any http to https
+http://lexleaks.com/*                 https://lexleaks.com/:splat             301!
+http://cms.lexleaks.com/*             https://lexleaks.com/admin/:splat       301! 

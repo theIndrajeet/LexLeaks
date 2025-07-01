@@ -31,9 +31,22 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
 
-# Redirect www to non-www (optional - adjust domain when you have it)
-# [[redirects]]
-#   from = "https://www.yourdomain.com/*"
-#   to = "https://yourdomain.com/:splat"
-#   status = 301
-#   force = true 
+# Redirect CMS subdomain to admin dashboard
+[[redirects]]
+  from = "https://cms.lexleaks.com"
+  to = "https://lexleaks.com/admin/dashboard"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://cms.lexleaks.com/*"
+  to = "https://lexleaks.com/admin/:splat"
+  status = 301
+  force = true
+
+# Redirect www to non-www
+[[redirects]]
+  from = "https://www.lexleaks.com/*"
+  to = "https://lexleaks.com/:splat"
+  status = 301
+  force = true 
