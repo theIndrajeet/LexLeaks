@@ -28,6 +28,9 @@ class PostBase(BaseModel):
     content: str = Field(..., min_length=1)
     excerpt: Optional[str] = Field(None, max_length=500)
     status: str = Field(default="draft", pattern="^(draft|published|archived)$")
+    verification_status: str = Field(default="unverified", pattern="^(unverified|verified|disputed)$")
+    category: Optional[str] = Field(None, max_length=50)
+    document_url: Optional[str] = Field(None, max_length=500)
 
 
 class PostCreate(PostBase):
@@ -46,6 +49,10 @@ class PostUpdate(BaseModel):
     content: Optional[str] = Field(None, min_length=1)
     excerpt: Optional[str] = Field(None, max_length=500)
     status: Optional[str] = Field(None, pattern="^(draft|published|archived)$")
+    verification_status: Optional[str] = Field(None, pattern="^(unverified|verified|disputed)$")
+    category: Optional[str] = Field(None, max_length=50)
+    document_url: Optional[str] = Field(None, max_length=500)
+    published_at: Optional[datetime] = None
     
     @field_validator('title')
     @classmethod
@@ -75,9 +82,20 @@ class PostSummary(BaseModel):
     slug: str
     excerpt: Optional[str]
     status: str
+    verification_status: str
+    category: Optional[str]
+    document_url: Optional[str]
     published_at: Optional[datetime]
     created_at: datetime
     author: UserResponse
+    
+    class Config:
+        from_attributes = True
+
+
+class PostWithCounts(PostSummary):
+    """Post summary with additional counts"""
+    impact_count: int = 0
     
     class Config:
         from_attributes = True
@@ -104,4 +122,35 @@ def generate_slug(title: str) -> str:
     # Convert to lowercase and replace spaces/special chars with hyphens
     slug = re.sub(r'[^\w\s-]', '', title.lower())
     slug = re.sub(r'[-\s]+', '-', slug)
-    return slug.strip('-') 
+    return slug.strip('-')
+
+
+# Impact Schemas
+class ImpactBase(BaseModel):
+    title: str = Field(..., min_length=1, max_length=200)
+    description: str = Field(..., min_length=1)
+    date: datetime
+    type: str = Field(..., pattern="^(legal_action|policy_change|investigation|resignation|reform)$")
+    status: str = Field(default="pending", pattern="^(pending|in_progress|completed)$")
+
+
+class ImpactCreate(ImpactBase):
+    post_id: int
+
+
+class ImpactUpdate(BaseModel):
+    title: Optional[str] = Field(None, min_length=1, max_length=200)
+    description: Optional[str] = Field(None, min_length=1)
+    date: Optional[datetime] = None
+    type: Optional[str] = Field(None, pattern="^(legal_action|policy_change|investigation|resignation|reform)$")
+    status: Optional[str] = Field(None, pattern="^(pending|in_progress|completed)$")
+
+
+class ImpactResponse(ImpactBase):
+    id: int
+    post_id: int
+    created_at: datetime
+    updated_at: Optional[datetime]
+    
+    class Config:
+        from_attributes = True 

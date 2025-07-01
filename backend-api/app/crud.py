@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import and_, or_
-from datetime import datetime
+from sqlalchemy import and_, or_, desc, asc, func
+from datetime import datetime, date
 from typing import List, Optional
 from . import models, schemas
 from .schemas import generate_slug
@@ -65,15 +65,196 @@ def get_posts(
     db: Session, 
     skip: int = 0, 
     limit: int = 100, 
-    status: Optional[str] = None
+    status: Optional[str] = None,
+    verification_status: Optional[str] = None,
+    search: Optional[str] = None,
+    category: Optional[str] = None,
+    author_username: Optional[str] = None,
+    date_from: Optional[date] = None,
+    date_to: Optional[date] = None,
+    sort_by: Optional[str] = 'newest',
+    impact_level: Optional[str] = None  # high, medium, low based on count
 ) -> List[models.Post]:
-    """Get posts with optional status filter"""
+    """
+    Get posts with advanced filtering, searching, and sorting.
+    """
     query = db.query(models.Post)
     
+    # Join with User table for author filtering
+    if author_username:
+        query = query.join(models.User).filter(models.User.username.ilike(f"%{author_username}%"))
+    
+    # Filter by status
     if status:
         query = query.filter(models.Post.status == status)
     
+    # Filter by verification status
+    if verification_status:
+        query = query.filter(models.Post.verification_status == verification_status)
+    
+    # Filter by category
+    if category:
+        query = query.filter(models.Post.category == category)
+        
+    # Filter by date range
+    if date_from:
+        query = query.filter(models.Post.published_at >= date_from)
+    if date_to:
+        query = query.filter(models.Post.published_at <= date_to)
+        
+    # Search query
+    if search:
+        search_filter = or_(
+            models.Post.title.ilike(f"%{search}%"),
+            models.Post.content.ilike(f"%{search}%"),
+            models.Post.excerpt.ilike(f"%{search}%")
+        )
+        query = query.filter(search_filter)
+    
+    # Filter by impact level
+    if impact_level:
+        # Create a subquery to count impacts per post
+        impact_count_subquery = (
+            db.query(
+                models.Impact.post_id,
+                func.count(models.Impact.id).label('impact_count')
+            )
+            .group_by(models.Impact.post_id)
+            .subquery()
+        )
+        
+        query = query.outerjoin(
+            impact_count_subquery,
+            models.Post.id == impact_count_subquery.c.post_id
+        )
+        
+        if impact_level == 'high':
+            query = query.filter(impact_count_subquery.c.impact_count >= 5)
+        elif impact_level == 'medium':
+            query = query.filter(impact_count_subquery.c.impact_count.between(2, 4))
+        elif impact_level == 'low':
+            query = query.filter(
+                or_(
+                    impact_count_subquery.c.impact_count == 1,
+                    impact_count_subquery.c.impact_count.is_(None)
+                )
+            )
+
+    # Sorting logic
+    if sort_by == 'oldest':
+        query = query.order_by(asc(models.Post.published_at))
+    else: # Default to newest
+        query = query.order_by(desc(models.Post.published_at))
+
     return query.offset(skip).limit(limit).all()
+
+
+def get_posts_with_counts(
+    db: Session, 
+    skip: int = 0, 
+    limit: int = 100, 
+    status: Optional[str] = None,
+    verification_status: Optional[str] = None,
+    search: Optional[str] = None,
+    category: Optional[str] = None,
+    author_username: Optional[str] = None,
+    date_from: Optional[date] = None,
+    date_to: Optional[date] = None,
+    sort_by: Optional[str] = 'newest',
+    impact_level: Optional[str] = None
+) -> List[dict]:
+    """
+    Get posts with impact counts and advanced filtering.
+    """
+    # Create a subquery to count impacts per post
+    impact_count_subquery = (
+        db.query(
+            models.Impact.post_id,
+            func.count(models.Impact.id).label('impact_count')
+        )
+        .group_by(models.Impact.post_id)
+        .subquery()
+    )
+    
+    # Main query with impact count
+    query = db.query(
+        models.Post,
+        func.coalesce(impact_count_subquery.c.impact_count, 0).label('impact_count')
+    ).outerjoin(
+        impact_count_subquery,
+        models.Post.id == impact_count_subquery.c.post_id
+    )
+    
+    # Join with User table for author filtering
+    if author_username:
+        query = query.join(models.User).filter(models.User.username.ilike(f"%{author_username}%"))
+    
+    # Filter by status
+    if status:
+        query = query.filter(models.Post.status == status)
+    
+    # Filter by verification status
+    if verification_status:
+        query = query.filter(models.Post.verification_status == verification_status)
+    
+    # Filter by category
+    if category:
+        query = query.filter(models.Post.category == category)
+        
+    # Filter by date range
+    if date_from:
+        query = query.filter(models.Post.published_at >= date_from)
+    if date_to:
+        query = query.filter(models.Post.published_at <= date_to)
+        
+    # Search query
+    if search:
+        search_filter = or_(
+            models.Post.title.ilike(f"%{search}%"),
+            models.Post.content.ilike(f"%{search}%"),
+            models.Post.excerpt.ilike(f"%{search}%")
+        )
+        query = query.filter(search_filter)
+    
+    # Filter by impact level
+    if impact_level:
+        if impact_level == 'high':
+            query = query.having(func.coalesce(impact_count_subquery.c.impact_count, 0) >= 5)
+        elif impact_level == 'medium':
+            query = query.having(func.coalesce(impact_count_subquery.c.impact_count, 0).between(2, 4))
+        elif impact_level == 'low':
+            query = query.having(func.coalesce(impact_count_subquery.c.impact_count, 0) <= 1)
+
+    # Sorting logic
+    if sort_by == 'oldest':
+        query = query.order_by(asc(models.Post.published_at))
+    elif sort_by == 'impact':
+        query = query.order_by(desc('impact_count'))
+    else: # Default to newest
+        query = query.order_by(desc(models.Post.published_at))
+
+    results = query.offset(skip).limit(limit).all()
+    
+    # Convert to list of dicts with impact_count
+    posts_with_counts = []
+    for post, impact_count in results:
+        post_dict = {
+            "id": post.id,
+            "title": post.title,
+            "slug": post.slug,
+            "excerpt": post.excerpt,
+            "status": post.status,
+            "verification_status": post.verification_status,
+            "category": post.category,
+            "document_url": post.document_url,
+            "published_at": post.published_at,
+            "created_at": post.created_at,
+            "author": post.author,
+            "impact_count": impact_count
+        }
+        posts_with_counts.append(post_dict)
+    
+    return posts_with_counts
 
 
 def get_published_posts(db: Session, skip: int = 0, limit: int = 100) -> List[models.Post]:
@@ -109,6 +290,7 @@ def create_post(db: Session, post: schemas.PostCreate, author_id: int) -> models
         content=post.content,
         excerpt=post.excerpt,
         status=post.status,
+        category=post.category,
         author_id=author_id,
         published_at=published_at
     )
@@ -188,4 +370,85 @@ def search_posts(
     if status:
         db_query = db_query.filter(models.Post.status == status)
     
-    return db_query.offset(skip).limit(limit).all() 
+    return db_query.offset(skip).limit(limit).all()
+
+
+# Impact CRUD operations
+def get_impact(db: Session, impact_id: int) -> Optional[models.Impact]:
+    """Get impact by ID"""
+    return db.query(models.Impact).filter(models.Impact.id == impact_id).first()
+
+
+def get_impacts(
+    db: Session,
+    skip: int = 0,
+    limit: int = 100,
+    post_id: Optional[int] = None,
+    type: Optional[str] = None,
+    status: Optional[str] = None
+) -> List[models.Impact]:
+    """Get impacts with optional filtering"""
+    query = db.query(models.Impact)
+    
+    if post_id:
+        query = query.filter(models.Impact.post_id == post_id)
+    if type:
+        query = query.filter(models.Impact.type == type)
+    if status:
+        query = query.filter(models.Impact.status == status)
+    
+    return query.order_by(desc(models.Impact.date)).offset(skip).limit(limit).all()
+
+
+def create_impact(db: Session, impact: schemas.ImpactCreate) -> models.Impact:
+    """Create a new impact"""
+    # Verify post exists
+    post = get_post(db, impact.post_id)
+    if not post:
+        raise ValueError("Post not found")
+    
+    db_impact = models.Impact(
+        title=impact.title,
+        description=impact.description,
+        date=impact.date,
+        type=impact.type,
+        status=impact.status,
+        post_id=impact.post_id
+    )
+    
+    db.add(db_impact)
+    db.commit()
+    db.refresh(db_impact)
+    return db_impact
+
+
+def update_impact(
+    db: Session,
+    impact_id: int,
+    impact_update: schemas.ImpactUpdate
+) -> Optional[models.Impact]:
+    """Update an existing impact"""
+    db_impact = get_impact(db, impact_id)
+    if not db_impact:
+        return None
+    
+    update_data = impact_update.model_dump(exclude_unset=True)
+    
+    # Apply updates
+    for field, value in update_data.items():
+        setattr(db_impact, field, value)
+    
+    db.commit()
+    db.refresh(db_impact)
+    return db_impact
+
+
+def delete_impact(db: Session, impact_id: int) -> bool:
+    """Delete an impact"""
+    db_impact = get_impact(db, impact_id)
+    if not db_impact:
+        return False
+    
+    db.delete(db_impact)
+    db.commit()
+    return True 

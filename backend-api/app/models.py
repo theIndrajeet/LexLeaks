@@ -28,10 +28,33 @@ class Post(Base):
     content = Column(Text, nullable=False)
     excerpt = Column(String(500), nullable=True)
     status = Column(String(20), default="draft", nullable=False)  # draft, published, archived
+    verification_status = Column(String(20), default="unverified", nullable=False)  # unverified, verified, disputed
+    category = Column(String(50), nullable=True, index=True) # e.g., corporate, judicial, etc.
+    document_url = Column(String(500), nullable=True)  # URL to associated PDF/document
     author_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     published_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     # Relationship to user
-    author = relationship("User", back_populates="posts") 
+    author = relationship("User", back_populates="posts")
+    # Relationship to impacts
+    impacts = relationship("Impact", back_populates="post", cascade="all, delete-orphan")
+
+
+class Impact(Base):
+    """Impact model for tracking real-world outcomes of posts"""
+    __tablename__ = "impacts"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(200), nullable=False)
+    description = Column(Text, nullable=False)
+    date = Column(DateTime(timezone=True), nullable=False)
+    type = Column(String(50), nullable=False)  # legal_action, policy_change, investigation, resignation, reform
+    status = Column(String(20), default="pending", nullable=False)  # pending, in_progress, completed
+    post_id = Column(Integer, ForeignKey("posts.id"), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
+    # Relationship to post
+    post = relationship("Post", back_populates="impacts") 

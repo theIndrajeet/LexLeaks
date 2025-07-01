@@ -1,4 +1,5 @@
 from typing import List, Optional
+from datetime import date
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 
@@ -11,21 +12,50 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=List[schemas.PostSummary])
+@router.get("/", response_model=List[schemas.PostWithCounts])
 def read_posts(
     skip: int = 0,
     limit: int = 100,
     status: Optional[str] = Query(None, regex="^(draft|published|archived)$"),
+    verification_status: Optional[str] = Query(None, regex="^(unverified|verified|disputed)$"),
+    search: Optional[str] = Query(None, min_length=1, description="Search query for title, content, and excerpt"),
+    category: Optional[str] = Query(None, description="Filter by category"),
+    author: Optional[str] = Query(None, description="Filter by author username"),
+    date_from: Optional[date] = Query(None, description="Filter posts published on or after this date"),
+    date_to: Optional[date] = Query(None, description="Filter posts published on or before this date"),
+    sort_by: Optional[str] = Query('newest', regex="^(newest|oldest|impact)$", description="Sort order"),
+    impact_level: Optional[str] = Query(None, regex="^(high|medium|low)$", description="Filter by impact level"),
     db: Session = Depends(get_db)
 ):
     """
-    Retrieve posts with optional status filter
+    Retrieve posts with advanced filtering, searching, and sorting.
+    - **status**: Filter by post status (draft, published, archived).
+    - **verification_status**: Filter by verification status (unverified, verified, disputed).
+    - **search**: Search query to filter by title, content, or excerpt.
+    - **category**: Filter by a specific category.
+    - **author**: Filter by author username (partial match).
+    - **date_from / date_to**: Filter by a date range (YYYY-MM-DD).
+    - **sort_by**: Sort by 'newest', 'oldest', or 'impact' (most impactful).
+    - **impact_level**: Filter by impact level - 'high' (5+ impacts), 'medium' (2-4), 'low' (0-1).
     """
-    posts = crud.get_posts(db, skip=skip, limit=limit, status=status)
+    posts = crud.get_posts_with_counts(
+        db, 
+        skip=skip, 
+        limit=limit, 
+        status=status,
+        verification_status=verification_status,
+        search=search,
+        category=category,
+        author_username=author,
+        date_from=date_from,
+        date_to=date_to,
+        sort_by=sort_by,
+        impact_level=impact_level
+    )
     return posts
 
 
-@router.get("/published", response_model=List[schemas.PostSummary])
+@router.get("/published", response_model=List[schemas.PostSummary], deprecated=True)
 def read_published_posts(
     skip: int = 0,
     limit: int = 100,
