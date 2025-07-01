@@ -313,7 +313,7 @@ def create_posts(token):
         
         # Create the post
         response = requests.post(
-            f"{API_BASE_URL}/api/posts",
+            f"{API_BASE_URL}/api/posts/",
             headers=headers,
             json=post_payload
         )

@@ -35,8 +35,15 @@ if r.status_code == 200:
         "excerpt": "Test excerpt",
         "status": "published"
     }
+    
+    # Try without trailing slash first
     r = requests.post(f"{API_BASE}/api/posts", headers=headers, json=post_data)
-    print(f"   Status: {r.status_code}")
+    print(f"   Without slash - Status: {r.status_code}")
+    print(f"   Response: {r.text}")
+    
+    # Try with trailing slash
+    r = requests.post(f"{API_BASE}/api/posts/", headers=headers, json=post_data)
+    print(f"   With slash - Status: {r.status_code}")
     print(f"   Response: {r.text}")
     
     # Test 4: Get posts
