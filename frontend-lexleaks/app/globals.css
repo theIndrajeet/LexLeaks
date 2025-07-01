@@ -1,0 +1,222 @@
+@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&family=Lora:ital,wght@0,400;0,700;1,400&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom vintage newspaper theme */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Lora', serif;
+    background-color: #fdf6e3; /* Warm, parchment-like off-white */
+    color: #3d3d3d; /* Dark charcoal gray */
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background-color: #f5f0d8;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #d3c5a9;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #c5b899;
+  }
+}
+
+/* Custom component styles */
+@layer components {
+  .font-mono-special {
+    font-family: 'Inconsolata', monospace;
+  }
+
+  .brand-accent {
+    color: #8B0000; /* Deep burgundy */
+  }
+
+  .brand-border {
+    border-color: #d3c5a9; /* Aged border color */
+  }
+
+  .brand-bg {
+    background-color: #fdf6e3; /* Parchment background */
+  }
+
+  .brand-text {
+    color: #3d3d3d; /* Charcoal gray */
+  }
+
+  .brand-button {
+    background-color: #8B0000;
+    color: #fdf6e3;
+    transition: background-color 0.3s ease;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0.5rem 1.5rem;
+    border-radius: 0.125rem;
+  }
+
+  .brand-button:hover {
+    background-color: #a52a2a; /* Lighter burgundy on hover */
+  }
+
+  .article-link:hover h2 {
+    color: #8B0000;
+  }
+
+  .case-file {
+    font-family: 'Inconsolata', monospace;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+  }
+
+  .article-title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    transition: color 0.3s ease-in-out;
+  }
+
+  .article-excerpt {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    color: #4a5568;
+  }
+
+  .read-more {
+    font-family: 'Inconsolata', monospace;
+    font-size: 0.875rem;
+    margin-top: 1.5rem;
+    color: #8B0000;
+    transition: all 0.3s ease;
+  }
+
+  .read-more:hover {
+    text-decoration: underline;
+  }
+
+  /* Header styles */
+  .main-header {
+    text-align: center;
+    border-bottom: 2px solid #d3c5a9;
+    padding-bottom: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .main-title {
+    font-size: 3.75rem;
+    font-weight: 700;
+    letter-spacing: -0.05em;
+    line-height: 1;
+    color: #1a1a1a;
+  }
+
+  .main-subtitle {
+    margin-top: 0.5rem;
+    font-size: 1.125rem;
+    font-family: 'Inconsolata', monospace;
+    color: #4a5568;
+  }
+
+  /* Navigation styles */
+  .main-nav {
+    font-family: 'Inconsolata', monospace;
+    font-size: 0.875rem;
+  }
+
+  .nav-link {
+    color: #4a5568;
+    transition: all 0.3s ease;
+  }
+
+  .nav-link:hover {
+    color: #8B0000;
+    text-decoration: underline;
+  }
+
+  /* Footer styles */
+  .main-footer {
+    text-align: center;
+    margin-top: 5rem;
+    padding-top: 2rem;
+    border-top: 2px solid #d3c5a9;
+  }
+
+  .footer-text {
+    font-family: 'Inconsolata', monospace;
+    font-size: 0.75rem;
+    color: #6b7280;
+  }
+
+  /* Article card styles */
+  .article-card {
+    transition: all 0.3s ease;
+    padding: 1.5rem 0;
+  }
+
+  .article-card:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Loading and error states */
+  .loading-skeleton {
+    background: linear-gradient(90deg, #f3ede0 25%, #ede6d3 50%, #f3ede0 75%);
+    background-size: 200% 100%;
+    animation: loading 2s infinite;
+  }
+
+  @keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* Admin styles */
+  .admin-card {
+    background-color: #ffffff;
+    border: 1px solid #d3c5a9;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+
+  .admin-button {
+    background-color: #8B0000;
+    color: #ffffff;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+  }
+
+  .admin-button:hover {
+    background-color: #a52a2a;
+  }
+
+  .admin-input {
+    border: 1px solid #d3c5a9;
+    border-radius: 0.25rem;
+    padding: 0.75rem;
+    font-family: 'Lora', serif;
+    background-color: #fdf6e3;
+  }
+
+  .admin-input:focus {
+    outline: none;
+    border-color: #8B0000;
+    box-shadow: 0 0 0 2px rgba(139, 0, 0, 0.1);
+  }
+}
