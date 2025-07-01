@@ -1,318 +1,218 @@
-# LexLeaks - Whistleblowing Platform
+# 🗞️ LexLeaks
 
-A secure, full-stack platform for exposing corruption and misconduct in the legal industry. Built with FastAPI (backend) and Next.js (frontend).
+> **A vintage-styled document leak platform built in just 13 hours** ⚡
 
-## 🏗️ Project Structure
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Built with](https://img.shields.io/badge/built%20with-Next.js%20%2B%20FastAPI-black)
+![Time to Build](https://img.shields.io/badge/built%20in-13%20hours-ff69b4)
 
-```
-LexLeaks/
-├── backend-api/                 # FastAPI Backend
-│   ├── app/
-│   │   ├── __init__.py
-│   │   ├── main.py             # FastAPI application entry point
-│   │   ├── database.py         # Database configuration
-│   │   ├── models.py           # SQLAlchemy models
-│   │   ├── schemas.py          # Pydantic schemas
-│   │   ├── crud.py             # Database operations
-│   │   ├── auth.py             # Authentication utilities
-│   │   └── routers/
-│   │       ├── __init__.py
-│   │       ├── posts.py        # Posts API endpoints
-│   │       └── auth.py         # Authentication endpoints
-│   ├── Dockerfile
-│   ├── requirements.txt
-│   └── .gitignore
-│
-└── frontend-lexleaks/          # Next.js Frontend
-    ├── app/
-    │   ├── (public)/           # Public routes
-    │   │   ├── page.tsx        # Home page
-    │   │   ├── [slug]/         # Dynamic article pages
-    │   │   ├── about/          # About page
-    │   │   └── layout.tsx      # Public layout
-    │   ├── (admin)/            # Admin routes
-    │   │   ├── login/          # Login page
-    │   │   ├── dashboard/      # Admin dashboard
-    │   │   └── layout.tsx      # Admin layout
-    │   ├── globals.css         # Global styles
-    │   └── layout.tsx          # Root layout
-    ├── components/
-    │   └── PostCard.tsx        # Reusable components
-    ├── lib/
-    │   └── api.ts              # API utilities
-    ├── package.json
-    ├── tailwind.config.js
-    └── tsconfig.json
-```
+## 🎯 What is LexLeaks?
+
+LexLeaks is a modern document leak platform with a vintage newspaper aesthetic. Think WikiLeaks meets The New York Times circa 1920. Features include:
+
+- 📰 **Vintage Newspaper Theme** - Complete with sepia tones, drop caps, and typewriter animations
+- 🌓 **Dark Mode** - Elegant dark theme with parchment-like colors
+- 📄 **Document Viewer** - Built-in PDF viewer with redaction tools
+- 📊 **Impact Tracking** - Track real-world outcomes from leaked documents
+- 🔍 **Advanced Search** - Filter by date, category, verification status
+- 🌍 **Multi-language Support** - 10 languages out of the box
+- 🔐 **Admin Dashboard** - Secure content management system
+- ✨ **Beautiful Animations** - Typewriter effects, smooth transitions
+
+**Live Demo**: [https://lexleaks.com](https://lexleaks.com)
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- Python 3.11+
 - Node.js 18+
-- PostgreSQL database (local or Supabase)
-- Git
-
-### Backend Setup
-
-1. **Navigate to backend directory:**
-```bash
-cd backend-api
-```
-
-2. **Create virtual environment:**
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-3. **Install dependencies:**
-```bash
-pip install -r requirements.txt
-```
-
-4. **Environment configuration:**
-Create a `.env` file in `backend-api/`:
-```env
-# Database Configuration
-DATABASE_URL=postgresql://username:password@localhost:5432/lexleaks_db
-
-# JWT Security
-SECRET_KEY=your-super-secret-jwt-key-change-this-in-production
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-
-# Admin User
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD_HASH=$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LeH.AtbZlNlH7WjYq
-
-# Environment
-ENVIRONMENT=development
-```
-
-5. **Generate password hash:**
-```python
-# Run this in Python to generate your admin password hash:
-from passlib.context import CryptContext
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-hashed = pwd_context.hash("your_admin_password")
-print(hashed)  # Use this in your .env file
-```
-
-6. **Run the backend:**
-```bash
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-The API will be available at http://localhost:8000
-API documentation at http://localhost:8000/docs
+- Python 3.10+
+- PostgreSQL (or Supabase account)
 
 ### Frontend Setup
 
-1. **Navigate to frontend directory:**
 ```bash
 cd frontend-lexleaks
-```
 
-2. **Install dependencies:**
-```bash
+# Install dependencies
 npm install
-```
 
-3. **Environment configuration:**
-Create a `.env.local` file in `frontend-lexleaks/`:
-```env
-NEXT_PUBLIC_API_URL=http://localhost:8000
-```
+# Set up environment variables
+cp .env.example .env.local
+# Edit .env.local with your API URL
 
-4. **Run the frontend:**
-```bash
+# Run development server
 npm run dev
 ```
 
-The website will be available at http://localhost:3000
+Visit `http://localhost:3000` 🎉
 
-### Initial Setup
+### Backend Setup
 
-1. **Create your first admin user:**
-Visit http://localhost:8000/docs and use the `/api/auth/register` endpoint to create your admin user, or update the backend to create one automatically.
+```bash
+cd ../backend-api
 
-2. **Login to admin:**
-Visit http://localhost:3000/admin/login and login with your admin credentials.
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-3. **Create your first post:**
-Use the admin dashboard to create and publish your first leak.
+# Install dependencies
+pip install -r requirements.txt
+
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your database credentials
+
+# Run migrations
+alembic upgrade head
+
+# Start the server
+uvicorn app.main:app --reload
+```
+
+API available at `http://localhost:8000` 🚀
+
+## 🛠️ Tech Stack
+
+### Frontend
+- **Framework**: Next.js 14.2.30 with TypeScript
+- **Styling**: Tailwind CSS with custom vintage theme
+- **State Management**: React Context API
+- **Animations**: CSS animations + Framer Motion
+- **Icons**: Lucide React
+- **PDF Viewer**: react-pdf with custom controls
+
+### Backend
+- **Framework**: FastAPI (Python)
+- **ORM**: SQLAlchemy
+- **Database**: PostgreSQL (Supabase)
+- **Authentication**: JWT tokens
+- **Migrations**: Alembic
+
+### Infrastructure
+- **Frontend Hosting**: Netlify
+- **Backend Hosting**: Google Cloud Run
+- **Database**: Supabase
+- **CDN**: Netlify Edge
+
+## ⚡ The 13-Hour Sprint
+
+Yes, this entire platform was built in a single 13-hour coding session. Here's what was accomplished:
+
+**Hours 1-3**: Core architecture, database models, API endpoints  
+**Hours 4-6**: Frontend setup, routing, component library  
+**Hours 7-9**: Vintage theme, animations, dark mode  
+**Hours 10-12**: Advanced features (search, filters, document viewer)  
+**Hour 13**: Deployment, testing, polish  
+
+### Features Built in Those 13 Hours:
+
+- ✅ Complete authentication system
+- ✅ Admin dashboard with CRUD operations
+- ✅ Vintage newspaper theme with dark mode
+- ✅ Typewriter animations
+- ✅ Advanced search with filters
+- ✅ Document viewer with redaction tools
+- ✅ Impact tracking system
+- ✅ Multi-language support (10 languages)
+- ✅ Responsive design
+- ✅ SEO optimization
+- ✅ Production deployment
+
+## 🎨 Design Philosophy
+
+LexLeaks combines modern web technologies with vintage newspaper aesthetics:
+
+- **Typography**: Georgia serif font with authentic drop caps
+- **Colors**: Sepia tones (#f5f0e6) with burgundy accents (#8B0000)
+- **Dark Mode**: Parchment-inspired (#1a1612 background, #f5f2ed text)
+- **Animations**: Subtle typewriter effect on headlines
+- **Layout**: Classic newspaper column structure
+
+## 📁 Project Structure
+
+```
+LexLeaks/
+├── frontend-lexleaks/     # Next.js frontend
+│   ├── app/              # App router pages
+│   ├── components/       # React components
+│   ├── contexts/         # React contexts
+│   └── public/           # Static assets
+├── backend-api/          # FastAPI backend
+│   ├── app/              # Application code
+│   ├── alembic/          # Database migrations
+│   └── requirements.txt  # Python dependencies
+└── docs/                 # Documentation
+```
 
 ## 🔧 Configuration
 
-### Database Schema
+### Environment Variables
 
-The application uses PostgreSQL with the following main tables:
+Frontend (`.env.local`):
+```bash
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
 
-- **users**: Admin users and authors
-- **posts**: Articles/leaks with title, content, status, etc.
+Backend (`.env`):
+```bash
+DATABASE_URL=postgresql://user:password@localhost/lexleaks
+SECRET_KEY=your-secret-key
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+```
 
-### Authentication
+## 🚢 Deployment
 
-- JWT tokens for admin authentication
-- Secure cookie storage
-- Protected admin routes
-- Public API for published content
-
-### Security Features
-
-- CORS configuration for frontend-backend communication
-- SQL injection protection via SQLAlchemy ORM
-- Password hashing with bcrypt
-- Environment variable protection
-- Input validation with Pydantic
-
-## 🎨 Features
-
-### Frontend Features
-
-- **Public Website:**
-  - Homepage with latest published leaks
-  - Individual article pages with clean URLs
-  - About page explaining the mission
-  - Responsive design with Tailwind CSS
-  - SEO optimized with Next.js metadata
-
-- **Admin Dashboard:**
-  - Secure login system
-  - Content management (create, edit, delete posts)
-  - Draft/publish workflow
-  - Rich text editor (ready for TipTap integration)
-  - Statistics overview
-
-### Backend Features
-
-- **RESTful API:**
-  - Post management endpoints
-  - Authentication endpoints
-  - Search functionality
-  - Status filtering (draft/published/archived)
-
-- **Security:**
-  - JWT authentication
-  - Protected admin endpoints
-  - CORS configuration
-  - Input validation
-
-## 🐳 Docker Deployment
-
-### Backend Docker
+### Frontend (Netlify)
 
 ```bash
-cd backend-api
-docker build -t lexleaks-api .
-docker run -p 8000:8000 --env-file .env lexleaks-api
+# Build command
+npm run build
+
+# Publish directory
+.next
 ```
 
-### Environment for Production
-
-Update your `.env` file for production:
-
-```env
-DATABASE_URL=postgresql://user:password@your-db-host:5432/lexleaks_production
-SECRET_KEY=your-production-secret-key-very-long-and-random
-ENVIRONMENT=production
-```
-
-## 📝 Usage
-
-### Creating Content
-
-1. Login to admin dashboard at `/admin/login`
-2. Navigate to "Create New Post"
-3. Write your article with title, content, and excerpt
-4. Choose status: Draft (private) or Published (public)
-5. Save and the post will be available with a SEO-friendly URL
-
-### Managing Posts
-
-- **Draft**: Private posts for preparation
-- **Published**: Public posts visible on the website
-- **Archived**: Hidden posts for backup
-
-### API Usage
-
-```javascript
-// Get published posts
-fetch('http://localhost:8000/api/posts/published')
-
-// Get specific post by slug
-fetch('http://localhost:8000/api/posts/slug/your-post-slug')
-
-// Search posts
-fetch('http://localhost:8000/api/posts/search?q=corruption')
-```
-
-## 🔒 Security Considerations
-
-1. **Environment Variables**: Never commit `.env` files
-2. **Database**: Use SSL connections in production
-3. **JWT Secret**: Use a strong, random secret key
-4. **CORS**: Update allowed origins for production domains
-5. **HTTPS**: Always use HTTPS in production
-6. **Rate Limiting**: Consider adding rate limiting for API endpoints
-
-## 🚀 Deployment
-
-### Backend Deployment (Google Cloud Run)
-
-1. Build and push Docker image
-2. Deploy to Cloud Run
-3. Set environment variables in Cloud Run console
-4. Connect to managed PostgreSQL database
-
-### Frontend Deployment (Vercel/Netlify)
-
-1. Connect GitHub repository
-2. Set `NEXT_PUBLIC_API_URL` environment variable
-3. Deploy automatically on commits
-
-## 🛠️ Development
-
-### Adding New Features
-
-1. **Backend**: Add new endpoints in `routers/`
-2. **Frontend**: Create new pages in `app/`
-3. **Components**: Add reusable components in `components/`
-4. **API**: Update `lib/api.ts` for new endpoints
-
-### Rich Text Editor Integration
-
-The project is ready for TipTap editor integration:
+### Backend (Google Cloud Run)
 
 ```bash
-npm install @tiptap/react @tiptap/starter-kit
+# Build and deploy
+gcloud run deploy backend-api \
+  --source . \
+  --region us-central1 \
+  --allow-unauthenticated
 ```
 
-## 📋 TODO
+## 📝 API Documentation
 
-- [ ] Rich text editor integration
-- [ ] Image upload functionality  
-- [ ] Email notifications
-- [ ] Comment system
-- [ ] Social sharing
-- [ ] Advanced search filters
-- [ ] User roles and permissions
-- [ ] Analytics dashboard
+FastAPI provides automatic API documentation:
+
+- **Swagger UI**: `http://localhost:8000/docs`
+- **ReDoc**: `http://localhost:8000/redoc`
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📄 License
 
-This project is for educational and transparency purposes. Use responsibly and in accordance with local laws.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Built with ☕ and determination
+- Inspired by vintage newspapers and modern leak platforms
+- Special thanks to the open source community
 
 ---
 
-**⚠️ Important Security Note**: This platform is designed for legitimate whistleblowing. Always verify information before publishing and ensure you comply with applicable laws and regulations. 
+<p align="center">
+  <strong>Built in 13 hours. Because sometimes you just need to ship.</strong>
+</p>
+
+<p align="center">
+  <a href="https://lexleaks.com">Live Demo</a> •
+  <a href="https://github.com/theIndrajeet/LexLeaks/issues">Report Bug</a> •
+  <a href="https://github.com/theIndrajeet/LexLeaks/pulls">Contribute</a>
+</p> 
