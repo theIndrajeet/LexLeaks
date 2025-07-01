@@ -37,6 +37,7 @@ app.add_middleware(
         "https://lexleaks.com",   # Production domain
         "https://www.lexleaks.com",  # Production domain with www
         "https://lexleaks.netlify.app",  # Your main Netlify domain
+        "https://glittery-dragon-d3e69b.netlify.app",  # Current Netlify deployment
     ],
     allow_origin_regex=r"https://.*\.netlify\.app",  # All Netlify preview deployments
     allow_credentials=True,

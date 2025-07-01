@@ -7,9 +7,10 @@ import requests
 import json
 from datetime import datetime, timedelta
 import random
+import os
 
 # API configuration
-API_BASE_URL = "http://localhost:8000"
+API_BASE_URL = os.getenv("API_BASE_URL", "https://lexleaks-api-563011146464.asia-south1.run.app")
 ADMIN_USERNAME = "admin"
 ADMIN_PASSWORD = "LexLeaks2024!"
 
@@ -317,26 +318,31 @@ def create_posts(token):
             json=post_payload
         )
         
-        if response.status_code == 201:
-            created_post = response.json()
-            print(f"✓ Created post: {post_data['title']}")
-            
-            # If the post should be published and has a published_at date, update it
-            if post_data["status"] == "published" and "published_at" in post_data:
-                update_payload = {
-                    "published_at": post_data["published_at"].isoformat()
-                }
-                update_response = requests.put(
-                    f"{API_BASE_URL}/api/posts/{created_post['id']}",
-                    headers=headers,
-                    json=update_payload
-                )
-                if update_response.status_code == 200:
-                    print(f"  → Set published date for post")
-                else:
-                    print(f"  → Failed to update published date: {update_response.status_code}")
-            
-            created_count += 1
+        if response.status_code == 201 or response.status_code == 200:
+            try:
+                created_post = response.json()
+                print(f"✓ Created post: {post_data['title']}")
+                
+                # If the post should be published and has a published_at date, update it
+                if post_data["status"] == "published" and "published_at" in post_data:
+                    update_payload = {
+                        "published_at": post_data["published_at"].isoformat()
+                    }
+                    update_response = requests.put(
+                        f"{API_BASE_URL}/api/posts/{created_post['id']}",
+                        headers=headers,
+                        json=update_payload
+                    )
+                    if update_response.status_code == 200:
+                        print(f"  → Set published date for post")
+                    else:
+                        print(f"  → Failed to update published date: {update_response.status_code}")
+                
+                created_count += 1
+            except Exception as e:
+                print(f"✗ Failed to parse response for: {post_data['title']}")
+                print(f"  Error: {str(e)}")
+                print(f"  Response: {response.text}")
         else:
             print(f"✗ Failed to create post: {post_data['title']}")
             print(f"  Error: {response.status_code} - {response.text}")
