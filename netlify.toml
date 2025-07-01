@@ -1,0 +1,29 @@
+# Netlify configuration for Next.js app
+
+[build]
+  base = "frontend-lexleaks"
+  command = "npm run build"
+  # Don't specify publish directory - let the Next.js plugin handle it
+
+[build.environment]
+  NEXT_PUBLIC_API_URL = "https://lexleaks-api-563011146464.asia-south1.run.app"
+
+# Essential for Next.js on Netlify
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Redirects for client-side routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  conditions = {Role = ["admin"]}
+
+# Headers for security
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin" 
