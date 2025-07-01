@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import ThemeToggle from '@/components/ThemeToggle'
-import LanguageSelector from '@/components/LanguageSelector'
 
 export default function SubmitPage() {
   return (
@@ -24,7 +23,7 @@ export default function SubmitPage() {
           <Link href="/submit" className="brand-button">
             Submit a Leak
           </Link>
-          <LanguageSelector />
+          
           <ThemeToggle />
         </div>
       </div>

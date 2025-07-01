@@ -2,19 +2,28 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import TypewriterTitle from '@/components/TypewriterTitle'
 import ThemeToggle from '@/components/ThemeToggle'
 import SearchFilter, { FilterState } from '@/components/SearchFilter'
 import ImpactTracker from '@/components/ImpactTracker'
-import DocumentViewer from '@/components/DocumentViewer'
-import LanguageSelector from '@/components/LanguageSelector'
+
+// Dynamic import for DocumentViewer to avoid SSR issues
+const DocumentViewer = dynamic(() => import('@/components/DocumentViewer'), {
+  ssr: false,
+  loading: () => (
+    <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-8 text-center">
+      <p>Loading document viewer...</p>
+    </div>
+  )
+})
 
 // Mock data for demonstration
 const mockImpacts = [
-  { id: 'impact1', title: 'Judicial Inquiry Launched', description: 'Following our report, the Judicial Conduct Committee has launched a formal investigation into Judge Harrison\'s financial disclosures.', date: '2025-02-15', type: 'investigation' as const, status: 'in_progress' as const, relatedPostId: 1 },
-  { id: 'impact2', title: 'New Disclosure Law Proposed', description: 'A new bill has been proposed in the state legislature requiring stricter financial disclosures from all public officials, citing our report as a key driver.', date: '2025-03-01', type: 'policy_change' as const, status: 'pending' as const, relatedPostId: 1 },
-  { id: 'impact3', title: 'Firm Partner Resigns', description: 'A senior partner at the implicated law firm has resigned amidst the fallout from the leak.', date: '2025-02-20', type: 'resignation' as const, status: 'completed' as const, relatedPostId: 2 },
-  { id: 'impact4', title: 'Class Action Lawsuit Filed', description: 'A class action lawsuit has been filed against Titan Industries on behalf of the affected residents.', date: '2025-04-10', type: 'legal_action' as const, status: 'in_progress' as const, relatedPostId: 1 },
+  { id: 1, title: 'Judicial Inquiry Launched', description: 'Following our report, the Judicial Conduct Committee has launched a formal investigation into Judge Harrison\'s financial disclosures.', date: '2025-02-15', type: 'investigation' as const, status: 'in_progress' as const, post_id: 1, created_at: '2025-02-15T10:00:00Z' },
+  { id: 2, title: 'New Disclosure Law Proposed', description: 'A new bill has been proposed in the state legislature requiring stricter financial disclosures from all public officials, citing our report as a key driver.', date: '2025-03-01', type: 'policy_change' as const, status: 'pending' as const, post_id: 1, created_at: '2025-03-01T10:00:00Z' },
+  { id: 3, title: 'Firm Partner Resigns', description: 'A senior partner at the implicated law firm has resigned amidst the fallout from the leak.', date: '2025-02-20', type: 'resignation' as const, status: 'completed' as const, post_id: 2, created_at: '2025-02-20T10:00:00Z' },
+  { id: 4, title: 'Class Action Lawsuit Filed', description: 'A class action lawsuit has been filed against Titan Industries on behalf of the affected residents.', date: '2025-04-10', type: 'legal_action' as const, status: 'in_progress' as const, post_id: 1, created_at: '2025-04-10T10:00:00Z' },
 ]
 
 const mockDocumentUrl = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"
@@ -52,7 +61,7 @@ export default function ContentDemoPage() {
           <Link href="/content-demo" className="nav-link font-bold">Content Demo</Link>
         </nav>
         <div className="flex items-center gap-4">
-          <LanguageSelector />
+          
           <ThemeToggle />
         </div>
       </div>

@@ -7,9 +7,19 @@ import { format } from 'date-fns'
 import { getPostBySlug, Post, getImpacts, Impact } from '@/lib/api'
 import ThemeToggle from '@/components/ThemeToggle'
 import StatusBadge from '@/components/StatusBadge'
-import LanguageSelector from '@/components/LanguageSelector'
+
 import ImpactTracker from '@/components/ImpactTracker'
-import DocumentViewer from '@/components/DocumentViewer'
+import dynamic from 'next/dynamic'
+
+// Dynamic import for DocumentViewer to avoid SSR issues
+const DocumentViewer = dynamic(() => import('@/components/DocumentViewer'), {
+  ssr: false,
+  loading: () => (
+    <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-8 text-center">
+      <p>Loading document viewer...</p>
+    </div>
+  )
+})
 
 interface PageProps {
   params: {
@@ -98,7 +108,6 @@ export default function PostPage({ params }: PageProps) {
             <Link href="/submit" className="brand-button">
               Submit a Leak
             </Link>
-            <LanguageSelector />
             <ThemeToggle />
           </div>
         </div>
@@ -178,7 +187,6 @@ export default function PostPage({ params }: PageProps) {
           <Link href="/submit" className="brand-button">
             Submit a Leak
           </Link>
-          <LanguageSelector />
           <ThemeToggle />
         </div>
       </div>

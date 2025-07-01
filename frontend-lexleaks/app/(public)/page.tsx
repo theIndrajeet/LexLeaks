@@ -7,7 +7,7 @@ import { getPublishedPosts, PostSummary } from '@/lib/api'
 import TypewriterTitle from '@/components/TypewriterTitle'
 import ThemeToggle from '@/components/ThemeToggle'
 import StatusBadge from '@/components/StatusBadge'
-import LanguageSelector from '@/components/LanguageSelector'
+
 import SearchFilter, { FilterState } from '@/components/SearchFilter'
 
 export default function HomePage() {
@@ -95,7 +95,6 @@ export default function HomePage() {
             <Link href="/submit" className="brand-button">
               Submit a Leak
             </Link>
-            <LanguageSelector />
             <ThemeToggle />
           </div>
         </div>
@@ -134,7 +133,6 @@ export default function HomePage() {
             <Link href="/submit" className="brand-button">
               Submit a Leak
             </Link>
-            <LanguageSelector />
             <ThemeToggle />
           </div>
         </div>
@@ -174,7 +172,6 @@ export default function HomePage() {
           <Link href="/submit" className="brand-button">
             Submit a Leak
           </Link>
-          <LanguageSelector />
           <ThemeToggle />
         </div>
       </div>

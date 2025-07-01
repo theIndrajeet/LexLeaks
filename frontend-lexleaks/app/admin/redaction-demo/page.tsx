@@ -2,7 +2,18 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import DocumentViewer, { Redaction } from '@/components/DocumentViewer'
+import dynamic from 'next/dynamic'
+import type { Redaction } from '@/components/DocumentViewer'
+
+// Dynamic import for DocumentViewer to avoid SSR issues
+const DocumentViewer = dynamic(() => import('@/components/DocumentViewer'), {
+  ssr: false,
+  loading: () => (
+    <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-8 text-center">
+      <p>Loading document viewer...</p>
+    </div>
+  )
+})
 import ThemeToggle from '@/components/ThemeToggle'
 
 export default function RedactionDemoPage() {

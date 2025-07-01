@@ -5,10 +5,19 @@ import Link from 'next/link'
 import TypewriterTitle from '@/components/TypewriterTitle'
 import ThemeToggle from '@/components/ThemeToggle'
 import StatusBadge from '@/components/StatusBadge'
-import LanguageSelector from '@/components/LanguageSelector'
 import SearchFilter from '@/components/SearchFilter'
 import ImpactTracker from '@/components/ImpactTracker'
-import DocumentViewer from '@/components/DocumentViewer'
+import dynamic from 'next/dynamic'
+
+// Dynamic import for DocumentViewer to avoid SSR issues
+const DocumentViewer = dynamic(() => import('@/components/DocumentViewer'), {
+  ssr: false,
+  loading: () => (
+    <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-8 text-center">
+      <p>Loading document viewer...</p>
+    </div>
+  )
+})
 import PostCard from '@/components/PostCard'
 
 export default function DemoPage() {
@@ -84,7 +93,7 @@ export default function DemoPage() {
           <Link href="/demo" className="nav-link font-bold">Demo</Link>
         </nav>
         <div className="flex items-center gap-4">
-          <LanguageSelector />
+          
           <ThemeToggle />
         </div>
       </div>
