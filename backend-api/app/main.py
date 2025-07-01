@@ -29,15 +29,16 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Configure CORS
+# Configure CORS - using allow_origin_regex to support Netlify preview URLs
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",  # Next.js development server
         "https://lexleaks.com",   # Production domain
         "https://www.lexleaks.com",  # Production domain with www
-        # Add your actual production domain here
+        "https://lexleaks.netlify.app",  # Your main Netlify domain
     ],
+    allow_origin_regex=r"https://.*\.netlify\.app",  # All Netlify preview deployments
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
