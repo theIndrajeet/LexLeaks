@@ -4,8 +4,8 @@
   # Build command for Next.js
   command = "npm run build"
   
-  # Next.js plugin will handle the publish directory automatically
-  # No need to specify publish = ".next"
+  # Explicitly set publish directory for Next.js
+  publish = ".next"
 
 [build.environment]
   # Your Google Cloud Run backend API URL
