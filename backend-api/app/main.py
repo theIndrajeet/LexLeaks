@@ -1,11 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
-from fastapi import Depends
-from sqlalchemy.sql import text
-from sqlalchemy.orm import Session
 
-from .database import engine, get_db
+from .database import engine
 from . import models
 from .routers import posts, auth, impacts
 
@@ -69,36 +66,6 @@ async def root():
 def health_check():
     """Health check endpoint"""
     return {"status": "healthy"}
-
-
-@app.get("/api/check-verification-field")
-def check_verification_field(db: Session = Depends(get_db)):
-    """Check if verification_status field exists in posts table"""
-    try:
-        # Try to query the verification_status column
-        result = db.execute(text("SELECT column_name FROM information_schema.columns WHERE table_name = 'posts' AND column_name = 'verification_status'"))
-        row = result.fetchone()
-        
-        if row:
-            # Also get a sample of verification statuses
-            posts_result = db.execute(text("SELECT id, title, verification_status FROM posts LIMIT 3"))
-            sample_posts = [{"id": row[0], "title": row[1], "verification_status": row[2]} for row in posts_result]
-            
-            return {
-                "field_exists": True,
-                "message": "verification_status column exists",
-                "sample_posts": sample_posts
-            }
-        else:
-            return {
-                "field_exists": False,
-                "message": "verification_status column does not exist"
-            }
-    except Exception as e:
-        return {
-            "field_exists": False,
-            "error": str(e)
-        }
 
 
 # API info endpoint
