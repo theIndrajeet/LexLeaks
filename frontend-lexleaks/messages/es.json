@@ -1,0 +1,92 @@
+{
+  "HomePage": {
+    "title": "LEXLEAKS",
+    "subtitle": "Exponiendo la Letra Pequeña.",
+    "nav": {
+      "home": "Inicio",
+      "about": "Acerca de",
+      "archive": "Archivo",
+      "submitLeak": "Enviar una Filtración"
+    },
+    "published": "Publicado",
+    "caseFile": "Expediente",
+    "readMore": "Leer Más",
+    "noStories": "Aún No Hay Historias",
+    "noStoriesDescription": "Sé el primero en exponer la mala conducta en la industria legal. Tu valentía para hablar puede marcar la diferencia.",
+    "submitYourStory": "Envía Tu Historia",
+    "loadMoreStories": "Cargar Más Historias",
+    "errorLoadingContent": "Error al Cargar el Contenido",
+    "tryAgain": "Intentar de Nuevo"
+  },
+  "PostPage": {
+    "by": "Por",
+    "backToAllStories": "Volver a Todas las Historias",
+    "exposeTheTruth": "Exponer la Verdad",
+    "exposeDescription": "¿Tienes evidencia de mala conducta en la industria legal? Tu historia podría proteger a otros y llevar responsabilidad a quienes abusan de su poder.",
+    "submitYourLeak": "Envía Tu Filtración",
+    "errorLoadingArticle": "Error al Cargar el Artículo",
+    "backToHome": "Volver al Inicio"
+  },
+  "SubmitPage": {
+    "title": "Envía Tu Filtración",
+    "document": "Documento",
+    "classification": "Clasificación",
+    "submissionGuidelines": "Pautas de Envío",
+    "confidential": "Confidencial",
+    "beforeYouSubmit": "Antes de Enviar",
+    "description": "LexLeaks está dedicado a exponer la corrupción, mala conducta y prácticas poco éticas en la industria legal. Tomamos muy en serio la seguridad de nuestras fuentes y hemos implementado múltiples capas de protección.",
+    "whatWereLookingFor": "Lo Que Buscamos",
+    "securityRecommendations": "Recomendaciones de Seguridad",
+    "submissionMethods": "Métodos de Envío",
+    "method1": "Método 1: Formulario Web Seguro",
+    "method2": "Método 2: Correo Electrónico Encriptado",
+    "method3": "Método 3: Correo Físico",
+    "whatHappensNext": "¿Qué Sucede Después?",
+    "importantWarning": "Advertencia Importante",
+    "warningText": "No envíes información falsa. Verificamos minuciosamente todas las afirmaciones y tomaremos acciones legales contra quienes intenten usar nuestra plataforma para difamación o acusaciones falsas.",
+    "needHelp": "¿Necesitas Ayuda?",
+    "helpDescription": "Si tienes preguntas sobre el proceso de envío o necesitas asistencia técnica, nuestro equipo de seguridad está aquí para ayudarte. Recuerda: tu seguridad es nuestra prioridad."
+  },
+  "SearchFilter": {
+    "searchPlaceholder": "Buscar filtraciones, casos o palabras clave...",
+    "search": "Buscar",
+    "searching": "Buscando...",
+    "status": "Estado",
+    "allStatuses": "Todos los Estados",
+    "published": "Publicado",
+    "verified": "Verificado",
+    "investigating": "Bajo Investigación",
+    "resolved": "Resuelto",
+    "category": "Categoría",
+    "allCategories": "Todas las Categorías",
+    "sortBy": "Ordenar Por",
+    "newestFirst": "Más Recientes Primero",
+    "oldestFirst": "Más Antiguos Primero",
+    "mostRelevant": "Más Relevantes",
+    "fromDate": "Desde Fecha",
+    "toDate": "Hasta Fecha",
+    "resetFilters": "Restablecer Filtros"
+  },
+  "ImpactTracker": {
+    "title": "Impacto en el Mundo Real",
+    "legalActions": "Acciones Legales",
+    "investigations": "Investigaciones",
+    "policyChanges": "Cambios de Política",
+    "completed": "Completado",
+    "showLess": "Mostrar menos",
+    "readMore": "Leer más"
+  },
+  "Categories": {
+    "corporate": "Derecho Corporativo",
+    "criminal": "Defensa Criminal",
+    "judicial": "Mala Conducta Judicial",
+    "regulatory": "Violaciones Regulatorias",
+    "ethics": "Violaciones Éticas",
+    "discrimination": "Discriminación",
+    "financial": "Fraude Financiero"
+  },
+  "Footer": {
+    "copyright": "© 2025 LexLeaks. Todos los Derechos Reservados.",
+    "dedication": "Dedicado a la transparencia y responsabilidad en la industria legal."
+  }
+} 

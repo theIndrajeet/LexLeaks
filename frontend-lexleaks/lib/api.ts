@@ -15,12 +15,16 @@ export interface PostSummary {
   slug: string
   excerpt?: string
   status: 'draft' | 'published' | 'archived'
+  verification_status: 'unverified' | 'verified' | 'disputed'
+  category?: string
+  document_url?: string
   author: {
     id: number
     username: string
   }
   created_at: string
   published_at?: string
+  impact_count?: number
 }
 
 export interface Post extends PostSummary {
@@ -38,9 +42,35 @@ export interface PostCreateData {
   content: string
   excerpt?: string
   status?: 'draft' | 'published' | 'archived'
+  verification_status?: 'unverified' | 'verified' | 'disputed'
+  category?: string
+  document_url?: string
 }
 
 export interface PostUpdateData extends Partial<PostCreateData> {}
+
+export interface Impact {
+  id: number
+  title: string
+  description: string
+  date: string
+  type: 'legal_action' | 'policy_change' | 'investigation' | 'resignation' | 'reform'
+  status: 'pending' | 'in_progress' | 'completed'
+  post_id: number
+  created_at: string
+  updated_at?: string
+}
+
+export interface ImpactCreateData {
+  title: string
+  description: string
+  date: string
+  type: 'legal_action' | 'policy_change' | 'investigation' | 'resignation' | 'reform'
+  status: 'pending' | 'in_progress' | 'completed'
+  post_id: number
+}
+
+export interface ImpactUpdateData extends Partial<Omit<ImpactCreateData, 'post_id'>> {}
 
 // Auth utilities
 const getAuthToken = (): string | null => {
@@ -125,13 +155,29 @@ export const getPublishedPosts = async (params: {
   limit?: number
   skip?: number
   search?: string
+  status?: string
+  verification_status?: string
+  category?: string
+  author?: string
+  date_from?: string
+  date_to?: string
+  sort_by?: 'newest' | 'oldest' | 'impact'
+  impact_level?: 'high' | 'medium' | 'low'
 } = {}): Promise<PostSummary[]> => {
   const queryParams = new URLSearchParams()
   if (params.limit) queryParams.append('limit', params.limit.toString())
   if (params.skip) queryParams.append('skip', params.skip.toString())
   if (params.search) queryParams.append('search', params.search)
+  if (params.status) queryParams.append('status', params.status)
+  if (params.verification_status) queryParams.append('verification_status', params.verification_status)
+  if (params.category) queryParams.append('category', params.category)
+  if (params.author) queryParams.append('author', params.author)
+  if (params.date_from) queryParams.append('date_from', params.date_from)
+  if (params.date_to) queryParams.append('date_to', params.date_to)
+  if (params.sort_by) queryParams.append('sort_by', params.sort_by)
+  if (params.impact_level) queryParams.append('impact_level', params.impact_level)
 
-  const endpoint = `/api/posts/published${queryParams.toString() ? `?${queryParams.toString()}` : ''}`
+  const endpoint = `/api/posts/${queryParams.toString() ? `?${queryParams.toString()}` : ''}`
   return apiRequest(endpoint)
 }
 
@@ -203,4 +249,47 @@ export const checkAuthStatus = async (): Promise<User | null> => {
     removeAuthToken()
     return null
   }
+}
+
+// Impact API
+export const getImpacts = async (params: {
+  limit?: number
+  skip?: number
+  post_id?: number
+  type?: string
+  status?: string
+} = {}): Promise<Impact[]> => {
+  const queryParams = new URLSearchParams()
+  if (params.limit) queryParams.append('limit', params.limit.toString())
+  if (params.skip) queryParams.append('skip', params.skip.toString())
+  if (params.post_id) queryParams.append('post_id', params.post_id.toString())
+  if (params.type) queryParams.append('type', params.type)
+  if (params.status) queryParams.append('status', params.status)
+
+  const endpoint = `/api/impacts${queryParams.toString() ? `?${queryParams.toString()}` : ''}`
+  return apiRequest(endpoint)
+}
+
+export const getImpact = async (id: number): Promise<Impact> => {
+  return apiRequest(`/api/impacts/${id}`)
+}
+
+export const createImpact = async (data: ImpactCreateData): Promise<Impact> => {
+  return apiRequest('/api/impacts/', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+export const updateImpact = async (id: number, data: ImpactUpdateData): Promise<Impact> => {
+  return apiRequest(`/api/impacts/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  })
+}
+
+export const deleteImpact = async (id: number): Promise<void> => {
+  return apiRequest(`/api/impacts/${id}`, {
+    method: 'DELETE',
+  })
 } 

@@ -7,27 +7,55 @@ import { getPublishedPosts, PostSummary } from '@/lib/api'
 import TypewriterTitle from '@/components/TypewriterTitle'
 import ThemeToggle from '@/components/ThemeToggle'
 import StatusBadge from '@/components/StatusBadge'
+import LanguageSelector from '@/components/LanguageSelector'
+import SearchFilter, { FilterState } from '@/components/SearchFilter'
 
 export default function HomePage() {
   const [posts, setPosts] = useState<PostSummary[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [filterLoading, setFilterLoading] = useState(false)
+
+  const fetchPosts = async (filters?: Partial<FilterState>) => {
+    try {
+      setFilterLoading(true)
+      setError(null)
+      
+      // Convert filter state to API params
+      const params: any = {
+        limit: 20,
+        status: 'published', // Always show only published posts on public page
+      }
+      
+      if (filters) {
+        if (filters.query) params.search = filters.query
+        if (filters.verificationStatus) params.verification_status = filters.verificationStatus
+        if (filters.category) params.category = filters.category
+        if (filters.author) params.author = filters.author
+        if (filters.dateFrom) params.date_from = filters.dateFrom
+        if (filters.dateTo) params.date_to = filters.dateTo
+        if (filters.sortBy && filters.sortBy !== 'relevance') params.sort_by = filters.sortBy
+        if (filters.impactLevel) params.impact_level = filters.impactLevel
+      }
+      
+      const fetchedPosts = await getPublishedPosts(params)
+      setPosts(fetchedPosts)
+    } catch (err) {
+      setError('Failed to load posts')
+      console.error('Error fetching posts:', err)
+    } finally {
+      setLoading(false)
+      setFilterLoading(false)
+    }
+  }
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const publishedPosts = await getPublishedPosts({ limit: 20 })
-        setPosts(publishedPosts)
-      } catch (err) {
-        setError('Failed to load posts')
-        console.error('Error fetching posts:', err)
-      } finally {
-        setLoading(false)
-      }
-    }
-
     fetchPosts()
   }, [])
+
+  const handleFilterChange = (filters: FilterState) => {
+    fetchPosts(filters)
+  }
 
   const generateCaseFile = (index: number) => {
     const fileNumber = String(index + 1).padStart(3, '0')
@@ -44,6 +72,8 @@ export default function HomePage() {
     if (hoursSincePublish < 24) return 'breaking'
     if (index === 0 && hoursSincePublish < 48) return 'exclusive'
     if (hoursSincePublish < 72) return 'new'
+    if (post.verification_status === 'verified') return 'verified'
+    if (post.impact_count && post.impact_count >= 5) return 'high-impact'
     return null
   }
 
@@ -65,6 +95,7 @@ export default function HomePage() {
             <Link href="/submit" className="brand-button">
               Submit a Leak
             </Link>
+            <LanguageSelector />
             <ThemeToggle />
           </div>
         </div>
@@ -103,6 +134,7 @@ export default function HomePage() {
             <Link href="/submit" className="brand-button">
               Submit a Leak
             </Link>
+            <LanguageSelector />
             <ThemeToggle />
           </div>
         </div>
@@ -142,9 +174,17 @@ export default function HomePage() {
           <Link href="/submit" className="brand-button">
             Submit a Leak
           </Link>
+          <LanguageSelector />
           <ThemeToggle />
         </div>
       </div>
+
+      {/* Search and Filter Section */}
+      {posts.length > 0 && (
+        <div className="mb-12">
+          <SearchFilter onSearch={handleFilterChange} loading={filterLoading} />
+        </div>
+      )}
 
       {/* Main Content: Leaks Feed */}
       <main>

@@ -1,10 +1,8 @@
-import { Metadata } from 'next'
-import Link from 'next/link'
+'use client'
 
-export const metadata: Metadata = {
-  title: 'Submit a Leak | LexLeaks',
-  description: 'Securely submit information about corruption and misconduct in the legal industry.',
-}
+import Link from 'next/link'
+import ThemeToggle from '@/components/ThemeToggle'
+import LanguageSelector from '@/components/LanguageSelector'
 
 export default function SubmitPage() {
   return (
@@ -22,9 +20,13 @@ export default function SubmitPage() {
           <Link href="/about" className="nav-link">About</Link>
           <Link href="/archive" className="nav-link">Archive</Link>
         </nav>
-        <Link href="/submit" className="brand-button">
-          Submit a Leak
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link href="/submit" className="brand-button">
+            Submit a Leak
+          </Link>
+          <LanguageSelector />
+          <ThemeToggle />
+        </div>
       </div>
 
       {/* Main Content */}

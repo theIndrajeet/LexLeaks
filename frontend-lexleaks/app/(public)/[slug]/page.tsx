@@ -4,9 +4,12 @@ import { useState, useEffect } from 'react'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { format } from 'date-fns'
-import { getPostBySlug, Post } from '@/lib/api'
+import { getPostBySlug, Post, getImpacts, Impact } from '@/lib/api'
 import ThemeToggle from '@/components/ThemeToggle'
 import StatusBadge from '@/components/StatusBadge'
+import LanguageSelector from '@/components/LanguageSelector'
+import ImpactTracker from '@/components/ImpactTracker'
+import DocumentViewer from '@/components/DocumentViewer'
 
 interface PageProps {
   params: {
@@ -16,8 +19,10 @@ interface PageProps {
 
 export default function PostPage({ params }: PageProps) {
   const [post, setPost] = useState<Post | null>(null)
+  const [impacts, setImpacts] = useState<Impact[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [documentRedactions, setDocumentRedactions] = useState<any[]>([])
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -31,6 +36,15 @@ export default function PostPage({ params }: PageProps) {
         }
         
         setPost(postData)
+        
+        // Fetch impacts for this post
+        try {
+          const postImpacts = await getImpacts({ post_id: postData.id })
+          setImpacts(postImpacts)
+        } catch (err) {
+          console.error('Error fetching impacts:', err)
+          // Don't fail the whole page if impacts can't be loaded
+        }
       } catch (err: any) {
         if (err.status === 404) {
           notFound()
@@ -84,6 +98,7 @@ export default function PostPage({ params }: PageProps) {
             <Link href="/submit" className="brand-button">
               Submit a Leak
             </Link>
+            <LanguageSelector />
             <ThemeToggle />
           </div>
         </div>
@@ -141,6 +156,9 @@ export default function PostPage({ params }: PageProps) {
     return hoursSincePublish < 72
   }
 
+  // Check if post has a document URL (you'll need to add this field to your Post model)
+  const documentUrl = (post as any).document_url
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Header Section */}
@@ -160,6 +178,7 @@ export default function PostPage({ params }: PageProps) {
           <Link href="/submit" className="brand-button">
             Submit a Leak
           </Link>
+          <LanguageSelector />
           <ThemeToggle />
         </div>
       </div>
@@ -175,6 +194,14 @@ export default function PostPage({ params }: PageProps) {
               <span>Case File: {generateCaseFile()}</span>
               {' | '}
               <span>By: {post.author.username}</span>
+              {(post as any).category && (
+                <>
+                  {' | '}
+                  <span className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded-md text-sm">
+                    {(post as any).category}
+                  </span>
+                </>
+              )}
             </div>
             {isRecent() && <StatusBadge type="new" />}
           </div>
@@ -200,6 +227,32 @@ export default function PostPage({ params }: PageProps) {
               __html: formatContent(post.content)
             }} 
           />
+
+          {/* Document Viewer if document URL exists */}
+          {documentUrl && (
+            <div className="mt-12">
+              <h3 className="text-2xl font-bold mb-6">Supporting Documents</h3>
+              <DocumentViewer
+                documentUrl={documentUrl}
+                title={`${post.title} - Evidence`}
+                redactedSections={documentRedactions}
+                onRedactionsChange={setDocumentRedactions}
+                allowRedaction={false}
+              />
+              {documentRedactions.length > 0 && (
+                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                  This document contains {documentRedactions.length} redacted sections to protect sensitive information.
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Impact Tracker */}
+          {impacts.length > 0 && (
+            <div className="mt-12">
+              <ImpactTracker impacts={impacts} />
+            </div>
+          )}
 
           {/* Back to Stories Link */}
           <div className="mt-12 pt-8 border-t-2 brand-border">
