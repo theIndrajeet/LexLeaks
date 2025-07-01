@@ -13,6 +13,9 @@
   
   # Node version (optional but recommended)
   NODE_VERSION = "18"
+  
+  # Force fresh build
+  NETLIFY_USE_CACHE = "false"
 
 # Essential plugin for Next.js on Netlify
 [[plugins]]
