@@ -158,7 +158,7 @@ export const getPost = async (id: number): Promise<Post> => {
 }
 
 export const createPost = async (data: PostCreateData): Promise<Post> => {
-  return apiRequest('/api/posts', {
+  return apiRequest('/api/posts/', {
     method: 'POST',
     body: JSON.stringify(data),
   })
