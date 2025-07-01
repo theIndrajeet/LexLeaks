@@ -5,6 +5,8 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { format } from 'date-fns'
 import { getPostBySlug, Post } from '@/lib/api'
+import ThemeToggle from '@/components/ThemeToggle'
+import StatusBadge from '@/components/StatusBadge'
 
 interface PageProps {
   params: {
@@ -44,6 +46,26 @@ export default function PostPage({ params }: PageProps) {
     fetchPost()
   }, [params.slug])
 
+  // Format content with typography enhancements
+  const formatContent = (content: string) => {
+    // Split into paragraphs
+    const paragraphs = content.split('\n\n')
+    
+    return paragraphs.map((paragraph, index) => {
+      // Add drop cap to first paragraph
+      if (index === 0) {
+        return `<p class="drop-cap">${paragraph}</p>`
+      }
+      
+      // Example: Create pull quotes for paragraphs starting with ">"
+      if (paragraph.startsWith('>')) {
+        return `<blockquote class="pull-quote">${paragraph.substring(1).trim()}</blockquote>`
+      }
+      
+      return `<p>${paragraph}</p>`
+    }).join('')
+  }
+
   if (loading) {
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -58,9 +80,12 @@ export default function PostPage({ params }: PageProps) {
             <Link href="/about" className="nav-link">About</Link>
             <Link href="/archive" className="nav-link">Archive</Link>
           </nav>
-          <Link href="/submit" className="brand-button">
-            Submit a Leak
-          </Link>
+          <div className="flex items-center gap-4">
+            <Link href="/submit" className="brand-button">
+              Submit a Leak
+            </Link>
+            <ThemeToggle />
+          </div>
         </div>
 
         <main>
@@ -85,9 +110,9 @@ export default function PostPage({ params }: PageProps) {
         </header>
         
         <div className="text-center py-12">
-          <div className="border border-red-300 bg-red-50 rounded-lg p-8">
-            <h3 className="text-xl font-bold text-red-800 mb-4">Error Loading Article</h3>
-            <p className="text-red-700 mb-6">{error}</p>
+          <div className="border border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950 rounded-lg p-8">
+            <h3 className="text-xl font-bold text-red-800 dark:text-red-300 mb-4">Error Loading Article</h3>
+            <p className="text-red-700 dark:text-red-400 mb-6">{error}</p>
             <Link href="/" className="brand-button">
               Back to Home
             </Link>
@@ -108,6 +133,14 @@ export default function PostPage({ params }: PageProps) {
     return `#LL-${fileNumber}-${alphaCode}${alphaCode}${alphaCode}`
   }
 
+  // Determine if post is recent
+  const isRecent = () => {
+    const publishDate = new Date(post.published_at || post.created_at)
+    const now = new Date()
+    const hoursSincePublish = (now.getTime() - publishDate.getTime()) / (1000 * 60 * 60)
+    return hoursSincePublish < 72
+  }
+
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Header Section */}
@@ -123,21 +156,27 @@ export default function PostPage({ params }: PageProps) {
           <Link href="/about" className="nav-link">About</Link>
           <Link href="/archive" className="nav-link">Archive</Link>
         </nav>
-        <Link href="/submit" className="brand-button">
-          Submit a Leak
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link href="/submit" className="brand-button">
+            Submit a Leak
+          </Link>
+          <ThemeToggle />
+        </div>
       </div>
 
       {/* Main Article Content */}
       <main>
         <article className="mb-16">
           {/* Article Meta */}
-          <div className="case-file">
-            <span>Published: {format(new Date(post.published_at || post.created_at), 'dd MMM yyyy')}</span>
-            {' | '}
-            <span>Case File: {generateCaseFile()}</span>
-            {' | '}
-            <span>By: {post.author.username}</span>
+          <div className="flex items-center justify-between mb-4">
+            <div className="case-file">
+              <span>Published: {format(new Date(post.published_at || post.created_at), 'dd MMM yyyy')}</span>
+              {' | '}
+              <span>Case File: {generateCaseFile()}</span>
+              {' | '}
+              <span>By: {post.author.username}</span>
+            </div>
+            {isRecent() && <StatusBadge type="new" />}
           </div>
 
           {/* Article Title */}
@@ -148,21 +187,19 @@ export default function PostPage({ params }: PageProps) {
           {/* Article Excerpt */}
           {post.excerpt && (
             <div className="border-l-4 brand-border pl-6 mb-8">
-              <p className="text-xl italic leading-relaxed text-gray-600">
+              <p className="text-xl italic leading-relaxed text-gray-600 dark:text-gray-400">
                 {post.excerpt}
               </p>
             </div>
           )}
 
-          {/* Article Content */}
-          <div className="prose prose-lg max-w-none text-justify leading-relaxed">
-            <div 
-              className="article-content"
-              dangerouslySetInnerHTML={{ 
-                __html: post.content.replace(/\n/g, '<br /><br />') 
-              }} 
-            />
-          </div>
+          {/* Article Content with Enhanced Typography */}
+          <div 
+            className="prose prose-lg dark:prose-invert max-w-none text-justify leading-relaxed"
+            dangerouslySetInnerHTML={{ 
+              __html: formatContent(post.content)
+            }} 
+          />
 
           {/* Back to Stories Link */}
           <div className="mt-12 pt-8 border-t-2 brand-border">
@@ -178,7 +215,7 @@ export default function PostPage({ params }: PageProps) {
         {/* Call to Action */}
         <div className="border-2 brand-border rounded-lg p-8 text-center">
           <h3 className="text-2xl font-bold mb-4">Expose the Truth</h3>
-          <p className="text-lg leading-relaxed mb-6">
+          <p className="text-lg leading-relaxed mb-6 dark:text-gray-300">
             Have evidence of legal industry misconduct? Your story could protect others 
             and bring accountability to those who abuse their power.
           </p>

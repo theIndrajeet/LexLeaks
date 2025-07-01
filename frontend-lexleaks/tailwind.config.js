@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class',
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -31,6 +32,20 @@ module.exports = {
           700: '#334155',
           800: '#1e293b',
           900: '#0f172a',
+        },
+      },
+      animation: {
+        'typewriter': 'typewriter 3s steps(30, end)',
+        'blink': 'blink 1s infinite',
+      },
+      keyframes: {
+        typewriter: {
+          from: { width: '0' },
+          to: { width: '100%' },
+        },
+        blink: {
+          '0%, 50%': { opacity: '1' },
+          '51%, 100%': { opacity: '0' },
         },
       },
       typography: {

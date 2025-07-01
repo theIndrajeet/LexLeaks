@@ -149,7 +149,7 @@ export const getAllPosts = async (params: {
   if (params.skip) queryParams.append('skip', params.skip.toString())
   if (params.search) queryParams.append('search', params.search)
 
-  const endpoint = `/api/posts${queryParams.toString() ? `?${queryParams.toString()}` : ''}`
+  const endpoint = `/api/posts/${queryParams.toString() ? `?${queryParams.toString()}` : ''}`
   return apiRequest(endpoint)
 }
 

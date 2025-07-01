@@ -1,5 +1,6 @@
 import './globals.css'
 import { Metadata } from 'next'
+import { ThemeProvider } from '@/contexts/ThemeContext'
 
 export const metadata: Metadata = {
   title: {
@@ -49,9 +50,11 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body className="h-full brand-bg antialiased">
-        <div className="min-h-full">
-          {children}
-        </div>
+        <ThemeProvider>
+          <div className="min-h-full">
+            {children}
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   )

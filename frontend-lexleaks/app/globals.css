@@ -15,6 +15,12 @@
     color: #3d3d3d; /* Dark charcoal gray */
   }
 
+  /* Dark mode styles with vintage sepia tones */
+  .dark body {
+    background-color: #1a1612; /* Dark sepia background */
+    color: #d4c5b9; /* Light sepia text */
+  }
+
   /* Custom scrollbar */
   ::-webkit-scrollbar {
     width: 8px;
@@ -24,13 +30,25 @@
     background-color: #f5f0d8;
   }
 
+  .dark ::-webkit-scrollbar-track {
+    background-color: #2a251f;
+  }
+
   ::-webkit-scrollbar-thumb {
     background-color: #d3c5a9;
     border-radius: 4px;
   }
 
+  .dark ::-webkit-scrollbar-thumb {
+    background-color: #5a4d3f;
+  }
+
   ::-webkit-scrollbar-thumb:hover {
     background-color: #c5b899;
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background-color: #6a5a49;
   }
 }
 
@@ -44,16 +62,32 @@
     color: #8B0000; /* Deep burgundy */
   }
 
+  .dark .brand-accent {
+    color: #d4766f; /* Lighter burgundy for dark mode */
+  }
+
   .brand-border {
     border-color: #d3c5a9; /* Aged border color */
+  }
+
+  .dark .brand-border {
+    border-color: #5a4d3f; /* Dark sepia border */
   }
 
   .brand-bg {
     background-color: #fdf6e3; /* Parchment background */
   }
 
+  .dark .brand-bg {
+    background-color: #1a1612; /* Dark sepia background */
+  }
+
   .brand-text {
     color: #3d3d3d; /* Charcoal gray */
+  }
+
+  .dark .brand-text {
+    color: #d4c5b9; /* Light sepia text */
   }
 
   .brand-button {
@@ -71,8 +105,21 @@
     background-color: #a52a2a; /* Lighter burgundy on hover */
   }
 
+  .dark .brand-button {
+    background-color: #d4766f;
+    color: #1a1612;
+  }
+
+  .dark .brand-button:hover {
+    background-color: #e68a7f;
+  }
+
   .article-link:hover h2 {
     color: #8B0000;
+  }
+
+  .dark .article-link:hover h2 {
+    color: #d4766f;
   }
 
   .case-file {
@@ -84,6 +131,10 @@
     margin-bottom: 0.5rem;
   }
 
+  .dark .case-file {
+    color: #9a8c7f;
+  }
+
   .article-title {
     font-size: 1.875rem;
     font-weight: 700;
@@ -92,10 +143,18 @@
     transition: color 0.3s ease-in-out;
   }
 
+  .dark .article-title {
+    color: #e8ddd4;
+  }
+
   .article-excerpt {
     font-size: 1.125rem;
     line-height: 1.7;
     color: #4a5568;
+  }
+
+  .dark .article-excerpt {
+    color: #b5a598;
   }
 
   .read-more {
@@ -104,6 +163,10 @@
     margin-top: 1.5rem;
     color: #8B0000;
     transition: all 0.3s ease;
+  }
+
+  .dark .read-more {
+    color: #d4766f;
   }
 
   .read-more:hover {
@@ -126,11 +189,19 @@
     color: #1a1a1a;
   }
 
+  .dark .main-title {
+    color: #e8ddd4;
+  }
+
   .main-subtitle {
     margin-top: 0.5rem;
     font-size: 1.125rem;
     font-family: 'Inconsolata', monospace;
     color: #4a5568;
+  }
+
+  .dark .main-subtitle {
+    color: #b5a598;
   }
 
   /* Navigation styles */
@@ -144,9 +215,17 @@
     transition: all 0.3s ease;
   }
 
+  .dark .nav-link {
+    color: #b5a598;
+  }
+
   .nav-link:hover {
     color: #8B0000;
     text-decoration: underline;
+  }
+
+  .dark .nav-link:hover {
+    color: #d4766f;
   }
 
   /* Footer styles */
@@ -218,5 +297,102 @@
     outline: none;
     border-color: #8B0000;
     box-shadow: 0 0 0 2px rgba(139, 0, 0, 0.1);
+  }
+
+  /* Drop cap styles */
+  .drop-cap::first-letter {
+    float: left;
+    font-size: 4.5rem;
+    line-height: 1;
+    font-weight: 700;
+    margin-right: 0.1em;
+    margin-top: -0.1em;
+    color: #8B0000;
+    font-family: 'Lora', serif;
+  }
+
+  .dark .drop-cap::first-letter {
+    color: #d4766f;
+  }
+
+  /* Pull quote styles */
+  .pull-quote {
+    position: relative;
+    padding: 2rem 3rem;
+    margin: 2rem 0;
+    font-size: 1.5rem;
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1.6;
+    text-align: center;
+    color: #4a5568;
+    border-left: 4px solid #8B0000;
+    border-right: 4px solid #8B0000;
+  }
+
+  .dark .pull-quote {
+    color: #b5a598;
+    border-left-color: #d4766f;
+    border-right-color: #d4766f;
+  }
+
+  .pull-quote::before,
+  .pull-quote::after {
+    content: '"';
+    position: absolute;
+    font-size: 4rem;
+    color: #8B0000;
+    opacity: 0.3;
+    font-family: 'Lora', serif;
+  }
+
+  .pull-quote::before {
+    top: -0.5rem;
+    left: 1rem;
+  }
+
+  .pull-quote::after {
+    bottom: -2rem;
+    right: 1rem;
+  }
+
+  .dark .pull-quote::before,
+  .dark .pull-quote::after {
+    color: #d4766f;
+  }
+
+  /* Animations */
+  @keyframes typewriter {
+    from {
+      width: 0;
+    }
+    to {
+      width: 100%;
+    }
+  }
+
+  @keyframes blink {
+    0%, 50% {
+      opacity: 1;
+    }
+    51%, 100% {
+      opacity: 0;
+    }
+  }
+
+  .typewriter-text {
+    overflow: hidden;
+    white-space: nowrap;
+    animation: typewriter 3s steps(30, end);
+  }
+
+  /* Parallax container */
+  .parallax-container {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .parallax-element {
+    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
   }
 }
