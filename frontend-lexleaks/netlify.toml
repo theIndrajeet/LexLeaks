@@ -2,7 +2,7 @@
 
 [build]
   command = "npm run build"
-  publish = ".next"
+  # Don't specify publish directory - let the Next.js plugin handle it
 
 [build.environment]
   NEXT_PUBLIC_API_URL = "https://lexleaks-api-563011146464.asia-south1.run.app"
