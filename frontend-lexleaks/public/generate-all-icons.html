@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LexLeaks - Automatic Icon Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .icon-preview {
+            display: inline-block;
+            margin: 10px;
+            padding: 10px;
+            background: #2a2a2a;
+            border-radius: 8px;
+        }
+        canvas {
+            display: block;
+            margin-bottom: 5px;
+            background: white;
+            border-radius: 4px;
+        }
+        button {
+            background: #8B0000;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 20px 10px;
+        }
+        button:hover {
+            background: #a50000;
+        }
+        #status {
+            margin: 20px 0;
+            padding: 10px;
+            background: #2a2a2a;
+            border-radius: 4px;
+        }
+        .success {
+            color: #4CAF50;
+        }
+        .info {
+            color: #2196F3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔒 LexLeaks Icon Generator</h1>
+        <p>Click the button below to generate all required PWA icons automatically.</p>
+        
+        <div id="previews"></div>
+        
+        <button onclick="generateAllIcons()">Generate All Icons</button>
+        <button onclick="downloadAsZip()">Download as ZIP</button>
+        
+        <div id="status"></div>
+    </div>
+
+    <script>
+        const requiredIcons = [
+            { size: 72, name: 'icon-72x72.png' },
+            { size: 96, name: 'icon-96x96.png' },
+            { size: 128, name: 'icon-128x128.png' },
+            { size: 144, name: 'icon-144x144.png' },
+            { size: 152, name: 'icon-152x152.png' },
+            { size: 192, name: 'icon-192x192.png' },
+            { size: 384, name: 'icon-384x384.png' },
+            { size: 512, name: 'icon-512x512.png' },
+            { size: 192, name: 'icon-maskable-192x192.png', maskable: true },
+            { size: 512, name: 'icon-maskable-512x512.png', maskable: true }
+        ];
+
+        const generatedIcons = [];
+
+        function drawIcon(canvas, size, maskable = false) {
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, size, size);
+            
+            // Dark background
+            ctx.fillStyle = '#1a1a1a';
+            ctx.fillRect(0, 0, size, size);
+            
+            // Adjust sizes for maskable icons
+            const scaleFactor = maskable ? 0.75 : 1;
+            
+            // Create document icon with leak effect
+            const centerX = size / 2;
+            const centerY = size / 2;
+            const docWidth = size * 0.4 * scaleFactor;
+            const docHeight = size * 0.5 * scaleFactor;
+            const docX = centerX - docWidth / 2;
+            const docY = centerY - docHeight / 2 - size * 0.05;
+            
+            // Document shadow
+            ctx.fillStyle = 'rgba(0,0,0,0.3)';
+            ctx.fillRect(docX + 2, docY + 2, docWidth, docHeight);
+            
+            // Document body
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(docX, docY, docWidth, docHeight);
+            
+            // Document fold corner
+            const foldSize = size * 0.08 * scaleFactor;
+            ctx.beginPath();
+            ctx.moveTo(docX + docWidth - foldSize, docY);
+            ctx.lineTo(docX + docWidth, docY + foldSize);
+            ctx.lineTo(docX + docWidth - foldSize, docY + foldSize);
+            ctx.closePath();
+            ctx.fillStyle = '#e0e0e0';
+            ctx.fill();
+            
+            // Document lines (redacted text)
+            ctx.fillStyle = '#333333';
+            const lineHeight = size * 0.02 * scaleFactor;
+            const lineSpacing = size * 0.04 * scaleFactor;
+            const lineMargin = size * 0.05 * scaleFactor;
+            const numLines = size >= 192 ? 4 : 3;
+            
+            for (let i = 0; i < numLines; i++) {
+                const lineY = docY + lineMargin + (lineHeight + lineSpacing) * i;
+                const lineWidth = i === 1 ? docWidth * 0.6 : docWidth - lineMargin * 2;
+                ctx.fillRect(docX + lineMargin, lineY, lineWidth, lineHeight);
+            }
+            
+            // Leak drops
+            ctx.fillStyle = '#8B0000';
+            const numDrops = maskable ? 1 : (size >= 192 ? 3 : 2);
+            
+            for (let i = 0; i < numDrops; i++) {
+                const dropX = maskable ? centerX : centerX + (i - (numDrops-1)/2) * size * 0.12;
+                const dropY = docY + docHeight + size * 0.02 + i * size * 0.03;
+                const dropRadius = size * 0.04 * scaleFactor;
+                
+                // Drop shape
+                ctx.beginPath();
+                ctx.arc(dropX, dropY, dropRadius, 0, Math.PI * 2);
+                if (size >= 128) {
+                    ctx.moveTo(dropX, dropY - dropRadius);
+                    ctx.quadraticCurveTo(dropX - dropRadius * 0.5, dropY - dropRadius * 1.5, 
+                                         dropX, dropY - dropRadius * 2);
+                    ctx.quadraticCurveTo(dropX + dropRadius * 0.5, dropY - dropRadius * 1.5, 
+                                         dropX, dropY - dropRadius);
+                }
+                ctx.fill();
+            }
+        }
+
+        function generateAllIcons() {
+            const previewsDiv = document.getElementById('previews');
+            const statusDiv = document.getElementById('status');
+            
+            previewsDiv.innerHTML = '';
+            generatedIcons.length = 0;
+            statusDiv.innerHTML = '<p class="info">Generating icons...</p>';
+            
+            requiredIcons.forEach((iconConfig, index) => {
+                const { size, name, maskable } = iconConfig;
+                
+                // Create preview container
+                const previewContainer = document.createElement('div');
+                previewContainer.className = 'icon-preview';
+                
+                // Create canvas
+                const canvas = document.createElement('canvas');
+                canvas.width = size;
+                canvas.height = size;
+                canvas.style.width = Math.min(size, 128) + 'px';
+                canvas.style.height = Math.min(size, 128) + 'px';
+                
+                // Draw icon
+                drawIcon(canvas, size, maskable);
+                
+                // Store for download
+                canvas.toBlob(blob => {
+                    generatedIcons.push({ name, blob });
+                    
+                    if (generatedIcons.length === requiredIcons.length) {
+                        statusDiv.innerHTML = '<p class="success">✅ All icons generated successfully!</p>';
+                    }
+                });
+                
+                // Add label
+                const label = document.createElement('div');
+                label.textContent = name;
+                label.style.fontSize = '12px';
+                label.style.marginTop = '5px';
+                
+                previewContainer.appendChild(canvas);
+                previewContainer.appendChild(label);
+                previewsDiv.appendChild(previewContainer);
+            });
+        }
+
+        async function downloadAsZip() {
+            if (generatedIcons.length === 0) {
+                alert('Please generate icons first!');
+                return;
+            }
+            
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = '<p class="info">Creating ZIP file...</p>';
+            
+            // Create a simple way to download all icons
+            // Since we can't use JSZip without importing it, we'll download them individually
+            for (const icon of generatedIcons) {
+                const url = URL.createObjectURL(icon.blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = icon.name;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                // Small delay between downloads
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            
+            statusDiv.innerHTML = '<p class="success">✅ All icons downloaded!</p>';
+        }
+
+        // Generate icons on load
+        window.onload = () => {
+            generateAllIcons();
+        };
+    </script>
+</body>
+</html> 

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Apple Touch Icon Generator</title>
+</head>
+<body>
+    <h1>Apple Touch Icon Generator</h1>
+    <canvas id="canvas" width="180" height="180"></canvas>
+    <br>
+    <button onclick="download()">Download apple-touch-icon.png</button>
+    
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const size = 180;
+        
+        // Background with rounded corners
+        ctx.fillStyle = '#1a1a1a';
+        
+        // Create rounded rectangle
+        const radius = size * 0.15;
+        ctx.beginPath();
+        ctx.moveTo(radius, 0);
+        ctx.lineTo(size - radius, 0);
+        ctx.quadraticCurveTo(size, 0, size, radius);
+        ctx.lineTo(size, size - radius);
+        ctx.quadraticCurveTo(size, size, size - radius, size);
+        ctx.lineTo(radius, size);
+        ctx.quadraticCurveTo(0, size, 0, size - radius);
+        ctx.lineTo(0, radius);
+        ctx.quadraticCurveTo(0, 0, radius, 0);
+        ctx.fill();
+        
+        // Draw icon
+        const centerX = size / 2;
+        const centerY = size / 2;
+        const docWidth = size * 0.35;
+        const docHeight = size * 0.45;
+        const docX = centerX - docWidth / 2;
+        const docY = centerY - docHeight / 2 - size * 0.04;
+        
+        // Document body
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(docX, docY, docWidth, docHeight);
+        
+        // Document fold
+        const foldSize = size * 0.07;
+        ctx.beginPath();
+        ctx.moveTo(docX + docWidth - foldSize, docY);
+        ctx.lineTo(docX + docWidth, docY + foldSize);
+        ctx.lineTo(docX + docWidth - foldSize, docY + foldSize);
+        ctx.closePath();
+        ctx.fillStyle = '#e0e0e0';
+        ctx.fill();
+        
+        // Lines
+        ctx.fillStyle = '#333333';
+        const lineHeight = size * 0.018;
+        const lineSpacing = size * 0.035;
+        const lineMargin = size * 0.045;
+        
+        for (let i = 0; i < 3; i++) {
+            const lineY = docY + lineMargin + (lineHeight + lineSpacing) * i;
+            ctx.fillRect(docX + lineMargin, lineY, docWidth - lineMargin * 2, lineHeight);
+        }
+        
+        // Leak drop
+        ctx.fillStyle = '#8B0000';
+        const dropX = centerX;
+        const dropY = docY + docHeight + size * 0.03;
+        const dropRadius = size * 0.04;
+        
+        ctx.beginPath();
+        ctx.arc(dropX, dropY, dropRadius, 0, Math.PI * 2);
+        ctx.fill();
+        
+        function download() {
+            canvas.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'apple-touch-icon.png';
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+        }
+    </script>
+</body>
+</html> 

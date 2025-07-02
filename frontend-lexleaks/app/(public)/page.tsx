@@ -7,6 +7,7 @@ import { getPublishedPosts, PostSummary } from '@/lib/api'
 import TypewriterTitle from '@/components/TypewriterTitle'
 import ThemeToggle from '@/components/ThemeToggle'
 import StatusBadge from '@/components/StatusBadge'
+import InstallPWA from '@/components/InstallPWA'
 
 import SearchFilter, { FilterState } from '@/components/SearchFilter'
 
@@ -250,6 +251,9 @@ export default function HomePage() {
         <p className="footer-text">&copy; 2025 LexLeaks. All Rights Reserved.</p>
         <p className="footer-text mt-1">Dedicated to transparency and accountability in the legal industry.</p>
       </footer>
+
+      {/* PWA Install Prompt */}
+      <InstallPWA />
     </div>
   )
 } 

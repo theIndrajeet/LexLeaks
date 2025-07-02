@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LexLeaks Icon Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .icon-container {
+            display: inline-block;
+            margin: 10px;
+            text-align: center;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        canvas {
+            border: 1px solid #ddd;
+            display: block;
+            margin-bottom: 10px;
+        }
+        button {
+            background: #8B0000;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #a50000;
+        }
+    </style>
+</head>
+<body>
+    <h1>LexLeaks PWA Icon Generator</h1>
+    <p>Click each button to download the icon for that size.</p>
+    <div id="icons"></div>
+
+    <script>
+        const sizes = [72, 96, 128, 144, 152, 192, 384, 512];
+        const container = document.getElementById('icons');
+
+        sizes.forEach(size => {
+            const div = document.createElement('div');
+            div.className = 'icon-container';
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            
+            const ctx = canvas.getContext('2d');
+            
+            // Dark background
+            ctx.fillStyle = '#1a1a1a';
+            ctx.fillRect(0, 0, size, size);
+            
+            // Create document icon with leak effect
+            const centerX = size / 2;
+            const centerY = size / 2;
+            const docWidth = size * 0.4;
+            const docHeight = size * 0.5;
+            const docX = centerX - docWidth / 2;
+            const docY = centerY - docHeight / 2 - size * 0.05;
+            
+            // Document shadow
+            ctx.fillStyle = 'rgba(0,0,0,0.3)';
+            ctx.fillRect(docX + 2, docY + 2, docWidth, docHeight);
+            
+            // Document body
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(docX, docY, docWidth, docHeight);
+            
+            // Document fold corner
+            const foldSize = size * 0.08;
+            ctx.beginPath();
+            ctx.moveTo(docX + docWidth - foldSize, docY);
+            ctx.lineTo(docX + docWidth, docY + foldSize);
+            ctx.lineTo(docX + docWidth - foldSize, docY + foldSize);
+            ctx.closePath();
+            ctx.fillStyle = '#e0e0e0';
+            ctx.fill();
+            
+            // Document lines (redacted text)
+            ctx.fillStyle = '#333333';
+            const lineHeight = size * 0.02;
+            const lineSpacing = size * 0.04;
+            const lineMargin = size * 0.05;
+            for (let i = 0; i < 4; i++) {
+                const lineY = docY + lineMargin + (lineHeight + lineSpacing) * i;
+                const lineWidth = i === 1 ? docWidth * 0.5 : docWidth - lineMargin * 2;
+                ctx.fillRect(docX + lineMargin, lineY, lineWidth, lineHeight);
+            }
+            
+            // Leak drops
+            ctx.fillStyle = '#8B0000';
+            for (let i = 0; i < 3; i++) {
+                const dropX = centerX + (i - 1) * size * 0.12;
+                const dropY = docY + docHeight + size * 0.02 + i * size * 0.03;
+                const dropRadius = size * 0.04;
+                
+                // Drop shape
+                ctx.beginPath();
+                ctx.arc(dropX, dropY, dropRadius, 0, Math.PI * 2);
+                ctx.moveTo(dropX, dropY - dropRadius);
+                ctx.quadraticCurveTo(dropX - dropRadius * 0.5, dropY - dropRadius * 1.5, 
+                                     dropX, dropY - dropRadius * 2);
+                ctx.quadraticCurveTo(dropX + dropRadius * 0.5, dropY - dropRadius * 1.5, 
+                                     dropX, dropY - dropRadius);
+                ctx.fill();
+            }
+            
+            div.appendChild(canvas);
+            
+            const button = document.createElement('button');
+            button.textContent = `Download ${size}x${size}`;
+            button.onclick = () => {
+                canvas.toBlob(blob => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `icon-${size}x${size}.png`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                });
+            };
+            
+            div.appendChild(button);
+            container.appendChild(div);
+        });
+
+        // Add maskable icon generator
+        const maskableDiv = document.createElement('div');
+        maskableDiv.className = 'icon-container';
+        maskableDiv.innerHTML = '<h3>Maskable Icons (with safe area)</h3>';
+        
+        [192, 512].forEach(size => {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            
+            const ctx = canvas.getContext('2d');
+            
+            // Background (larger for maskable)
+            ctx.fillStyle = '#1a1a1a';
+            ctx.fillRect(0, 0, size, size);
+            
+            // Safe area indicator (80% of icon)
+            const safeSize = size * 0.8;
+            const offset = size * 0.1;
+            
+            // Create document icon within safe area
+            const centerX = size / 2;
+            const centerY = size / 2;
+            const docWidth = size * 0.3; // Smaller for maskable
+            const docHeight = size * 0.375;
+            const docX = centerX - docWidth / 2;
+            const docY = centerY - docHeight / 2 - size * 0.04;
+            
+            // Document body
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(docX, docY, docWidth, docHeight);
+            
+            // Document fold corner
+            const foldSize = size * 0.06;
+            ctx.beginPath();
+            ctx.moveTo(docX + docWidth - foldSize, docY);
+            ctx.lineTo(docX + docWidth, docY + foldSize);
+            ctx.lineTo(docX + docWidth - foldSize, docY + foldSize);
+            ctx.closePath();
+            ctx.fillStyle = '#e0e0e0';
+            ctx.fill();
+            
+            // Simplified lines
+            ctx.fillStyle = '#333333';
+            const lineHeight = size * 0.015;
+            const lineSpacing = size * 0.03;
+            const lineMargin = size * 0.04;
+            for (let i = 0; i < 3; i++) {
+                const lineY = docY + lineMargin + (lineHeight + lineSpacing) * i;
+                ctx.fillRect(docX + lineMargin, lineY, docWidth - lineMargin * 2, lineHeight);
+            }
+            
+            // Simplified leak drops
+            ctx.fillStyle = '#8B0000';
+            const dropX = centerX;
+            const dropY = docY + docHeight + size * 0.02;
+            const dropRadius = size * 0.035;
+            
+            ctx.beginPath();
+            ctx.arc(dropX, dropY, dropRadius, 0, Math.PI * 2);
+            ctx.fill();
+            
+            maskableDiv.appendChild(canvas);
+            
+            const button = document.createElement('button');
+            button.textContent = `Download Maskable ${size}x${size}`;
+            button.onclick = () => {
+                canvas.toBlob(blob => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `icon-maskable-${size}x${size}.png`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                });
+            };
+            
+            maskableDiv.appendChild(button);
+        });
+        
+        container.appendChild(maskableDiv);
+    </script>
+</body>
+</html> 
