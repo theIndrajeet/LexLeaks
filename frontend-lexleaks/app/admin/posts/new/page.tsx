@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { createPost } from '@/lib/api'
+import RichTextEditor from '@/components/RichTextEditor'
 
 export default function NewPostPage() {
   const router = useRouter()
@@ -52,7 +53,7 @@ export default function NewPostPage() {
 
   return (
     <div className="min-h-screen brand-bg p-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
@@ -126,22 +127,19 @@ export default function NewPostPage() {
               </p>
             </div>
 
-            {/* Content */}
+            {/* Content - Rich Text Editor */}
             <div>
-              <label htmlFor="content" className="block text-sm font-bold font-mono-special uppercase tracking-wide mb-2">
+              <label className="block text-sm font-bold font-mono-special uppercase tracking-wide mb-2">
                 Content *
               </label>
-              <textarea
-                id="content"
-                value={formData.content}
-                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                className="admin-input w-full font-mono-special text-sm"
-                rows={20}
-                required
-                placeholder="Write your article content here. You can use HTML tags for formatting..."
+              <RichTextEditor
+                content={formData.content}
+                onChange={(content) => setFormData({ ...formData, content })}
+                placeholder="Start writing your article..."
+                className="mb-2"
               />
               <p className="text-sm text-gray-500 mt-1">
-                HTML tags supported: &lt;p&gt;, &lt;h2&gt;, &lt;h3&gt;, &lt;ul&gt;, &lt;ol&gt;, &lt;li&gt;, &lt;blockquote&gt;, &lt;strong&gt;, &lt;em&gt;
+                Use the toolbar above to format your content. Supports headings, lists, links, images, and more.
               </p>
             </div>
 
@@ -181,27 +179,33 @@ export default function NewPostPage() {
           </div>
         </form>
 
-        {/* HTML Reference */}
+        {/* Editor Tips */}
         <div className="mt-8 bg-white rounded-lg shadow-sm p-8">
-          <h2 className="text-lg font-bold mb-4 font-mono-special">HTML Reference</h2>
-          <div className="space-y-3 font-mono-special text-sm">
-            <div>
-              <code className="bg-gray-100 px-2 py-1 rounded">&lt;p&gt;Paragraph text&lt;/p&gt;</code>
+          <h2 className="text-lg font-bold mb-4 font-mono-special">Editor Tips</h2>
+          <div className="space-y-3 text-sm text-gray-600">
+            <div className="flex items-start">
+              <span className="text-[#8B0000] mr-2">•</span>
+              <span>Use <kbd className="px-2 py-1 bg-gray-100 rounded text-xs">Cmd/Ctrl + B</kbd> for bold text</span>
             </div>
-            <div>
-              <code className="bg-gray-100 px-2 py-1 rounded">&lt;h2&gt;Section Heading&lt;/h2&gt;</code>
+            <div className="flex items-start">
+              <span className="text-[#8B0000] mr-2">•</span>
+              <span>Use <kbd className="px-2 py-1 bg-gray-100 rounded text-xs">Cmd/Ctrl + I</kbd> for italic text</span>
             </div>
-            <div>
-              <code className="bg-gray-100 px-2 py-1 rounded">&lt;ul&gt;&lt;li&gt;Bullet point&lt;/li&gt;&lt;/ul&gt;</code>
+            <div className="flex items-start">
+              <span className="text-[#8B0000] mr-2">•</span>
+              <span>Use <kbd className="px-2 py-1 bg-gray-100 rounded text-xs">Cmd/Ctrl + K</kbd> to add links</span>
             </div>
-            <div>
-              <code className="bg-gray-100 px-2 py-1 rounded">&lt;blockquote&gt;Quote text&lt;/blockquote&gt;</code>
+            <div className="flex items-start">
+              <span className="text-[#8B0000] mr-2">•</span>
+              <span>Drag and drop or paste images directly into the editor</span>
             </div>
-            <div>
-              <code className="bg-gray-100 px-2 py-1 rounded">&lt;strong&gt;Bold text&lt;/strong&gt;</code>
+            <div className="flex items-start">
+              <span className="text-[#8B0000] mr-2">•</span>
+              <span>Start a line with <code className="px-2 py-1 bg-gray-100 rounded text-xs">-</code> or <code className="px-2 py-1 bg-gray-100 rounded text-xs">1.</code> for lists</span>
             </div>
-            <div>
-              <code className="bg-gray-100 px-2 py-1 rounded">&lt;em&gt;Italic text&lt;/em&gt;</code>
+            <div className="flex items-start">
+              <span className="text-[#8B0000] mr-2">•</span>
+              <span>Start a line with <code className="px-2 py-1 bg-gray-100 rounded text-xs">&gt;</code> for quotes</span>
             </div>
           </div>
         </div>

@@ -78,7 +78,7 @@ export default function SearchFilter({ onSearch, loading = false }: SearchFilter
   }).length
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-8">
+    <div className="bg-[#fdf6e3] dark:bg-[#1a1612] shadow-sm border-2 brand-border p-6 mb-8">
       <form onSubmit={handleSearch}>
         {/* Main Search Bar */}
         <div className="flex gap-3 mb-4">
@@ -88,13 +88,14 @@ export default function SearchFilter({ onSearch, loading = false }: SearchFilter
               value={filters.query}
               onChange={(e) => handleFilterChange('query', e.target.value)}
               placeholder="Search leaks, cases, or keywords..."
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg 
-                       bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
-                       focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border-2 brand-border rounded-sm 
+                       bg-[#fdf6e3] dark:bg-[#1a1612] brand-text
+                       focus:ring-2 focus:ring-[#8B0000] dark:focus:ring-[#d4766f] focus:border-[#8B0000] dark:focus:border-[#d4766f]
+                       font-serif transition-colors"
               disabled={loading}
             />
             <svg
-              className="absolute left-3 top-3.5 h-5 w-5 text-gray-400"
+              className="absolute left-3 top-3.5 h-5 w-5 text-gray-500 dark:text-gray-400"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -110,16 +111,17 @@ export default function SearchFilter({ onSearch, loading = false }: SearchFilter
           <button
             type="submit"
             disabled={loading}
-            className="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 
-                     disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="brand-button font-mono-special
+                     disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Searching...' : 'Search'}
           </button>
           <button
             type="button"
             onClick={() => setIsExpanded(!isExpanded)}
-            className="px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg 
-                     hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors relative"
+            className="px-4 py-3 border-2 brand-border rounded-sm 
+                     hover:bg-[#f5f0d8] dark:hover:bg-[#2a251f] transition-colors relative
+                     font-mono-special"
           >
             <svg
               className={`h-5 w-5 text-gray-600 dark:text-gray-400 transition-transform ${
@@ -137,8 +139,8 @@ export default function SearchFilter({ onSearch, loading = false }: SearchFilter
               />
             </svg>
             {activeFiltersCount > 0 && (
-              <span className="absolute -top-1 -right-1 h-5 w-5 bg-primary-600 text-white text-xs 
-                             rounded-full flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 h-5 w-5 bg-[#8B0000] dark:bg-[#d4766f] text-white dark:text-gray-900 text-xs 
+                             rounded-full flex items-center justify-center font-mono-special">
                 {activeFiltersCount}
               </span>
             )}
@@ -147,19 +149,20 @@ export default function SearchFilter({ onSearch, loading = false }: SearchFilter
 
         {/* Advanced Filters */}
         {isExpanded && (
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+          <div className="border-t-2 brand-border pt-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {/* Status Filter */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-mono-special uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2">
                   Status
                 </label>
                 <select
                   value={filters.status}
                   onChange={(e) => handleFilterChange('status', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                           bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
-                           focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border-2 brand-border rounded-sm 
+                           bg-[#fdf6e3] dark:bg-[#1a1612] brand-text
+                           focus:ring-2 focus:ring-[#8B0000] dark:focus:ring-[#d4766f] focus:border-[#8B0000] dark:focus:border-[#d4766f]
+                           font-serif"
                 >
                   <option value="">All Statuses</option>
                   <option value="published">Published</option>
@@ -170,15 +173,16 @@ export default function SearchFilter({ onSearch, loading = false }: SearchFilter
 
               {/* Verification Status Filter */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-mono-special uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2">
                   Verification Status
                 </label>
                 <select
                   value={filters.verificationStatus}
                   onChange={(e) => handleFilterChange('verificationStatus', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                           bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
-                           focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border-2 brand-border rounded-sm 
+                           bg-[#fdf6e3] dark:bg-[#1a1612] brand-text
+                           focus:ring-2 focus:ring-[#8B0000] dark:focus:ring-[#d4766f] focus:border-[#8B0000] dark:focus:border-[#d4766f]
+                           font-serif"
                 >
                   <option value="">All Verifications</option>
                   <option value="verified">Verified</option>
@@ -189,15 +193,16 @@ export default function SearchFilter({ onSearch, loading = false }: SearchFilter
 
               {/* Category Filter */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-mono-special uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2">
                   Category
                 </label>
                 <select
                   value={filters.category}
                   onChange={(e) => handleFilterChange('category', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                           bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
-                           focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border-2 brand-border rounded-sm 
+                           bg-[#fdf6e3] dark:bg-[#1a1612] brand-text
+                           focus:ring-2 focus:ring-[#8B0000] dark:focus:ring-[#d4766f] focus:border-[#8B0000] dark:focus:border-[#d4766f]
+                           font-serif"
                 >
                   {categories.map(cat => (
                     <option key={cat.value} value={cat.value}>{cat.label}</option>
@@ -207,15 +212,16 @@ export default function SearchFilter({ onSearch, loading = false }: SearchFilter
 
               {/* Sort By */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-mono-special uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2">
                   Sort By
                 </label>
                 <select
                   value={filters.sortBy}
                   onChange={(e) => handleFilterChange('sortBy', e.target.value as any)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                           bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
-                           focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border-2 brand-border rounded-sm 
+                           bg-[#fdf6e3] dark:bg-[#1a1612] brand-text
+                           focus:ring-2 focus:ring-[#8B0000] dark:focus:ring-[#d4766f] focus:border-[#8B0000] dark:focus:border-[#d4766f]
+                           font-serif"
                 >
                   <option value="newest">Newest First</option>
                   <option value="oldest">Oldest First</option>
@@ -226,7 +232,7 @@ export default function SearchFilter({ onSearch, loading = false }: SearchFilter
 
               {/* Date From */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-mono-special uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2">
                   From Date
                 </label>
                 <input
@@ -234,15 +240,16 @@ export default function SearchFilter({ onSearch, loading = false }: SearchFilter
                   value={filters.dateFrom}
                   onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
                   max={filters.dateTo || format(new Date(), 'yyyy-MM-dd')}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                           bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
-                           focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border-2 brand-border rounded-sm 
+                           bg-[#fdf6e3] dark:bg-[#1a1612] brand-text
+                           focus:ring-2 focus:ring-[#8B0000] dark:focus:ring-[#d4766f] focus:border-[#8B0000] dark:focus:border-[#d4766f]
+                           font-serif"
                 />
               </div>
 
               {/* Date To */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-mono-special uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2">
                   To Date
                 </label>
                 <input
@@ -251,15 +258,16 @@ export default function SearchFilter({ onSearch, loading = false }: SearchFilter
                   onChange={(e) => handleFilterChange('dateTo', e.target.value)}
                   min={filters.dateFrom}
                   max={format(new Date(), 'yyyy-MM-dd')}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                           bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
-                           focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border-2 brand-border rounded-sm 
+                           bg-[#fdf6e3] dark:bg-[#1a1612] brand-text
+                           focus:ring-2 focus:ring-[#8B0000] dark:focus:ring-[#d4766f] focus:border-[#8B0000] dark:focus:border-[#d4766f]
+                           font-serif"
                 />
               </div>
 
               {/* Author Filter */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-mono-special uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2">
                   Author
                 </label>
                 <input
@@ -267,23 +275,25 @@ export default function SearchFilter({ onSearch, loading = false }: SearchFilter
                   value={filters.author}
                   onChange={(e) => handleFilterChange('author', e.target.value)}
                   placeholder="Filter by author..."
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                           bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
-                           focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border-2 brand-border rounded-sm 
+                           bg-[#fdf6e3] dark:bg-[#1a1612] brand-text
+                           focus:ring-2 focus:ring-[#8B0000] dark:focus:ring-[#d4766f] focus:border-[#8B0000] dark:focus:border-[#d4766f]
+                           font-serif"
                 />
               </div>
 
               {/* Impact Level Filter */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-mono-special uppercase tracking-wider text-gray-600 dark:text-gray-400 mb-2">
                   Impact Level
                 </label>
                 <select
                   value={filters.impactLevel}
                   onChange={(e) => handleFilterChange('impactLevel', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                           bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
-                           focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border-2 brand-border rounded-sm 
+                           bg-[#fdf6e3] dark:bg-[#1a1612] brand-text
+                           focus:ring-2 focus:ring-[#8B0000] dark:focus:ring-[#d4766f] focus:border-[#8B0000] dark:focus:border-[#d4766f]
+                           font-serif"
                 >
                   <option value="">All Impact Levels</option>
                   <option value="high">High Impact (5+ outcomes)</option>
@@ -297,9 +307,9 @@ export default function SearchFilter({ onSearch, loading = false }: SearchFilter
                 <button
                   type="button"
                   onClick={handleReset}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
-                           text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 
-                           transition-colors"
+                  className="w-full px-4 py-2 border-2 brand-border rounded-sm 
+                           brand-text hover:bg-[#f5f0d8] dark:hover:bg-[#2a251f]
+                           transition-colors font-mono-special uppercase tracking-wider text-sm"
                 >
                   Reset Filters
                 </button>
@@ -310,26 +320,28 @@ export default function SearchFilter({ onSearch, loading = false }: SearchFilter
             {activeFiltersCount > 0 && (
               <div className="mt-4 flex flex-wrap gap-2">
                 {filters.query && (
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm 
-                                 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                  <span className="inline-flex items-center px-3 py-1 rounded-sm text-sm 
+                                 bg-[#f5f0d8] dark:bg-[#2a251f] brand-text font-mono-special
+                                 border brand-border">
                     Search: "{filters.query}"
                     <button
                       type="button"
                       onClick={() => handleFilterChange('query', '')}
-                      className="ml-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-200"
+                      className="ml-2 text-gray-500 hover:text-[#8B0000] dark:hover:text-[#d4766f]"
                     >
                       ×
                     </button>
                   </span>
                 )}
                 {filters.status && (
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm 
-                                 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                  <span className="inline-flex items-center px-3 py-1 rounded-sm text-sm 
+                                 bg-[#f5f0d8] dark:bg-[#2a251f] brand-text font-mono-special
+                                 border brand-border">
                     Status: {filters.status}
                     <button
                       type="button"
                       onClick={() => handleFilterChange('status', '')}
-                      className="ml-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-200"
+                      className="ml-2 text-gray-500 hover:text-[#8B0000] dark:hover:text-[#d4766f]"
                     >
                       ×
                     </button>
@@ -342,7 +354,7 @@ export default function SearchFilter({ onSearch, loading = false }: SearchFilter
                     <button
                       type="button"
                       onClick={() => handleFilterChange('category', '')}
-                      className="ml-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-200"
+                      className="ml-2 text-gray-500 hover:text-[#8B0000] dark:hover:text-[#d4766f]"
                     >
                       ×
                     </button>
@@ -355,7 +367,7 @@ export default function SearchFilter({ onSearch, loading = false }: SearchFilter
                     <button
                       type="button"
                       onClick={() => handleFilterChange('verificationStatus', '')}
-                      className="ml-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-200"
+                      className="ml-2 text-gray-500 hover:text-[#8B0000] dark:hover:text-[#d4766f]"
                     >
                       ×
                     </button>
@@ -368,7 +380,7 @@ export default function SearchFilter({ onSearch, loading = false }: SearchFilter
                     <button
                       type="button"
                       onClick={() => handleFilterChange('author', '')}
-                      className="ml-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-200"
+                      className="ml-2 text-gray-500 hover:text-[#8B0000] dark:hover:text-[#d4766f]"
                     >
                       ×
                     </button>
@@ -381,7 +393,7 @@ export default function SearchFilter({ onSearch, loading = false }: SearchFilter
                     <button
                       type="button"
                       onClick={() => handleFilterChange('impactLevel', '')}
-                      className="ml-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-200"
+                      className="ml-2 text-gray-500 hover:text-[#8B0000] dark:hover:text-[#d4766f]"
                     >
                       ×
                     </button>
