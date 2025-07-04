@@ -91,6 +91,7 @@ export default function HomePage() {
             <Link href="/" className="nav-link">Home</Link>
             <Link href="/about" className="nav-link">About</Link>
             <Link href="/archive" className="nav-link">Archive</Link>
+            <Link href="https://asksarkar.netlify.app" className="nav-link" target="_blank" rel="noopener noreferrer">Ask Sarkar</Link>
           </nav>
           <div className="flex items-center gap-4">
             <Link href="/submit" className="brand-button">
@@ -129,6 +130,7 @@ export default function HomePage() {
             <Link href="/" className="nav-link">Home</Link>
             <Link href="/about" className="nav-link">About</Link>
             <Link href="/archive" className="nav-link">Archive</Link>
+            <Link href="https://asksarkar.netlify.app" className="nav-link" target="_blank" rel="noopener noreferrer">Ask Sarkar</Link>
           </nav>
           <div className="flex items-center gap-4">
             <Link href="/submit" className="brand-button">
@@ -168,6 +170,7 @@ export default function HomePage() {
           <Link href="/" className="nav-link">Home</Link>
           <Link href="/about" className="nav-link">About</Link>
           <Link href="/archive" className="nav-link">Archive</Link>
+          <Link href="https://asksarkar.netlify.app" className="nav-link" target="_blank" rel="noopener noreferrer">Ask Sarkar</Link>
         </nav>
         <div className="flex items-center gap-4">
           <Link href="/submit" className="brand-button">
