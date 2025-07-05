@@ -4,8 +4,8 @@
   # Build command for Next.js
   command = "npm run build"
   
-  # Explicitly set publish directory for Next.js
-  publish = ".next"
+  # Remove explicit publish directory - let Netlify handle it automatically for Next.js
+  # publish = ".next"  # REMOVED - this was causing issues
 
 [build.environment]
   # Your Google Cloud Run backend API URL
@@ -14,12 +14,16 @@
   # Node version (optional but recommended)
   NODE_VERSION = "18"
   
-  # Force fresh build
-  NETLIFY_USE_CACHE = "false"
+  # Enable automatic deployments
+  NETLIFY_USE_CACHE = "true"
 
 # Essential plugin for Next.js on Netlify
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+# Auto-deploy settings (ensure webhooks work)
+[build.processing]
+  skip_processing = false
 
 # Headers for security
 [[headers]]
@@ -30,6 +34,44 @@
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# Serve static PWA files with proper headers
+[[headers]]
+  for = "/manifest.json"
+  [headers.values]
+    Content-Type = "application/manifest+json"
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Content-Type = "application/javascript"
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/sw-custom.js"
+  [headers.values]
+    Content-Type = "application/javascript"
+    Cache-Control = "no-cache"
+
+# Force serve static files before dynamic routing
+[[redirects]]
+  from = "/manifest.json"
+  to = "/manifest.json"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/sw.js"
+  to = "/sw.js"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/sw-custom.js"
+  to = "/sw-custom.js"
+  status = 200
+  force = true
 
 # Redirect CMS subdomain to admin dashboard
 [[redirects]]
