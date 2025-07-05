@@ -16,6 +16,8 @@ class User(Base):
     
     # Relationship to posts
     posts = relationship("Post", back_populates="author")
+    # Relationship to push subscriptions
+    push_subscriptions = relationship("PushSubscription", back_populates="user", cascade="all, delete-orphan")
 
 
 class Post(Base):
@@ -23,10 +25,10 @@ class Post(Base):
     __tablename__ = "posts"
     
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String(200), nullable=False)
+    title = Column(Text, nullable=False)
     slug = Column(String(250), unique=True, index=True, nullable=False)
     content = Column(Text, nullable=False)
-    excerpt = Column(String(500), nullable=True)
+    excerpt = Column(Text, nullable=True)
     status = Column(String(20), default="draft", nullable=False)  # draft, published, archived
     verification_status = Column(String(20), default="unverified", nullable=False)  # unverified, verified, disputed
     category = Column(String(50), nullable=True, index=True) # e.g., corporate, judicial, etc.
@@ -47,7 +49,7 @@ class Impact(Base):
     __tablename__ = "impacts"
     
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String(200), nullable=False)
+    title = Column(Text, nullable=False)
     description = Column(Text, nullable=False)
     date = Column(DateTime(timezone=True), nullable=False)
     type = Column(String(50), nullable=False)  # legal_action, policy_change, investigation, resignation, reform
@@ -58,3 +60,25 @@ class Impact(Base):
     
     # Relationship to post
     post = relationship("Post", back_populates="impacts") 
+
+
+class PushSubscription(Base):
+    __tablename__ = "push_subscriptions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    endpoint = Column(String, unique=True, nullable=False)
+    p256dh = Column(String, nullable=False)
+    auth = Column(String, nullable=False)
+    user_agent = Column(String, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    is_active = Column(Boolean, default=True)
+    
+    # Notification preferences
+    notify_new_posts = Column(Boolean, default=True)
+    notify_updates = Column(Boolean, default=True)
+    notify_weekly_digest = Column(Boolean, default=False)
+    
+    # Relationship
+    user = relationship("User", back_populates="push_subscriptions") 

@@ -24,9 +24,9 @@ class UserResponse(UserBase):
 
 # Post Schemas
 class PostBase(BaseModel):
-    title: str = Field(..., min_length=1, max_length=200)
+    title: str = Field(..., min_length=1)
     content: str = Field(..., min_length=1)
-    excerpt: Optional[str] = Field(None, max_length=500)
+    excerpt: Optional[str] = Field(None)
     status: str = Field(default="draft", pattern="^(draft|published|archived)$")
     verification_status: str = Field(default="unverified", pattern="^(unverified|verified|disputed)$")
     category: Optional[str] = Field(None, max_length=50)
@@ -45,9 +45,9 @@ class PostCreate(PostBase):
 
 
 class PostUpdate(BaseModel):
-    title: Optional[str] = Field(None, min_length=1, max_length=200)
+    title: Optional[str] = Field(None, min_length=1)
     content: Optional[str] = Field(None, min_length=1)
-    excerpt: Optional[str] = Field(None, max_length=500)
+    excerpt: Optional[str] = Field(None)
     status: Optional[str] = Field(None, pattern="^(draft|published|archived)$")
     verification_status: Optional[str] = Field(None, pattern="^(unverified|verified|disputed)$")
     category: Optional[str] = Field(None, max_length=50)
@@ -127,7 +127,7 @@ def generate_slug(title: str) -> str:
 
 # Impact Schemas
 class ImpactBase(BaseModel):
-    title: str = Field(..., min_length=1, max_length=200)
+    title: str = Field(..., min_length=1)
     description: str = Field(..., min_length=1)
     date: datetime
     type: str = Field(..., pattern="^(legal_action|policy_change|investigation|resignation|reform)$")
@@ -139,7 +139,7 @@ class ImpactCreate(ImpactBase):
 
 
 class ImpactUpdate(BaseModel):
-    title: Optional[str] = Field(None, min_length=1, max_length=200)
+    title: Optional[str] = Field(None, min_length=1)
     description: Optional[str] = Field(None, min_length=1)
     date: Optional[datetime] = None
     type: Optional[str] = Field(None, pattern="^(legal_action|policy_change|investigation|resignation|reform)$")
@@ -154,3 +154,55 @@ class ImpactResponse(ImpactBase):
     
     class Config:
         from_attributes = True 
+
+
+# Push Notification Schemas
+from typing import Dict, Any
+
+
+class PushSubscriptionKeys(BaseModel):
+    p256dh: str
+    auth: str
+
+
+class PushSubscriptionData(BaseModel):
+    endpoint: str
+    expirationTime: Optional[str] = None
+    keys: PushSubscriptionKeys
+
+
+class PushSubscriptionCreate(BaseModel):
+    subscription: PushSubscriptionData
+    userAgent: Optional[str] = None
+    timestamp: Optional[str] = None
+
+
+class PushSubscriptionUpdate(BaseModel):
+    notify_new_posts: Optional[bool] = None
+    notify_updates: Optional[bool] = None
+    notify_weekly_digest: Optional[bool] = None
+
+
+class PushSubscriptionResponse(BaseModel):
+    id: int
+    endpoint: str
+    is_active: bool
+    notify_new_posts: bool
+    notify_updates: bool
+    notify_weekly_digest: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class PushNotificationSend(BaseModel):
+    title: str
+    body: str
+    icon: Optional[str] = "/icon-192x192.png"
+    badge: Optional[str] = "/icon-96x96.png"
+    url: Optional[str] = "/"
+    tag: Optional[str] = None
+    data: Optional[Dict[str, Any]] = None
+    user_ids: Optional[List[int]] = None  # If None, send to all
+    subscription_ids: Optional[List[int]] = None  # Specific subscriptions 

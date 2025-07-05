@@ -23,7 +23,7 @@ import TaskItem from '@tiptap/extension-task-item'
 import HorizontalRule from '@tiptap/extension-horizontal-rule'
 import Youtube from '@tiptap/extension-youtube'
 import CharacterCount from '@tiptap/extension-character-count'
-import { useCallback, useState } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 
 interface RichTextEditorProps {
   content: string
@@ -32,7 +32,7 @@ interface RichTextEditorProps {
   className?: string
 }
 
-const MenuBar = ({ editor }: { editor: any }) => {
+const MenuBar = ({ editor, isHtmlMode, setIsHtmlMode }: { editor: any, isHtmlMode: boolean, setIsHtmlMode: (value: boolean) => void }) => {
   const [showFontMenu, setShowFontMenu] = useState(false)
   const [showColorMenu, setShowColorMenu] = useState(false)
   const [showInsertMenu, setShowInsertMenu] = useState(false)
@@ -72,6 +72,38 @@ const MenuBar = ({ editor }: { editor: any }) => {
     }
   }, [editor])
 
+  const pasteAsPlainText = useCallback(async () => {
+    try {
+      const text = await navigator.clipboard.readText()
+      if (text) {
+        // Split text into paragraphs
+        const paragraphs = text.split(/\n\n+/)
+        const html = paragraphs
+          .filter(p => p.trim())
+          .map(p => `<p>${p.trim()}</p>`)
+          .join('')
+        
+        if (html) {
+          editor.chain().focus().insertContent(html).run()
+        }
+      }
+    } catch (err) {
+      // Fallback for browsers that don't support clipboard API
+      const text = window.prompt('Paste your text here:')
+      if (text) {
+        const paragraphs = text.split(/\n\n+/)
+        const html = paragraphs
+          .filter(p => p.trim())
+          .map(p => `<p>${p.trim()}</p>`)
+          .join('')
+        
+        if (html) {
+          editor.chain().focus().insertContent(html).run()
+        }
+      }
+    }
+  }, [editor])
+
   const colors = [
     '#000000', '#434343', '#666666', '#999999', '#B7B7B7', '#CCCCCC', '#D9D9D9', '#EFEFEF', '#F3F3F3', '#FFFFFF',
     '#980000', '#FF0000', '#FF9900', '#FFFF00', '#00FF00', '#00FFFF', '#4A86E8', '#0000FF', '#9900FF', '#FF00FF',
@@ -93,12 +125,28 @@ const MenuBar = ({ editor }: { editor: any }) => {
     <div className="border-b-2 brand-border bg-[#f5f0d8] dark:bg-[#2a251f]">
       {/* First toolbar row */}
       <div className="flex flex-wrap items-center gap-1 px-4 py-2 border-b brand-border">
+        {/* HTML Mode Toggle */}
+        <button
+          type="button"
+          onClick={() => setIsHtmlMode(!isHtmlMode)}
+          className={`px-3 py-1.5 rounded-sm transition-colors text-sm font-mono-special ${
+            isHtmlMode 
+              ? 'bg-[#8B0000] dark:bg-[#d4766f] text-white dark:text-gray-900' 
+              : 'hover:bg-[#eee8d5] dark:hover:bg-[#3a352f]'
+          }`}
+          title={isHtmlMode ? "Switch to Visual Mode" : "Switch to HTML Mode"}
+        >
+          {isHtmlMode ? 'Visual' : 'HTML'}
+        </button>
+
+        <div className="w-px h-6 bg-gray-300 dark:bg-gray-600" />
+
         {/* Undo/Redo */}
         <div className="flex gap-1">
           <button
             type="button"
             onClick={() => editor.chain().focus().undo().run()}
-            disabled={!editor.can().chain().focus().undo().run()}
+            disabled={!editor.can().chain().focus().undo().run() || isHtmlMode}
             className="p-2 rounded-sm transition-colors hover:bg-[#eee8d5] dark:hover:bg-[#3a352f] disabled:opacity-50"
             title="Undo (Cmd+Z)"
           >
@@ -107,7 +155,7 @@ const MenuBar = ({ editor }: { editor: any }) => {
           <button
             type="button"
             onClick={() => editor.chain().focus().redo().run()}
-            disabled={!editor.can().chain().focus().redo().run()}
+            disabled={!editor.can().chain().focus().redo().run() || isHtmlMode}
             className="p-2 rounded-sm transition-colors hover:bg-[#eee8d5] dark:hover:bg-[#3a352f] disabled:opacity-50"
             title="Redo (Cmd+Shift+Z)"
           >
@@ -122,12 +170,13 @@ const MenuBar = ({ editor }: { editor: any }) => {
           <button
             type="button"
             onClick={() => setShowFontMenu(!showFontMenu)}
-            className="px-3 py-1.5 rounded-sm transition-colors hover:bg-[#eee8d5] dark:hover:bg-[#3a352f] text-sm font-mono-special flex items-center gap-1"
+            disabled={isHtmlMode}
+            className="px-3 py-1.5 rounded-sm transition-colors hover:bg-[#eee8d5] dark:hover:bg-[#3a352f] text-sm font-mono-special flex items-center gap-1 disabled:opacity-50"
           >
             {editor.getAttributes('textStyle').fontFamily || 'Font'}
             <span className="text-xs">▼</span>
           </button>
-          {showFontMenu && (
+          {showFontMenu && !isHtmlMode && (
             <div className="absolute top-full left-0 mt-1 bg-white dark:bg-gray-800 border-2 brand-border rounded-sm shadow-lg z-50 min-w-[150px]">
               {fonts.map((font) => (
                 <button
@@ -636,6 +685,16 @@ const MenuBar = ({ editor }: { editor: any }) => {
           Clear Format
         </button>
 
+        {/* Paste as Plain Text */}
+        <button
+          type="button"
+          onClick={pasteAsPlainText}
+          className="px-3 py-1.5 rounded-sm transition-colors hover:bg-[#eee8d5] dark:hover:bg-[#3a352f] text-sm font-mono-special"
+          title="Paste as Plain Text"
+        >
+          📋 Plain Text
+        </button>
+
         {/* Character count */}
         <div className="ml-auto text-sm text-gray-600 dark:text-gray-400 font-mono-special">
           {editor.storage.characterCount.characters()} chars | {editor.storage.characterCount.words()} words
@@ -651,6 +710,9 @@ export default function RichTextEditor({
   placeholder = 'Start writing...',
   className = ''
 }: RichTextEditorProps) {
+  const [isHtmlMode, setIsHtmlMode] = useState(false)
+  const [htmlContent, setHtmlContent] = useState(content || '')
+
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -731,16 +793,159 @@ export default function RichTextEditor({
       }),
       CharacterCount
     ],
-    content,
+    content: content || '',
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML())
+      const html = editor.getHTML()
+      setHtmlContent(html)
+      onChange(html)
     },
     editorProps: {
       attributes: {
         class: 'prose prose-base dark:prose-invert max-w-none focus:outline-none min-h-[400px] px-4 py-3 [&_*]:max-w-none'
+      },
+      handlePaste: (view, event) => {
+        const clipboardData = event.clipboardData
+        if (!clipboardData) return false
+        
+        const html = clipboardData.getData('text/html')
+        const text = clipboardData.getData('text/plain')
+        
+        // If there's HTML content from any source
+        if (html) {
+          event.preventDefault()
+          
+          // Create a temporary div to parse the HTML
+          const tempDiv = document.createElement('div')
+          tempDiv.innerHTML = html
+          
+          // Remove all style attributes first
+          tempDiv.querySelectorAll('*').forEach(el => {
+            el.removeAttribute('style')
+            el.removeAttribute('class')
+            el.removeAttribute('id')
+          })
+          
+          // Keep only allowed tags
+          const allowedTags = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'ul', 'ol', 'li', 
+                              'strong', 'b', 'em', 'i', 'u', 'strike', 's', 'br', 'a', 
+                              'blockquote', 'code', 'pre', 'table', 'thead', 'tbody', 
+                              'tr', 'th', 'td', 'img', 'hr', 'sup', 'sub']
+          
+          // Function to clean an element
+          const cleanElement = (el: Element) => {
+            // Remove all attributes except href for links and src/alt for images
+            const tagName = el.tagName.toLowerCase()
+            const attrs = Array.from(el.attributes)
+            
+            attrs.forEach(attr => {
+              if (tagName === 'a' && attr.name === 'href') {
+                return // Keep href
+              } else if (tagName === 'img' && (attr.name === 'src' || attr.name === 'alt')) {
+                return // Keep src and alt
+              } else {
+                el.removeAttribute(attr.name)
+              }
+            })
+            
+            // Clean child elements
+            Array.from(el.children).forEach(child => cleanElement(child))
+          }
+          
+          // Process all elements
+          const allElements = Array.from(tempDiv.querySelectorAll('*'))
+          
+          allElements.forEach(el => {
+            const tagName = el.tagName.toLowerCase()
+            
+            // Replace disallowed tags with their content
+            if (!allowedTags.includes(tagName)) {
+              // For divs and spans, replace with paragraph if they contain text
+              if ((tagName === 'div' || tagName === 'span') && el.textContent?.trim()) {
+                const p = document.createElement('p')
+                p.innerHTML = el.innerHTML
+                el.replaceWith(p)
+              } else {
+                // For other tags, just unwrap the content
+                el.replaceWith(...Array.from(el.childNodes))
+              }
+            } else {
+              // Clean allowed elements
+              cleanElement(el)
+            }
+          })
+          
+          // Convert bold/strong tags that might be causing issues
+          tempDiv.querySelectorAll('b').forEach(el => {
+            const strong = document.createElement('strong')
+            strong.innerHTML = el.innerHTML
+            el.replaceWith(strong)
+          })
+          
+          // Final cleanup
+          let cleanHtml = tempDiv.innerHTML
+            // Remove empty paragraphs
+            .replace(/<p[^>]*>[\s&nbsp;]*<\/p>/gi, '')
+            // Remove excessive line breaks
+            .replace(/(<br\s*\/?>[\s]*){3,}/gi, '<br><br>')
+            // Clean up whitespace
+            .replace(/&nbsp;/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim()
+          
+          // If we still have content, insert it
+          if (cleanHtml && editor) {
+            // For very simple content (just text), insert as paragraph
+            if (!cleanHtml.includes('<')) {
+              cleanHtml = `<p>${cleanHtml}</p>`
+            }
+            
+            editor.chain().focus().insertContent(cleanHtml).run()
+            return true
+          }
+        } else if (text) {
+          // For plain text, prevent default and insert as paragraphs
+          event.preventDefault()
+          
+          // Split text into paragraphs
+          const paragraphs = text.split(/\n\n+/)
+          const html = paragraphs
+            .filter(p => p.trim())
+            .map(p => `<p>${p.trim()}</p>`)
+            .join('')
+          
+          if (html && editor) {
+            editor.chain().focus().insertContent(html).run()
+            return true
+          }
+        }
+        
+        // Let TipTap handle other cases
+        return false
       }
     }
   })
+
+  // Sync editor content when switching from HTML to visual mode
+  useEffect(() => {
+    if (!isHtmlMode && editor && htmlContent !== editor.getHTML()) {
+      editor.commands.setContent(htmlContent)
+    }
+  }, [isHtmlMode])
+
+  // Update HTML content when content prop changes
+  useEffect(() => {
+    if (content !== htmlContent) {
+      setHtmlContent(content || '')
+      if (editor && !isHtmlMode) {
+        editor.commands.setContent(content || '')
+      }
+    }
+  }, [content])
+
+  const handleHtmlChange = (value: string) => {
+    setHtmlContent(value)
+    onChange(value)
+  }
 
   if (!editor) {
     return null
@@ -748,12 +953,30 @@ export default function RichTextEditor({
 
   return (
     <div className={`border-2 brand-border rounded-sm bg-[#fdf6e3] dark:bg-[#1a1612] ${className}`}>
-      <MenuBar editor={editor} />
-      <EditorContent editor={editor} />
+      <MenuBar editor={editor} isHtmlMode={isHtmlMode} setIsHtmlMode={setIsHtmlMode} />
+      
+      {isHtmlMode ? (
+        <div className="relative">
+          <textarea
+            value={htmlContent}
+            onChange={(e) => handleHtmlChange(e.target.value)}
+            className="w-full min-h-[400px] px-4 py-3 bg-[#fdf6e3] dark:bg-[#1a1612] text-gray-900 dark:text-gray-100 font-mono text-sm resize-y focus:outline-none"
+            placeholder="Paste or write your HTML here..."
+          />
+          <div className="absolute top-2 right-2 text-xs text-gray-500 dark:text-gray-400 font-mono-special">
+            HTML Mode
+          </div>
+        </div>
+      ) : (
+        <EditorContent editor={editor} />
+      )}
       
       {/* Status bar */}
       <div className="border-t-2 brand-border px-4 py-2 bg-[#f5f0d8] dark:bg-[#2a251f] text-xs text-gray-600 dark:text-gray-400 font-mono-special">
-        Press Cmd+K for links • Drag & drop images • YouTube URLs auto-embed
+        {isHtmlMode 
+          ? 'HTML Mode: Paste or edit raw HTML directly' 
+          : 'Press Cmd+K for links • Drag & drop images • YouTube URLs auto-embed'
+        }
       </div>
     </div>
   )

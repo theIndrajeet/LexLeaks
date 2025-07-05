@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&family=Lora:ital,wght@0,400;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Crimson+Text:ital,wght@0,400;0,600;0,700;1,400&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Bebas+Neue&family=Oswald:wght@300;400;500&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,15 +10,42 @@
   }
 
   body {
-    font-family: 'Lora', serif;
+    font-family: 'Crimson Text', 'Georgia', serif;
     background-color: #fdf6e3; /* Warm, parchment-like off-white */
     color: #3d3d3d; /* Dark charcoal gray */
+    font-size: 18px;
+    line-height: 1.7;
   }
 
   /* Dark mode styles with vintage sepia tones */
   .dark body {
     background-color: #1a1612; /* Dark sepia background */
     color: #f5f2ed; /* Off-white/cream text for better visibility */
+  }
+
+  /* Typography hierarchy */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', 'Georgia', serif;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  h1 {
+    font-size: 3rem;
+    font-weight: 900;
+  }
+
+  h2 {
+    font-size: 2.25rem;
+  }
+
+  h3 {
+    font-size: 1.875rem;
+  }
+
+  h4 {
+    font-size: 1.5rem;
   }
 
   /* Custom scrollbar */
@@ -55,7 +82,20 @@
 /* Custom component styles */
 @layer components {
   .font-mono-special {
-    font-family: 'Inconsolata', monospace;
+    font-family: 'Courier Prime', 'Courier New', monospace;
+    letter-spacing: -0.03em;
+  }
+
+  .font-display {
+    font-family: 'Playfair Display', 'Georgia', serif;
+  }
+
+  .font-condensed {
+    font-family: 'Oswald', 'Arial Narrow', sans-serif;
+  }
+
+  .font-impact {
+    font-family: 'Bebas Neue', 'Impact', sans-serif;
   }
 
   .brand-accent {
@@ -123,10 +163,10 @@
   }
 
   .case-file {
-    font-family: 'Inconsolata', monospace;
+    font-family: 'Courier Prime', 'Courier New', monospace;
     font-size: 0.75rem;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.15em;
     color: #6b7280;
     margin-bottom: 0.5rem;
   }
@@ -136,11 +176,13 @@
   }
 
   .article-title {
-    font-size: 1.875rem;
+    font-family: 'Playfair Display', 'Georgia', serif;
+    font-size: 2.25rem;
     font-weight: 700;
-    line-height: 1.2;
+    line-height: 1.1;
     margin-bottom: 1rem;
     transition: color 0.3s ease-in-out;
+    letter-spacing: -0.03em;
   }
 
   .dark .article-title {
@@ -148,9 +190,11 @@
   }
 
   .article-excerpt {
+    font-family: 'Crimson Text', 'Georgia', serif;
     font-size: 1.125rem;
     line-height: 1.7;
     color: #4a5568;
+    font-style: italic;
   }
 
   .dark .article-excerpt {
@@ -158,11 +202,13 @@
   }
 
   .read-more {
-    font-family: 'Inconsolata', monospace;
+    font-family: 'Courier Prime', 'Courier New', monospace;
     font-size: 0.875rem;
     margin-top: 1.5rem;
     color: #8B0000;
     transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
   }
 
   .dark .read-more {
@@ -182,11 +228,13 @@
   }
 
   .main-title {
-    font-size: 3.75rem;
-    font-weight: 700;
+    font-family: 'Playfair Display', 'Georgia', serif;
+    font-size: 4.5rem;
+    font-weight: 900;
     letter-spacing: -0.05em;
-    line-height: 1;
+    line-height: 0.9;
     color: #1a1a1a;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
   }
 
   .dark .main-title {
@@ -196,8 +244,10 @@
   .main-subtitle {
     margin-top: 0.5rem;
     font-size: 1.125rem;
-    font-family: 'Inconsolata', monospace;
+    font-family: 'Courier Prime', 'Courier New', monospace;
     color: #4a5568;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
   }
 
   .dark .main-subtitle {
@@ -206,8 +256,11 @@
 
   /* Navigation styles */
   .main-nav {
-    font-family: 'Inconsolata', monospace;
+    font-family: 'Oswald', 'Arial Narrow', sans-serif;
     font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 400;
   }
 
   .nav-link {
@@ -237,9 +290,10 @@
   }
 
   .footer-text {
-    font-family: 'Inconsolata', monospace;
+    font-family: 'Courier Prime', 'Courier New', monospace;
     font-size: 0.75rem;
     color: #6b7280;
+    letter-spacing: 0.1em;
   }
 
   .dark .footer-text {
@@ -277,12 +331,15 @@
   }
 
   .admin-button {
+    font-family: 'Oswald', 'Arial Narrow', sans-serif;
     background-color: #8B0000;
     color: #ffffff;
     padding: 0.5rem 1rem;
     border-radius: 0.25rem;
-    font-weight: 600;
+    font-weight: 500;
     transition: background-color 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
   }
 
   .admin-button:hover {
@@ -293,8 +350,9 @@
     border: 1px solid #d3c5a9;
     border-radius: 0.25rem;
     padding: 0.75rem;
-    font-family: 'Lora', serif;
+    font-family: 'Crimson Text', 'Georgia', serif;
     background-color: #fdf6e3;
+    font-size: 16px;
   }
 
   .admin-input:focus {
@@ -306,13 +364,13 @@
   /* Drop cap styles */
   .drop-cap::first-letter {
     float: left;
-    font-size: 4.5rem;
-    line-height: 1;
+    font-size: 5rem;
+    line-height: 0.8;
     font-weight: 700;
     margin-right: 0.1em;
-    margin-top: -0.1em;
+    margin-top: 0.1em;
     color: #8B0000;
-    font-family: 'Lora', serif;
+    font-family: 'Playfair Display', 'Georgia', serif;
   }
 
   .dark .drop-cap::first-letter {
@@ -332,6 +390,7 @@
     color: #4a5568;
     border-left: 4px solid #8B0000;
     border-right: 4px solid #8B0000;
+    font-family: 'Crimson Text', 'Georgia', serif;
   }
 
   .dark .pull-quote {
@@ -347,7 +406,7 @@
     font-size: 4rem;
     color: #8B0000;
     opacity: 0.3;
-    font-family: 'Lora', serif;
+    font-family: 'Playfair Display', 'Georgia', serif;
   }
 
   .pull-quote::before {
@@ -403,6 +462,27 @@
   /* Prose styles for article content */
   .prose {
     color: #3d3d3d;
+    font-family: 'Crimson Text', 'Georgia', serif;
+    font-size: 1.125rem;
+    line-height: 1.8;
+  }
+
+  .prose h1,
+  .prose h2,
+  .prose h3,
+  .prose h4,
+  .prose h5,
+  .prose h6 {
+    font-family: 'Playfair Display', 'Georgia', serif;
+  }
+
+  .prose blockquote {
+    font-style: italic;
+    font-family: 'Crimson Text', 'Georgia', serif;
+  }
+
+  .prose code {
+    font-family: 'Courier Prime', 'Courier New', monospace;
   }
 
   .dark .prose {

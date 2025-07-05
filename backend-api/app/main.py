@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 
 from .database import engine
 from . import models
-from .routers import posts, auth, impacts
+from .routers import posts, auth, impacts, notifications
 
 
 # Create database tables
@@ -49,6 +49,7 @@ app.add_middleware(
 app.include_router(auth.router, prefix="/api")
 app.include_router(posts.router, prefix="/api")
 app.include_router(impacts.router, prefix="/api")
+app.include_router(notifications.router, prefix="/api/notifications")
 
 
 # Root endpoint
@@ -77,6 +78,7 @@ async def api_info():
             "authentication": "/api/auth",
             "posts": "/api/posts",
             "impacts": "/api/impacts",
+            "notifications": "/api/notifications",
             "documentation": "/docs"
         }
     } 

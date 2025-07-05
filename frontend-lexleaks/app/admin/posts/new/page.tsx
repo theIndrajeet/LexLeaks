@@ -42,10 +42,51 @@ export default function NewPostPage() {
     setLoading(true)
 
     try {
-      const post = await createPost(formData)
+      // Validate content has actual text
+      const tempDiv = document.createElement('div')
+      tempDiv.innerHTML = formData.content
+      const textContent = tempDiv.textContent || tempDiv.innerText || ''
+      
+      if (!textContent.trim()) {
+        setError('Content cannot be empty')
+        setLoading(false)
+        return
+      }
+
+      // Check content length (backend might have limits)
+      console.log('Content length:', formData.content.length)
+      console.log('Text content length:', textContent.length)
+      
+      // No longer checking content length since backend has no limits
+      // Just log for debugging
+      console.log('Sending post with content length:', formData.content.length)
+
+      // Don't send slug - backend generates it automatically
+      const { slug, ...dataToSend } = formData
+      
+      console.log('Sending data:', {
+        ...dataToSend,
+        content: dataToSend.content.substring(0, 100) + '...' // Log first 100 chars
+      })
+      
+      const post = await createPost(dataToSend)
       router.push(`/admin/posts/${post.id}/edit`)
     } catch (err: any) {
+      console.error('Error creating post:', err)
+      console.error('Error details:', err.response?.data)
+      
+      // More detailed error message
+      if (err.response?.status === 422) {
+        const errorDetails = err.response?.data?.detail
+        if (Array.isArray(errorDetails)) {
+          const fieldErrors = errorDetails.map((e: any) => `${e.loc?.join('.')}: ${e.msg}`).join(', ')
+          setError(`Validation error: ${fieldErrors}`)
+        } else {
+          setError('Validation error: Please check your content format')
+        }
+      } else {
       setError(err.message || 'Failed to create post')
+      }
     } finally {
       setLoading(false)
     }
