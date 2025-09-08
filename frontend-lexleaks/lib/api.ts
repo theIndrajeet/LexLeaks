@@ -292,4 +292,42 @@ export const deleteImpact = async (id: number): Promise<void> => {
   return apiRequest(`/api/impacts/${id}`, {
     method: 'DELETE',
   })
+}
+
+// AI API
+export interface AIGenerateRequest {
+  topic: string
+  article_type: 'quick' | 'standard' | 'deep'
+  ai_provider: 'gemini' | 'perplexity' | 'both'
+  publish_option: 'now' | 'draft' | 'schedule'
+  scheduled_for?: string
+  category?: string
+}
+
+export interface AIGenerateResponse {
+  success: boolean
+  post_id: number
+  title: string
+  status: string
+  word_count: number
+  provider: string
+  scheduled_for?: string
+  preview_url?: string
+}
+
+export const generateAIArticle = async (data: AIGenerateRequest): Promise<AIGenerateResponse> => {
+  return apiRequest('/api/ai/generate', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+export const getScheduledPosts = async (): Promise<any[]> => {
+  return apiRequest('/api/ai/scheduled')
+}
+
+export const publishScheduledPosts = async (): Promise<any> => {
+  return apiRequest('/api/ai/publish-scheduled', {
+    method: 'POST',
+  })
 } 

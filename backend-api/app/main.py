@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 
 from .database import engine
 from . import models
-from .routers import posts, auth, impacts, notifications
+from .routers import posts, auth, impacts, ai, google_auth
 
 
 # Create database tables
@@ -34,6 +34,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",  # Next.js development server
+        "http://localhost:3001",  # Next.js development server (alternative port)
         "https://lexleaks.com",   # Production domain
         "https://www.lexleaks.com",  # Production domain with www
         "https://lexleaks.netlify.app",  # Your main Netlify domain
@@ -49,7 +50,9 @@ app.add_middleware(
 app.include_router(auth.router, prefix="/api")
 app.include_router(posts.router, prefix="/api")
 app.include_router(impacts.router, prefix="/api")
-app.include_router(notifications.router, prefix="/api/notifications")
+app.include_router(ai.router, prefix="/api")
+app.include_router(google_auth.router, prefix="/api/auth")
+# app.include_router(notifications.router, prefix="/api/notifications")  # TODO: Add notifications module
 
 
 # Root endpoint

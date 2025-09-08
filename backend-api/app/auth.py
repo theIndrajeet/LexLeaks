@@ -61,15 +61,19 @@ async def get_current_user(
     )
     
     try:
-        username = verify_token(credentials.credentials)
-        if username is None:
+        user_id = verify_token(credentials.credentials)
+        if user_id is None:
             raise credentials_exception
     except JWTError:
         raise credentials_exception
     
-    user = crud.get_user_by_username(db, username=username)
+    # Try to get user by ID first (for OAuth users), then by username (for regular users)
+    user = crud.get_user(db, user_id=int(user_id))
     if user is None:
-        raise credentials_exception
+        # Fallback to username lookup for backward compatibility
+        user = crud.get_user_by_username(db, username=user_id)
+        if user is None:
+            raise credentials_exception
     
     return user
 

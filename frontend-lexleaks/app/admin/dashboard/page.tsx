@@ -62,12 +62,20 @@ export default function DashboardPage() {
           <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
           <p className="text-gray-600 mt-2">Overview of your LexLeaks content</p>
         </div>
-        <Link
-          href="/admin/posts/new"
-          className="btn-primary"
-        >
-          Create New Post
-        </Link>
+        <div className="flex gap-3">
+          <Link
+            href="/admin/ai-writer"
+            className="btn-primary bg-purple-600 hover:bg-purple-700"
+          >
+            🤖 AI Writer
+          </Link>
+          <Link
+            href="/admin/posts/new"
+            className="btn-primary"
+          >
+            Create New Post
+          </Link>
+        </div>
       </div>
 
       {/* Stats Cards */}

@@ -8,6 +8,7 @@ import TypewriterTitle from '@/components/TypewriterTitle'
 import ThemeToggle from '@/components/ThemeToggle'
 import StatusBadge from '@/components/StatusBadge'
 import InstallPWA from '@/components/InstallPWA'
+import GoogleAuthButton from '@/components/GoogleAuthButton'
 
 import SearchFilter, { FilterState } from '@/components/SearchFilter'
 
@@ -94,6 +95,7 @@ export default function HomePage() {
             <Link href="https://asksarkar.netlify.app" className="nav-link" target="_blank" rel="noopener noreferrer">Ask Sarkar</Link>
           </nav>
           <div className="flex items-center gap-4">
+            <GoogleAuthButton />
             <Link href="/submit" className="brand-button">
               Submit a Leak
             </Link>
@@ -133,6 +135,7 @@ export default function HomePage() {
             <Link href="https://asksarkar.netlify.app" className="nav-link" target="_blank" rel="noopener noreferrer">Ask Sarkar</Link>
           </nav>
           <div className="flex items-center gap-4">
+            <GoogleAuthButton />
             <Link href="/submit" className="brand-button">
               Submit a Leak
             </Link>
@@ -173,6 +176,7 @@ export default function HomePage() {
           <Link href="https://asksarkar.netlify.app" className="nav-link" target="_blank" rel="noopener noreferrer">Ask Sarkar</Link>
         </nav>
         <div className="flex items-center gap-4">
+          <GoogleAuthButton />
           <Link href="/submit" className="brand-button">
             Submit a Leak
           </Link>

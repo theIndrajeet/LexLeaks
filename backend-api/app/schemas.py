@@ -13,13 +13,21 @@ class UserCreate(UserBase):
     password: str = Field(..., min_length=8)
 
 
-class UserResponse(UserBase):
+class UserResponse(BaseModel):
     id: int
+    username: Optional[str] = None
+    email: Optional[str] = None
+    full_name: Optional[str] = None
     is_admin: bool
     created_at: datetime
     
     class Config:
         from_attributes = True
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
 
 
 # Post Schemas

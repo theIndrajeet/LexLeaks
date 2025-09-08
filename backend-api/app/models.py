@@ -9,10 +9,17 @@ class User(Base):
     __tablename__ = "users"
     
     id = Column(Integer, primary_key=True, index=True)
-    username = Column(String(50), unique=True, index=True, nullable=False)
-    hashed_password = Column(String(255), nullable=False)
+    username = Column(String(50), unique=True, index=True, nullable=True)  # Nullable for OAuth users
+    hashed_password = Column(String(255), nullable=True)  # Nullable for OAuth users
     is_admin = Column(Boolean, default=False, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    # OAuth fields
+    email = Column(String(255), unique=True, index=True, nullable=True)  # For OAuth users
+    full_name = Column(String(255), nullable=True)  # For OAuth users
+    google_id = Column(String(255), unique=True, nullable=True)  # Google OAuth ID
+    profile_picture = Column(String(500), nullable=True)  # Profile picture URL
+    oauth_provider = Column(String(50), nullable=True)  # 'google', 'local', etc.
     
     # Relationship to posts
     posts = relationship("Post", back_populates="author")
@@ -37,6 +44,11 @@ class Post(Base):
     published_at = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    
+    # AI-related fields
+    ai_generated = Column(Boolean, default=False, nullable=True)
+    ai_prompt = Column(Text, nullable=True)
+    scheduled_for = Column(DateTime(timezone=True), nullable=True)
     
     # Relationship to user
     author = relationship("User", back_populates="posts")
