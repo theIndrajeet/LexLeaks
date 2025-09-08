@@ -12,7 +12,7 @@ export default function TestPWA() {
   }, [])
 
   const checkStatus = async () => {
-    const checks = {
+    const checks: Record<string, any> = {
       // Environment Variables
       apiUrl: process.env.NEXT_PUBLIC_API_URL || 'NOT SET',
       vapidKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ? 'SET ✅' : 'NOT SET ❌',

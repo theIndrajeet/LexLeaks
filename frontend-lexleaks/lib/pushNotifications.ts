@@ -50,7 +50,7 @@ export class PushNotificationManager {
         // Create new subscription
         subscription = await registration.pushManager.subscribe({
           userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY)
+          applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY) as BufferSource
         })
         
         // Send subscription to backend
@@ -175,7 +175,7 @@ export class PushNotificationManager {
 }
 
 // Helper function to convert VAPID key
-function urlBase64ToUint8Array(base64String: string): Uint8Array {
+function urlBase64ToUint8Array(base64String: string): ArrayBufferView {
   const padding = '='.repeat((4 - base64String.length % 4) % 4)
   const base64 = (base64String + padding)
     .replace(/\-/g, '+')
