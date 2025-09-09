@@ -13,31 +13,61 @@ function AuthCallbackContent() {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        const googleAuth = GoogleAuthService.getInstance()
-        const result = googleAuth.handleAuthCallback()
+        const code = searchParams.get('code')
+        const state = searchParams.get('state')
         
-        if (result) {
-          setStatus('success')
-          setMessage('Login successful! Redirecting...')
+        if (code && state) {
+          // We have OAuth code and state, need to exchange for token
+          setStatus('loading')
+          setMessage('Exchanging authorization code...')
           
-          // Redirect to appropriate page based on user role
-          setTimeout(async () => {
-            // Check if user is admin
-            try {
-              const userInfo = await googleAuth.getGoogleUserInfo()
-              if (userInfo.is_admin) {
-                router.push('/admin/dashboard')
-              } else {
+          try {
+            // Send the code to backend to exchange for token
+            const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+            const response = await fetch(`${apiUrl}/api/auth/google/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`, {
+              method: 'GET',
+              credentials: 'include'
+            })
+            
+            if (response.ok) {
+              // Backend should redirect us to success page with token
+              // If we get here, something went wrong
+              setStatus('error')
+              setMessage('Unexpected response from server')
+            } else {
+              setStatus('error')
+              setMessage('Failed to exchange authorization code')
+            }
+          } catch (error: any) {
+            setStatus('error')
+            setMessage('Network error: ' + error.message)
+          }
+        } else {
+          // Check for existing token (legacy flow)
+          const googleAuth = GoogleAuthService.getInstance()
+          const result = googleAuth.handleAuthCallback()
+          
+          if (result) {
+            setStatus('success')
+            setMessage('Login successful! Redirecting...')
+            
+            // Redirect to appropriate page based on user role
+            setTimeout(async () => {
+              try {
+                const userInfo = await googleAuth.getGoogleUserInfo()
+                if (userInfo.is_admin) {
+                  router.push('/admin/dashboard')
+                } else {
+                  router.push('/')
+                }
+              } catch (error) {
                 router.push('/')
               }
-            } catch (error) {
-              // If we can't get user info, redirect to home
-              router.push('/')
-            }
-          }, 2000)
-        } else {
-          setStatus('error')
-          setMessage('Authentication failed. Please try again.')
+            }, 2000)
+          } else {
+            setStatus('error')
+            setMessage('No authorization code or token found')
+          }
         }
       } catch (error: any) {
         setStatus('error')
@@ -46,7 +76,7 @@ function AuthCallbackContent() {
     }
 
     handleCallback()
-  }, [router])
+  }, [router, searchParams])
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
