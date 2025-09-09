@@ -19,7 +19,8 @@ class GoogleOAuthService:
     
     @property
     def redirect_uri(self):
-        return os.getenv("GOOGLE_REDIRECT_URI")
+        # HARDCODED: Using frontend callback URL directly
+        return "https://lexleaks.com/auth/callback"
         
     @property
     def scopes(self):
