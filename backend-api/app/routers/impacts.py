@@ -12,7 +12,7 @@ router = APIRouter(
 
 
 @router.get("/", response_model=List[schemas.ImpactResponse])
-@router.get("", response_model=List[schemas.ImpactResponse])
+@router.get("", response_model=List[schemas.ImpactResponse], include_in_schema=False)
 def read_impacts(
     skip: int = 0,
     limit: int = 100,
@@ -29,7 +29,7 @@ def read_impacts(
 
 
 @router.post("/", response_model=schemas.ImpactResponse, status_code=status.HTTP_201_CREATED)
-@router.post("", response_model=schemas.ImpactResponse, status_code=status.HTTP_201_CREATED)
+@router.post("", response_model=schemas.ImpactResponse, status_code=status.HTTP_201_CREATED, include_in_schema=False)
 def create_impact(
     impact: schemas.ImpactCreate,
     db: Session = Depends(get_db),
