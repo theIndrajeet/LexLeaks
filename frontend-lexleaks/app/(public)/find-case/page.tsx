@@ -27,7 +27,7 @@ interface SearchResponse {
   error?: string
 }
 
-export default function FindCasePage() {
+function FindCaseContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   
@@ -367,5 +367,25 @@ export default function FindCasePage() {
         <p className="footer-text mt-1">Dedicated to transparency and accountability in the legal industry.</p>
       </footer>
     </div>
+  )
+}
+
+export default function FindCasePage() {
+  return (
+    <Suspense fallback={
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <header className="main-header parallax-container">
+          <TypewriterTitle text="FIND CASE" className="main-title" delay={150} />
+          <p className="main-subtitle">Search Indian Legal Cases & Judgments.</p>
+        </header>
+        <Navigation currentPage="/find-case" />
+        <div className="text-center py-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    }>
+      <FindCaseContent />
+    </Suspense>
   )
 }
