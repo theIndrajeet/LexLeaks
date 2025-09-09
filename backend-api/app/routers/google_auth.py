@@ -14,6 +14,16 @@ from ..schemas import UserResponse, TokenResponse
 
 router = APIRouter()
 
+@router.get("/google/debug")
+async def google_debug():
+    """Debug Google OAuth configuration"""
+    return {
+        "client_id": os.getenv("GOOGLE_CLIENT_ID", "NOT_SET"),
+        "client_secret": "SET" if os.getenv("GOOGLE_CLIENT_SECRET") else "NOT_SET",
+        "redirect_uri": os.getenv("GOOGLE_REDIRECT_URI", "NOT_SET"),
+        "google_oauth_redirect_uri": google_oauth.redirect_uri
+    }
+
 @router.get("/google/login")
 async def google_login(request: Request, state: Optional[str] = None):
     """Initiate Google OAuth login"""
