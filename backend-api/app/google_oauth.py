@@ -30,7 +30,7 @@ class GoogleOAuthService:
         ]
     
     def get_authorization_url(self, state: str = None) -> str:
-        """Generate Google OAuth authorization URL"""
+        """Generate Google OAuth authorization URL - Updated to use dynamic env vars"""
         flow = Flow.from_client_config(
             {
                 "web": {
