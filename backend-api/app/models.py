@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Boolean, Float
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from .database import Base
@@ -93,4 +93,38 @@ class PushSubscription(Base):
     notify_weekly_digest = Column(Boolean, default=False)
     
     # Relationship
-    user = relationship("User", back_populates="push_subscriptions") 
+    user = relationship("User", back_populates="push_subscriptions")
+
+
+class JobOpportunity(Base):
+    """Job opportunity model for THE ENGINE"""
+    __tablename__ = "job_opportunities"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String(255), index=True, nullable=False)
+    company = Column(String(255), index=True, nullable=False)
+    location = Column(String(255), nullable=True)
+    work_type = Column(String(50), nullable=True)  # remote, hybrid, office, flexible
+    salary_min = Column(Integer, nullable=True)
+    salary_max = Column(Integer, nullable=True)
+    salary_currency = Column(String(10), default="USD", nullable=False)
+    job_type = Column(String(50), nullable=True)  # full-time, part-time, contract, internship
+    experience_level = Column(String(50), nullable=True)  # entry, mid, senior
+    practice_area = Column(String(100), nullable=True)  # corporate, criminal, ip, etc.
+    firm_size = Column(String(50), nullable=True)  # boutique, mid-size, big-law
+    practice_type = Column(String(50), nullable=True)  # litigation, transactional, regulatory
+    description = Column(Text, nullable=True)
+    requirements = Column(Text, nullable=True)
+    benefits = Column(Text, nullable=True)
+    application_url = Column(String(500), nullable=True)
+    source = Column(String(100), nullable=False)  # indeed, linkedin, etc.
+    source_url = Column(String(500), nullable=True)
+    posted_date = Column(DateTime(timezone=True), nullable=True)
+    expires_date = Column(DateTime(timezone=True), nullable=True)
+    quality_score = Column(Float, nullable=True)
+    is_remote = Column(Boolean, default=False, nullable=False)
+    is_hybrid = Column(Boolean, default=False, nullable=False)
+    is_office = Column(Boolean, default=False, nullable=False)
+    gemini_enhanced = Column(Boolean, default=False, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now()) 

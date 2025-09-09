@@ -5,10 +5,9 @@ import Link from 'next/link'
 import { format } from 'date-fns'
 import { getPublishedPosts, PostSummary } from '@/lib/api'
 import TypewriterTitle from '@/components/TypewriterTitle'
-import ThemeToggle from '@/components/ThemeToggle'
+import Navigation from '@/components/Navigation'
 import StatusBadge from '@/components/StatusBadge'
 import InstallPWA from '@/components/InstallPWA'
-import GoogleAuthButton from '@/components/GoogleAuthButton'
 
 import SearchFilter, { FilterState } from '@/components/SearchFilter'
 
@@ -87,21 +86,7 @@ export default function HomePage() {
           <p className="main-subtitle">Exposing the Fine Print.</p>
         </header>
         
-        <div className="flex flex-col sm:flex-row justify-between items-center mb-16">
-          <nav className="main-nav space-x-6 text-sm mb-6 sm:mb-0">
-            <Link href="/" className="nav-link">Home</Link>
-            <Link href="/about" className="nav-link">About</Link>
-            <Link href="/archive" className="nav-link">Archive</Link>
-            <Link href="https://asksarkar.netlify.app" className="nav-link" target="_blank" rel="noopener noreferrer">Ask Sarkar</Link>
-          </nav>
-          <div className="flex items-center gap-4">
-            <GoogleAuthButton />
-            <Link href="/submit" className="brand-button">
-              Submit a Leak
-            </Link>
-            <ThemeToggle />
-          </div>
-        </div>
+        <Navigation currentPage="/" />
 
         <main>
           <div className="space-y-16">
@@ -127,21 +112,7 @@ export default function HomePage() {
           <p className="main-subtitle">Exposing the Fine Print.</p>
         </header>
         
-        <div className="flex flex-col sm:flex-row justify-between items-center mb-16">
-          <nav className="main-nav space-x-6 text-sm mb-6 sm:mb-0">
-            <Link href="/" className="nav-link">Home</Link>
-            <Link href="/about" className="nav-link">About</Link>
-            <Link href="/archive" className="nav-link">Archive</Link>
-            <Link href="https://asksarkar.netlify.app" className="nav-link" target="_blank" rel="noopener noreferrer">Ask Sarkar</Link>
-          </nav>
-          <div className="flex items-center gap-4">
-            <GoogleAuthButton />
-            <Link href="/submit" className="brand-button">
-              Submit a Leak
-            </Link>
-            <ThemeToggle />
-          </div>
-        </div>
+        <Navigation currentPage="/" />
         
         <div className="text-center py-12">
           <div className="border border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950 rounded-lg p-8">
@@ -167,22 +138,7 @@ export default function HomePage() {
         <p className="main-subtitle">Exposing the Fine Print.</p>
       </header>
 
-      {/* Navigation & Submit Button */}
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-16">
-        <nav className="main-nav space-x-6 text-sm mb-6 sm:mb-0">
-          <Link href="/" className="nav-link">Home</Link>
-          <Link href="/about" className="nav-link">About</Link>
-          <Link href="/archive" className="nav-link">Archive</Link>
-          <Link href="https://asksarkar.netlify.app" className="nav-link" target="_blank" rel="noopener noreferrer">Ask Sarkar</Link>
-        </nav>
-        <div className="flex items-center gap-4">
-          <GoogleAuthButton />
-          <Link href="/submit" className="brand-button">
-            Submit a Leak
-          </Link>
-          <ThemeToggle />
-        </div>
-      </div>
+      <Navigation currentPage="/" />
 
       {/* Search and Filter Section */}
       {posts.length > 0 && (

@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { format } from 'date-fns'
 import { getPostBySlug, Post, getImpacts, Impact } from '@/lib/api'
-import ThemeToggle from '@/components/ThemeToggle'
+import Navigation from '@/components/Navigation'
 import StatusBadge from '@/components/StatusBadge'
 
 import ImpactTracker from '@/components/ImpactTracker'
@@ -98,19 +98,7 @@ export default function PostPage({ params }: PageProps) {
           <p className="main-subtitle">Exposing the Fine Print.</p>
         </header>
         
-        <div className="flex flex-col sm:flex-row justify-between items-center mb-16">
-          <nav className="main-nav space-x-6 text-sm mb-6 sm:mb-0">
-            <Link href="/" className="nav-link">Home</Link>
-            <Link href="/about" className="nav-link">About</Link>
-            <Link href="/archive" className="nav-link">Archive</Link>
-          </nav>
-          <div className="flex items-center gap-4">
-            <Link href="/submit" className="brand-button">
-              Submit a Leak
-            </Link>
-            <ThemeToggle />
-          </div>
-        </div>
+        <Navigation />
 
         <main>
           <div className="space-y-4">
@@ -176,20 +164,7 @@ export default function PostPage({ params }: PageProps) {
         <p className="main-subtitle">Exposing the Fine Print.</p>
       </header>
 
-      {/* Navigation & Submit Button */}
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-16">
-        <nav className="main-nav space-x-6 text-sm mb-6 sm:mb-0">
-          <Link href="/" className="nav-link">Home</Link>
-          <Link href="/about" className="nav-link">About</Link>
-          <Link href="/archive" className="nav-link">Archive</Link>
-        </nav>
-        <div className="flex items-center gap-4">
-          <Link href="/submit" className="brand-button">
-            Submit a Leak
-          </Link>
-          <ThemeToggle />
-        </div>
-      </div>
+      <Navigation />
 
       {/* Main Article Content */}
       <main>

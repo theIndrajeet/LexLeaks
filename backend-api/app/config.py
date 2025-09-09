@@ -18,3 +18,15 @@ ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "LexLeaks2024!")
 
 # CORS configuration
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
+
+# AI API Keys
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+PERPLEXITY_API_KEY = os.getenv("PERPLEXITY_API_KEY")
+
+# Google OAuth
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
+GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI")
+
+# Indian Kanoon API
+INDIAN_KANOON_API_KEY = os.getenv("INDIAN_KANOON_API_KEY")

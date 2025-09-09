@@ -213,4 +213,54 @@ class PushNotificationSend(BaseModel):
     tag: Optional[str] = None
     data: Optional[Dict[str, Any]] = None
     user_ids: Optional[List[int]] = None  # If None, send to all
-    subscription_ids: Optional[List[int]] = None  # Specific subscriptions 
+    subscription_ids: Optional[List[int]] = None  # Specific subscriptions
+
+
+# Job Opportunity Schemas
+class JobOpportunityResponse(BaseModel):
+    id: int
+    title: str
+    company: str
+    location: Optional[str]
+    work_type: Optional[str]  # remote, hybrid, office, flexible
+    salary_min: Optional[int]
+    salary_max: Optional[int]
+    salary_currency: str
+    job_type: Optional[str]  # full-time, part-time, contract, internship
+    experience_level: Optional[str]  # entry, mid, senior
+    practice_area: Optional[str]  # corporate, criminal, ip, etc.
+    firm_size: Optional[str]  # boutique, mid-size, big-law
+    practice_type: Optional[str]  # litigation, transactional, regulatory
+    description: Optional[str]
+    requirements: Optional[str]
+    benefits: Optional[str]
+    application_url: Optional[str]
+    source: str  # indeed, linkedin, etc.
+    source_url: Optional[str]
+    posted_date: Optional[datetime]
+    expires_date: Optional[datetime]
+    quality_score: Optional[float]
+    is_remote: bool
+    is_hybrid: bool
+    is_office: bool
+    gemini_enhanced: bool
+    created_at: datetime
+    updated_at: Optional[datetime]
+    
+    class Config:
+        from_attributes = True
+
+
+class JobSearchResponse(BaseModel):
+    jobs: List[JobOpportunityResponse]
+    total_count: int
+    page: int
+    limit: int
+    total_pages: int
+
+
+class MarketTrendsResponse(BaseModel):
+    insights: Dict[str, Any]
+    data_period: str
+    total_jobs_analyzed: int
+    generated_at: datetime 

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import dynamic from 'next/dynamic'
 import TypewriterTitle from '@/components/TypewriterTitle'
-import ThemeToggle from '@/components/ThemeToggle'
+import Navigation from '@/components/Navigation'
 import SearchFilter, { FilterState } from '@/components/SearchFilter'
 import ImpactTracker from '@/components/ImpactTracker'
 
@@ -53,18 +53,7 @@ export default function ContentDemoPage() {
         <p className="main-subtitle">Showcasing Advanced Content Capabilities</p>
       </header>
 
-      {/* Navigation & Theme Toggle */}
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-16">
-        <nav className="main-nav space-x-6 text-sm mb-6 sm:mb-0">
-          <Link href="/" className="nav-link">Home</Link>
-          <Link href="/demo" className="nav-link">Visual Demo</Link>
-          <Link href="/content-demo" className="nav-link font-bold">Content Demo</Link>
-        </nav>
-        <div className="flex items-center gap-4">
-          
-          <ThemeToggle />
-        </div>
-      </div>
+      <Navigation currentPage="/content-demo" />
 
       {/* Main Content */}
       <main className="space-y-16">

@@ -24,7 +24,8 @@ export class GoogleAuthService {
 
   async initiateGoogleLogin(): Promise<string> {
     try {
-      const response = await fetch('http://localhost:8000/api/auth/google/login', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${apiUrl}/api/auth/google/login`, {
         method: 'GET',
         credentials: 'include'
       });
@@ -55,7 +56,8 @@ export class GoogleAuthService {
         throw new Error('No authentication token found');
       }
 
-      const response = await fetch('http://localhost:8000/api/auth/google/user-info', {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+      const response = await fetch(`${apiUrl}/api/auth/google/user-info`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

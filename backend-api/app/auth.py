@@ -61,19 +61,24 @@ async def get_current_user(
     )
     
     try:
-        user_id = verify_token(credentials.credentials)
+        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id: Optional[str] = payload.get("sub")
         if user_id is None:
             raise credentials_exception
     except JWTError:
         raise credentials_exception
     
-    # Try to get user by ID first (for OAuth users), then by username (for regular users)
-    user = crud.get_user(db, user_id=int(user_id))
+    # Try to find user by ID (for OAuth users)
+    user = crud.get_user_by_id(db, user_id=int(user_id))
+    
+    # If not found by ID, try by username (for traditional users, though username might be None for OAuth)
     if user is None:
-        # Fallback to username lookup for backward compatibility
-        user = crud.get_user_by_username(db, username=user_id)
-        if user is None:
-            raise credentials_exception
+        username: Optional[str] = payload.get("username") # Fallback for traditional users
+        if username:
+            user = crud.get_user_by_username(db, username=username)
+    
+    if user is None:
+        raise credentials_exception
     
     return user
 
@@ -83,11 +88,7 @@ async def get_current_admin_user(
     current_user = Depends(get_current_user)
 ):
     """Dependency to ensure the current user is an admin"""
-    # For now, we'll consider the first user or a specific username as admin
-    # You can modify this logic based on your needs
-    admin_username = os.getenv("ADMIN_USERNAME", "admin")
-    
-    if current_user.username != admin_username:
+    if not current_user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not enough permissions"

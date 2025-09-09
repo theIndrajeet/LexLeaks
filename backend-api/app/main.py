@@ -1,15 +1,26 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+import logging
 
 from .database import engine
 from . import models
-from .routers import posts, auth, impacts, ai, google_auth
+from .routers import posts, auth, impacts, ai, google_auth, kanoon, opportunities
+from .smart_automation import start_automation
 
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Create database tables
 def create_tables():
-    models.Base.metadata.create_all(bind=engine)
+    try:
+        models.Base.metadata.create_all(bind=engine)
+        logger.info("✅ Database tables created/verified successfully")
+    except Exception as e:
+        logger.error(f"❌ Database connection failed: {e}")
+        logger.warning("⚠️  Server will continue without database features")
+        logger.warning("⚠️  Some features may not work properly")
 
 
 # Lifespan event handler
@@ -17,6 +28,8 @@ def create_tables():
 async def lifespan(app: FastAPI):
     # Startup
     create_tables()
+    # Start smart automation
+    await start_automation()
     yield
     # Shutdown (if needed)
 
@@ -52,6 +65,8 @@ app.include_router(posts.router, prefix="/api")
 app.include_router(impacts.router, prefix="/api")
 app.include_router(ai.router, prefix="/api")
 app.include_router(google_auth.router, prefix="/api/auth")
+app.include_router(kanoon.router, prefix="/api/kanoon")
+app.include_router(opportunities.router, prefix="/api")
 # app.include_router(notifications.router, prefix="/api/notifications")  # TODO: Add notifications module
 
 
@@ -81,6 +96,9 @@ async def api_info():
             "authentication": "/api/auth",
             "posts": "/api/posts",
             "impacts": "/api/impacts",
+            "opportunities": "/api/opportunities",
+            "kanoon": "/api/kanoon",
+            "ai": "/api/ai",
             "notifications": "/api/notifications",
             "documentation": "/docs"
         }

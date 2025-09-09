@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { format } from 'date-fns'
 import { getAllPosts, PostSummary } from '@/lib/api'
+import Navigation from '@/components/Navigation'
 
 export default function ArchivePage() {
   const [posts, setPosts] = useState<PostSummary[]>([])
@@ -46,16 +47,7 @@ export default function ArchivePage() {
           <p className="main-subtitle">Exposing the Fine Print.</p>
         </header>
         
-        <div className="flex flex-col sm:flex-row justify-between items-center mb-16">
-          <nav className="main-nav space-x-6 text-sm mb-6 sm:mb-0">
-            <Link href="/" className="nav-link">Home</Link>
-            <Link href="/about" className="nav-link">About</Link>
-            <Link href="/archive" className="nav-link brand-accent font-bold">Archive</Link>
-          </nav>
-          <Link href="/submit" className="brand-button">
-            Submit a Leak
-          </Link>
-        </div>
+        <Navigation currentPage="/archive" />
 
         <main>
           <div className="space-y-8">
@@ -104,17 +96,7 @@ export default function ArchivePage() {
         <p className="main-subtitle">Exposing the Fine Print.</p>
       </header>
 
-      {/* Navigation & Submit Button */}
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-16">
-        <nav className="main-nav space-x-6 text-sm mb-6 sm:mb-0">
-          <Link href="/" className="nav-link">Home</Link>
-          <Link href="/about" className="nav-link">About</Link>
-          <Link href="/archive" className="nav-link brand-accent font-bold">Archive</Link>
-        </nav>
-        <Link href="/submit" className="brand-button">
-          Submit a Leak
-        </Link>
-      </div>
+      <Navigation currentPage="/archive" />
 
       {/* Main Content */}
       <main>

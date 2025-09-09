@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import ThemeToggle from '@/components/ThemeToggle'
+import Navigation from '@/components/Navigation'
 
 export default function SubmitPage() {
   return (
@@ -12,21 +12,7 @@ export default function SubmitPage() {
         <p className="main-subtitle">Exposing the Fine Print.</p>
       </header>
 
-      {/* Navigation & Submit Button */}
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-16">
-        <nav className="main-nav space-x-6 text-sm mb-6 sm:mb-0">
-          <Link href="/" className="nav-link">Home</Link>
-          <Link href="/about" className="nav-link">About</Link>
-          <Link href="/archive" className="nav-link">Archive</Link>
-        </nav>
-        <div className="flex items-center gap-4">
-          <Link href="/submit" className="brand-button">
-            Submit a Leak
-          </Link>
-          
-          <ThemeToggle />
-        </div>
-      </div>
+      <Navigation currentPage="/submit" showSubmitButton={false} />
 
       {/* Main Content */}
       <main>

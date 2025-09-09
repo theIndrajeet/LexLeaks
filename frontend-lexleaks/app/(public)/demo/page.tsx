@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import TypewriterTitle from '@/components/TypewriterTitle'
-import ThemeToggle from '@/components/ThemeToggle'
+import Navigation from '@/components/Navigation'
 import StatusBadge from '@/components/StatusBadge'
 import SearchFilter from '@/components/SearchFilter'
 import ImpactTracker from '@/components/ImpactTracker'
@@ -84,19 +84,7 @@ export default function DemoPage() {
         <p className="main-subtitle">Component Showcase</p>
       </header>
 
-      {/* Navigation */}
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-16">
-        <nav className="main-nav space-x-6 text-sm mb-6 sm:mb-0">
-          <Link href="/" className="nav-link">Home</Link>
-          <Link href="/about" className="nav-link">About</Link>
-          <Link href="/archive" className="nav-link">Archive</Link>
-          <Link href="/demo" className="nav-link font-bold">Demo</Link>
-        </nav>
-        <div className="flex items-center gap-4">
-          
-          <ThemeToggle />
-        </div>
-      </div>
+      <Navigation currentPage="/demo" />
 
       <main className="space-y-16">
         {/* Status Badges Section */}

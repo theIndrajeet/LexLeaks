@@ -16,6 +16,11 @@ def get_user(db: Session, user_id: int) -> Optional[models.User]:
     return db.query(models.User).filter(models.User.id == user_id).first()
 
 
+def get_user_by_id(db: Session, user_id: int) -> Optional[models.User]:
+    """Get user by ID (alias for get_user)"""
+    return db.query(models.User).filter(models.User.id == user_id).first()
+
+
 def get_user_by_username(db: Session, username: str) -> Optional[models.User]:
     """Get user by username"""
     return db.query(models.User).filter(models.User.username == username).first()

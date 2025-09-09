@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
+import Navigation from '@/components/Navigation'
 
 export const metadata: Metadata = {
   title: 'About LexLeaks',
@@ -15,17 +16,7 @@ export default function AboutPage() {
         <p className="main-subtitle">Exposing the Fine Print.</p>
       </header>
 
-      {/* Navigation & Submit Button */}
-      <div className="flex flex-col sm:flex-row justify-between items-center mb-16">
-        <nav className="main-nav space-x-6 text-sm mb-6 sm:mb-0">
-          <Link href="/" className="nav-link">Home</Link>
-          <Link href="/about" className="nav-link brand-accent font-bold">About</Link>
-          <Link href="/archive" className="nav-link">Archive</Link>
-        </nav>
-        <Link href="/submit" className="brand-button">
-          Submit a Leak
-        </Link>
-      </div>
+      <Navigation currentPage="/about" />
 
       {/* Main Content */}
       <main>

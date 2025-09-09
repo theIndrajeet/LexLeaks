@@ -352,6 +352,7 @@
     padding: 0.75rem;
     font-family: 'Crimson Text', 'Georgia', serif;
     background-color: #fdf6e3;
+    color: #1a1a1a;
     font-size: 16px;
   }
 
@@ -359,6 +360,26 @@
     outline: none;
     border-color: #8B0000;
     box-shadow: 0 0 0 2px rgba(139, 0, 0, 0.1);
+  }
+
+  .admin-input::placeholder {
+    color: #6b7280;
+  }
+
+  /* Dark mode styles for admin inputs */
+  .dark .admin-input {
+    background-color: #2d2a24;
+    border-color: #4a4539;
+    color: #faf8f5;
+  }
+
+  .dark .admin-input:focus {
+    border-color: #d4766f;
+    box-shadow: 0 0 0 2px rgba(212, 118, 111, 0.1);
+  }
+
+  .dark .admin-input::placeholder {
+    color: #9ca3af;
   }
 
   /* Drop cap styles */
