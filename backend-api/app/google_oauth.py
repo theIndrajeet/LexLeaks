@@ -7,12 +7,23 @@ import httpx
 
 class GoogleOAuthService:
     def __init__(self):
-        self.client_id = os.getenv("GOOGLE_CLIENT_ID")
-        self.client_secret = os.getenv("GOOGLE_CLIENT_SECRET")
-        self.redirect_uri = os.getenv("GOOGLE_REDIRECT_URI")
+        pass
+    
+    @property
+    def client_id(self):
+        return os.getenv("GOOGLE_CLIENT_ID")
+    
+    @property
+    def client_secret(self):
+        return os.getenv("GOOGLE_CLIENT_SECRET")
+    
+    @property
+    def redirect_uri(self):
+        return os.getenv("GOOGLE_REDIRECT_URI")
         
-        # OAuth 2.0 scopes
-        self.scopes = [
+    @property
+    def scopes(self):
+        return [
             "openid",
             "https://www.googleapis.com/auth/userinfo.email",
             "https://www.googleapis.com/auth/userinfo.profile"
