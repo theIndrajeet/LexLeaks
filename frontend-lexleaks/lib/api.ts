@@ -388,7 +388,6 @@ export interface LegalQueryResponse {
     tools_used: string[]
     duration_ms: number
   }
-  success: boolean
   timestamp: string
 }
 
