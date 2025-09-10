@@ -382,7 +382,14 @@ class LegalAIService:
                 case_law_context += f"   URL: {case.get('url', '')}\n"
         
         return f"""
-        You are JurisBrain, an AI legal assistant. Provide a comprehensive, accurate, and helpful answer to this legal question.
+        You are JurisBrain AI. Lead with a short answer, then provide detailed reasoning with inline citations.
+        
+        CRITICAL RULES:
+        - Never treat UI control phrases (e.g., "Try again", "Simplify your question") as legal queries
+        - If the input is control/meta, perform the action and re-answer the original legal question
+        - Always provide a direct, assertive answer first, then detailed analysis
+        - Use inline citation pins [1][2] for all claims
+        - Include 1-2 crisp follow-up questions at the end
         
         Original Query: {original_query}
         
@@ -397,28 +404,26 @@ class LegalAIService:
         
         {case_law_context}
         
-        Please provide your answer in the following structure:
+        RESPONSE FORMAT (Required):
         
-        1. **Quick Take** (2-3 sentences): A clear, concise answer to the question
+        1. **Direct Answer** (1-2 sentences): Clear, assertive response with inline pins [1][2]
         
-        2. **Detailed Legal Analysis**: 
-           - Current legal position
-           - Relevant case law and precedents
-           - Statutory provisions (if applicable)
-           - Recent developments or changes
+        2. **Legal Analysis**: 
+           - Current legal position with citations [1]
+           - Key case law and precedents [2][3]
+           - Statutory provisions (if applicable) [4]
+           - Recent developments [5]
         
-        3. **Practical Implications**: What this means in practice
+        3. **Practical Implications**: What this means in real cases
         
-        4. **Important Considerations**: Any caveats, exceptions, or additional factors
+        4. **Important Considerations**: Caveats, exceptions, limitations
         
-        5. **Sources and Citations**: Reference the cases and sources used
-        
-        Make your answer:
-        - Accurate and well-researched
-        - Easy to understand for non-lawyers
-        - Comprehensive but not overwhelming
-        - Properly cited with case references
-        - Professional and helpful tone
+        QUALITY REQUIREMENTS:
+        - Professional but human tone
+        - Every claim must have inline citation pins [1][2]
+        - Include exactly 2 follow-up questions that advance the conversation
+        - If confidence is low, provide ONE clarifying question + options, not filler paragraphs
+        - For failed/partial results, offer specific next steps with actionable chips
         
         Remember: This is for educational purposes only and does not constitute legal advice.
         """
@@ -658,12 +663,19 @@ class LegalAIService:
             - Conversation Count: {session.get('conversation_count', 0)}
             
             Generate follow-up questions that:
-            1. Are specific and actionable
-            2. Build on the current answer
-            3. Explore related legal aspects
-            4. Are appropriate for the user's level (consider conversation count)
+            1. Are specific and actionable (can be clicked to continue conversation)
+            2. Build on the current answer and explore related aspects
+            3. Include scope modification options when relevant
+            4. Mix different types: clarification, expansion, scope changes
             
-            Return as a JSON array of strings.
+            Examples of good follow-ups:
+            - "Show only Supreme Court cases from 2020-present"
+            - "What are the penalties for violating this law?"
+            - "How does this apply to private companies?"
+            - "Narrow to Constitutional Law aspects"
+            - "Include recent amendments"
+            
+            Return as a JSON array of exactly 3 strings.
             """
             
             response = self.gemini_model.generate_content(follow_up_prompt)

@@ -334,10 +334,23 @@ export const publishScheduledPosts = async (): Promise<any> => {
 }
 
 // Legal AI API
+// Structured message interfaces for conversation routing
+export interface StructuredMessage {
+  type: 'USER_QUERY' | 'FOLLOWUP' | 'SCOPE_UPDATE' | 'UI_EVENT' | 'META'
+  action?: 'RETRY_LAST' | 'WIDEN_SCOPE' | 'NARROW_TO_SC' | 'ADD_CONTEXT' | 'SIMPLIFY_ANSWER' | 'EXPAND_ANSWER'
+  text?: string | null
+  state_delta?: {
+    scope?: {
+      court?: string
+      date_range?: string
+      jurisdiction?: string
+    }
+  }
+}
+
 export interface LegalQueryRequest {
-  query: string
-  context?: string
   session_id?: string
+  message: StructuredMessage
 }
 
 export interface LegalQueryResponse {
@@ -429,6 +442,18 @@ export const processLegalQuery = async (data: LegalQueryRequest): Promise<LegalQ
   return apiRequest('/api/legal-ai/query', {
     method: 'POST',
     body: JSON.stringify(data),
+  })
+}
+
+// Legacy support for simple text queries
+export const processLegalQueryLegacy = async (query: string, context?: string, session_id?: string): Promise<LegalQueryResponse> => {
+  return processLegalQuery({
+    session_id,
+    message: {
+      type: 'USER_QUERY',
+      text: query,
+      state_delta: {}
+    }
   })
 }
 

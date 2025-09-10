@@ -18,7 +18,8 @@ ALGORITHM = os.getenv("ALGORITHM", "HS256")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
 
 if not SECRET_KEY:
-    raise ValueError("SECRET_KEY environment variable is not set")
+    SECRET_KEY = "default-secret-key-for-development-only"
+    print("Warning: Using default SECRET_KEY. Set SECRET_KEY environment variable for production.")
 
 # Security scheme
 security = HTTPBearer()

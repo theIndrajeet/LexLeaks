@@ -48,8 +48,12 @@ export default function JurisBrainAIPage() {
 
     try {
       const response = await processLegalQuery({
-        query,
-        session_id: chatState.sessionId || undefined
+        session_id: chatState.sessionId || undefined,
+        message: {
+          type: 'USER_QUERY',
+          text: query,
+          state_delta: {}
+        }
       })
 
       // Create AI message from response
@@ -104,8 +108,99 @@ export default function JurisBrainAIPage() {
   }
 
   const handleFollowUpClick = (followUpText: string) => {
-    setInputValue(followUpText)
-    handleSendMessage()
+    // Map follow-up text to structured actions
+    let action = "RETRY_LAST"
+    let type = "FOLLOWUP"
+    
+    if (followUpText.toLowerCase().includes("try again")) {
+      action = "RETRY_LAST"
+    } else if (followUpText.toLowerCase().includes("simplify")) {
+      action = "SIMPLIFY_ANSWER"
+    } else if (followUpText.toLowerCase().includes("narrow") || followUpText.toLowerCase().includes("supreme court")) {
+      action = "NARROW_TO_SC"
+    } else if (followUpText.toLowerCase().includes("widen") || followUpText.toLowerCase().includes("all courts")) {
+      action = "WIDEN_SCOPE"
+    } else if (followUpText.toLowerCase().includes("more details") || followUpText.toLowerCase().includes("expand")) {
+      action = "EXPAND_ANSWER"
+    }
+    
+    // Send structured action instead of plain text
+    handleStructuredAction(type, action, followUpText)
+  }
+
+  const handleStructuredAction = async (type: string, action: string, displayText: string) => {
+    setIsLoading(true)
+    
+    try {
+      // Add user message for display
+      const userMessage: UserMsg = {
+        id: Date.now().toString(),
+        content: displayText,
+        timestamp: new Date().toISOString()
+      }
+      
+      setChatState(prev => ({
+        ...prev,
+        messages: [...prev.messages, userMessage]
+      }))
+      
+      // Send structured action to backend
+      const response = await processLegalQuery({
+        session_id: chatState.sessionId,
+        message: {
+          type: type,
+          action: action,
+          text: null,
+          state_delta: {}
+        }
+      })
+      
+      if (response.success) {
+        const aiMessage: AIMsg = {
+          id: response.turn_id,
+          content: response.answer.text,
+          summary: response.answer.summary,
+          confidence: response.answer.confidence,
+          reasoning_trail: response.reasoning_trail,
+          citations: response.citations,
+          followups: response.followups,
+          timestamp: response.timestamp,
+          isStreaming: false
+        }
+        
+        setChatState(prev => ({
+          ...prev,
+          sessionId: response.session_id,
+          messages: [...prev.messages, aiMessage],
+          memory: {
+            ...prev.memory,
+            ...response.memory_update
+          }
+        }))
+      } else {
+        // Handle error
+        const errorMessage: AIMsg = {
+          id: Date.now().toString(),
+          content: response.error || "Sorry, I encountered an error processing your request.",
+          summary: "Error occurred",
+          confidence: "low",
+          reasoning_trail: [],
+          citations: [],
+          followups: ["Try again", "Simplify your question"],
+          timestamp: new Date().toISOString(),
+          isStreaming: false
+        }
+        
+        setChatState(prev => ({
+          ...prev,
+          messages: [...prev.messages, errorMessage]
+        }))
+      }
+    } catch (error) {
+      console.error('Error processing structured action:', error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const toggleReasoning = (messageId: string) => {

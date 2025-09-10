@@ -6,13 +6,20 @@ from pydantic import BaseModel
 from ..database import get_db
 from ..auth import get_current_admin_user
 from ..legal_ai_service import legal_ai_service
+from ..conversation_router import ConversationRouter
 
 router = APIRouter()
 
+# Structured message models
+class StructuredMessage(BaseModel):
+    type: str  # 'USER_QUERY' | 'FOLLOWUP' | 'SCOPE_UPDATE' | 'UI_EVENT' | 'META'
+    action: Optional[str] = None  # 'RETRY_LAST' | 'WIDEN_SCOPE' | 'NARROW_TO_SC' | etc.
+    text: Optional[str] = None
+    state_delta: Optional[Dict[str, Any]] = {}
+
 class LegalQueryRequest(BaseModel):
-    query: str
-    context: Optional[str] = None
     session_id: Optional[str] = None
+    message: StructuredMessage
 
 class LegalQueryResponse(BaseModel):
     session_id: str
@@ -31,18 +38,24 @@ async def process_legal_query(
     request: LegalQueryRequest
 ):
     """
-    Process a legal query using JurisBrain AI workflow:
-    User Query → Gemini (Understanding) → Perplexity (Research) → Indian Kanoon (Case Law) → Gemini (Synthesis) → Final Answer
+    Process a structured legal query using JurisBrain AI with conversation routing.
     
-    - **query**: The legal question to analyze
-    - **context**: Optional additional context for the query
+    Supports structured messages to separate intent from content:
+    - **USER_QUERY**: New legal questions
+    - **FOLLOWUP**: Actions like "Try again", "Narrow scope"  
+    - **SCOPE_UPDATE**: Update search parameters
+    - **META**: General guidance requests
     
+    Prevents UI control text from being treated as legal queries.
     Returns comprehensive legal analysis with case law references and current developments.
     """
     try:
-        result = await legal_ai_service.process_legal_query(
-            query=request.query,
-            context=request.context,
+        # Initialize conversation router
+        conversation_router = ConversationRouter(legal_ai_service)
+        
+        # Route the conversation turn based on message type
+        result = await conversation_router.route_turn(
+            message=request.message.dict(),
             session_id=request.session_id
         )
         

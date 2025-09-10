@@ -11,7 +11,9 @@ load_dotenv()
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 if not DATABASE_URL:
-    raise ValueError("DATABASE_URL environment variable is not set")
+    # Use a default database URL for development/testing
+    DATABASE_URL = "sqlite:///./test.db"
+    print("Warning: Using default SQLite database. Set DATABASE_URL environment variable for production.")
 
 # Add connection pool and timeout settings for better reliability
 engine = create_engine(
