@@ -109,7 +109,7 @@ export default function JurisBrainAIPage() {
 
   const handleFollowUpClick = (followUpText: string) => {
     // Map follow-up text to structured actions
-    let action = "RETRY_LAST"
+    let action: 'RETRY_LAST' | 'WIDEN_SCOPE' | 'NARROW_TO_SC' | 'ADD_CONTEXT' | 'SIMPLIFY_ANSWER' | 'EXPAND_ANSWER' | undefined = "RETRY_LAST"
     let type: 'USER_QUERY' | 'FOLLOWUP' | 'SCOPE_UPDATE' | 'UI_EVENT' | 'META' = "FOLLOWUP"
     
     if (followUpText.toLowerCase().includes("try again")) {
@@ -128,7 +128,7 @@ export default function JurisBrainAIPage() {
     handleStructuredAction(type, action, followUpText)
   }
 
-  const handleStructuredAction = async (type: 'USER_QUERY' | 'FOLLOWUP' | 'SCOPE_UPDATE' | 'UI_EVENT' | 'META', action: string, displayText: string) => {
+  const handleStructuredAction = async (type: 'USER_QUERY' | 'FOLLOWUP' | 'SCOPE_UPDATE' | 'UI_EVENT' | 'META', action: 'RETRY_LAST' | 'WIDEN_SCOPE' | 'NARROW_TO_SC' | 'ADD_CONTEXT' | 'SIMPLIFY_ANSWER' | 'EXPAND_ANSWER' | undefined, displayText: string) => {
     setIsLoading(true)
     
     try {
