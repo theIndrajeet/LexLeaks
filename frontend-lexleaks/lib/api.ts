@@ -354,6 +354,8 @@ export interface LegalQueryRequest {
 }
 
 export interface LegalQueryResponse {
+  success?: boolean
+  error?: string
   session_id: string
   turn_id: string
   answer: {
