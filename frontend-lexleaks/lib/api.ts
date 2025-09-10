@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://lexleaks-api-563011146464.asia-south1.run.app'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
 // Types
 export interface User {
@@ -299,6 +299,7 @@ export interface AIGenerateRequest {
   topic: string
   article_type: 'quick' | 'standard' | 'deep'
   ai_provider: 'gemini' | 'perplexity' | 'both'
+  template: 'internship' | 'legal_explainer'
   publish_option: 'now' | 'draft' | 'schedule'
   scheduled_for?: string
   category?: string
@@ -329,5 +330,128 @@ export const getScheduledPosts = async (): Promise<any[]> => {
 export const publishScheduledPosts = async (): Promise<any> => {
   return apiRequest('/api/ai/publish-scheduled', {
     method: 'POST',
+  })
+}
+
+// Legal AI API
+export interface LegalQueryRequest {
+  query: string
+  context?: string
+  session_id?: string
+}
+
+export interface LegalQueryResponse {
+  session_id: string
+  turn_id: string
+  answer: {
+    summary: string
+    text: string
+    confidence: 'high' | 'medium' | 'low'
+  }
+  reasoning_trail: Array<{
+    step: string
+    notes: string
+  }>
+  citations: Array<{
+    pin: number
+    type: 'case' | 'web'
+    title: string
+    court_or_source: string
+    date: string
+    url: string
+    snippet: string
+    lines: string
+    weight: 'binding' | 'secondary'
+  }>
+  followups: string[]
+  memory_update: {
+    scope: any
+    facts: string[]
+  }
+  telemetry: {
+    mode: string
+    tools_used: string[]
+    duration_ms: number
+  }
+  success: boolean
+  timestamp: string
+}
+
+// Chat State Types
+export interface ChatState {
+  sessionId: string
+  messages: Array<UserMsg | AIMsg>
+  memory: {
+    scope: { jurisdiction: string; court: string; date_range: string }
+    facts: string[]
+    preferences: { style: 'concise' | 'detailed'; export: 'PDF' | 'DOCX' | 'MD' }
+  }
+  streamingTurnId?: string
+}
+
+export interface UserMsg {
+  id: string
+  type: 'user'
+  content: string
+  timestamp: string
+}
+
+export interface AIMsg {
+  id: string
+  type: 'ai'
+  turn_id: string
+  answer: {
+    summary: string
+    text: string
+    confidence: 'high' | 'medium' | 'low'
+  }
+  reasoning_trail: Array<{
+    step: string
+    notes: string
+  }>
+  citations: Array<{
+    pin: number
+    type: 'case' | 'web'
+    title: string
+    court_or_source: string
+    date: string
+    url: string
+    snippet: string
+    lines: string
+    weight: 'binding' | 'secondary'
+  }>
+  followups: string[]
+  timestamp: string
+  isStreaming?: boolean
+}
+
+export const processLegalQuery = async (data: LegalQueryRequest): Promise<LegalQueryResponse> => {
+  return apiRequest('/api/legal-ai/query', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
+
+export const getLegalAIHealth = async (): Promise<any> => {
+  return apiRequest('/api/legal-ai/health')
+}
+
+export const getLegalAIStats = async (): Promise<any> => {
+  return apiRequest('/api/legal-ai/stats')
+}
+
+export const testLegalQuery = async (): Promise<any> => {
+  return apiRequest('/api/legal-ai/test-query', {
+    method: 'POST',
+  })
+}
+
+export const getSessionInfo = async (sessionId: string): Promise<any> => {
+  return apiRequest(`/api/legal-ai/session/${sessionId}`)
+}
+
+export const clearSession = async (sessionId: string): Promise<any> => {
+  return apiRequest(`/api/legal-ai/session/${sessionId}`, {
+    method: 'DELETE',
   })
 } 

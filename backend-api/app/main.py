@@ -5,7 +5,7 @@ import logging
 
 from .database import engine
 from . import models
-from .routers import posts, auth, impacts, ai, google_auth, kanoon, opportunities
+from .routers import posts, auth, impacts, ai, google_auth, kanoon, opportunities, legal_ai
 from .smart_automation import start_automation
 
 # Set up logging
@@ -67,6 +67,7 @@ app.include_router(ai.router, prefix="/api")
 app.include_router(google_auth.router, prefix="/api/auth")
 app.include_router(kanoon.router, prefix="/api/kanoon")
 app.include_router(opportunities.router, prefix="/api")
+app.include_router(legal_ai.router, prefix="/api/legal-ai")
 # app.include_router(notifications.router, prefix="/api/notifications")  # TODO: Add notifications module
 
 
@@ -99,6 +100,7 @@ async def api_info():
             "opportunities": "/api/opportunities",
             "kanoon": "/api/kanoon",
             "ai": "/api/ai",
+            "jurisbrain-ai": "/api/legal-ai",
             "notifications": "/api/notifications",
             "documentation": "/docs"
         }

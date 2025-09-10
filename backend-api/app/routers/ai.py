@@ -16,6 +16,7 @@ class AIGenerateRequest(BaseModel):
     topic: str
     article_type: Literal["quick", "standard", "deep"] = "standard"
     ai_provider: Literal["gemini", "perplexity", "both"] = "gemini"
+    template: Literal["internship", "legal_explainer"] = "legal_explainer"
     publish_option: Literal["now", "draft", "schedule"] = "draft"
     scheduled_for: Optional[datetime] = None
     category: Optional[str] = "ai-generated"
@@ -33,7 +34,8 @@ async def generate_article(
         result = await ai_generator.generate_article(
             topic=request.topic,
             article_type=request.article_type,
-            ai_provider=request.ai_provider
+            ai_provider=request.ai_provider,
+            template=request.template
         )
         
         if result.get("error"):

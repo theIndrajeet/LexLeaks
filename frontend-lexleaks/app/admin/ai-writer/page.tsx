@@ -11,6 +11,7 @@ export default function AIWriterPage() {
   const router = useRouter()
   const [topic, setTopic] = useState('')
   const [articleType, setArticleType] = useState<'quick' | 'standard' | 'deep'>('standard')
+  const [template, setTemplate] = useState<'internship' | 'legal_explainer'>('legal_explainer')
   const [aiProvider, setAiProvider] = useState<'gemini' | 'perplexity' | 'both'>('gemini')
   const [publishOption, setPublishOption] = useState<'now' | 'draft' | 'schedule'>('draft')
   const [scheduledFor, setScheduledFor] = useState('')
@@ -39,6 +40,7 @@ export default function AIWriterPage() {
       const data = await generateAIArticle({
         topic,
         article_type: articleType,
+        template,
         ai_provider: aiProvider,
         publish_option: publishOption,
         scheduled_for: publishOption === 'schedule' ? scheduledFor : undefined,
@@ -104,10 +106,17 @@ export default function AIWriterPage() {
                 onChange={(e) => setTopic(e.target.value)}
                 className="admin-input w-full"
                 rows={3}
-                placeholder="e.g., 'Apple's antitrust case and its implications for tech companies' or 'Latest Supreme Court ruling on privacy rights'"
+                placeholder={
+                  template === 'internship' 
+                    ? "e.g., 'Internship at Amarchand Mangaldas: Corporate Law Experience' or 'Summer Associate Program at Khaitan & Co'"
+                    : "e.g., 'Data Protection Act 2023: Compliance Requirements for Indian Companies' or 'Supreme Court Ruling on Cryptocurrency Regulation'"
+                }
               />
               <p className="text-sm text-gray-500 mt-1">
-                Be specific for better results. Include context, companies, or legal areas you want covered.
+                {template === 'internship' 
+                  ? "Be specific about the firm, role, or career path. Include company names, practice areas, or specific experiences."
+                  : "Be specific for better results. Include context, companies, or legal areas you want covered."
+                }
               </p>
             </div>
 
@@ -158,6 +167,43 @@ export default function AIWriterPage() {
               </div>
             </div>
 
+            {/* Article Template */}
+            <div>
+              <label className="block text-sm font-bold font-mono-special uppercase tracking-wide mb-2">
+                Article Template
+              </label>
+              <div className="grid grid-cols-2 gap-4">
+                <div 
+                  className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+                    template === 'legal_explainer' 
+                      ? 'border-red-800 bg-red-50' 
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                  onClick={() => setTemplate('legal_explainer')}
+                >
+                  <div className="font-semibold">⚖️ Legal Explainer</div>
+                  <div className="text-sm text-gray-600 mt-1">Legal analysis & policy breakdown</div>
+                  <div className="text-xs text-gray-500 mt-1">Background, framework, impact, debates</div>
+                </div>
+                
+                <div 
+                  className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+                    template === 'internship' 
+                      ? 'border-red-800 bg-red-50' 
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                  onClick={() => setTemplate('internship')}
+                >
+                  <div className="font-semibold">🎓 Internship Experience</div>
+                  <div className="text-sm text-gray-600 mt-1">Career & internship insights</div>
+                  <div className="text-xs text-gray-500 mt-1">Application, experience, takeaways</div>
+                </div>
+              </div>
+              <p className="text-sm text-gray-500 mt-2">
+                Choose the template structure that best fits your article topic.
+              </p>
+            </div>
+
             {/* AI Provider */}
             <div>
               <label className="block text-sm font-bold font-mono-special uppercase tracking-wide mb-2">
@@ -167,6 +213,7 @@ export default function AIWriterPage() {
                 value={aiProvider}
                 onChange={(e) => setAiProvider(e.target.value as any)}
                 className="admin-input w-full"
+                aria-label="AI Provider"
               >
                 <option value="gemini">🤖 Gemini (Fast & Creative)</option>
                 <option value="perplexity">🔍 Perplexity (Research-Heavy)</option>
@@ -227,6 +274,7 @@ export default function AIWriterPage() {
                       onChange={(e) => setScheduledFor(e.target.value)}
                       className="admin-input"
                       min={new Date().toISOString().slice(0, 16)}
+                      aria-label="Schedule date and time"
                     />
                   </div>
                 )}
@@ -242,6 +290,7 @@ export default function AIWriterPage() {
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 className="admin-input w-full"
+                aria-label="Category"
               >
                 <option value="ai-generated">AI Generated</option>
                 <option value="corporate">Corporate</option>

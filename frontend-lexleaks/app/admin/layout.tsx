@@ -3,6 +3,7 @@
 import { ReactNode, useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { checkAuthStatus } from '@/lib/api'
+import Navigation from '@/components/Navigation'
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const router = useRouter()
@@ -41,7 +42,12 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen brand-bg">
-      {children}
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <Navigation currentPage={pathname} showSubmitButton={false} />
+        <main>
+          {children}
+        </main>
+      </div>
     </div>
   )
 } 

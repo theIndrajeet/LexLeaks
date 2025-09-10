@@ -64,6 +64,12 @@ export default function DashboardPage() {
         </div>
         <div className="flex gap-3">
           <Link
+            href="/legal-ai"
+            className="btn-primary bg-[#8B0000] hover:bg-[#a52a2a]"
+          >
+            ⚖️ JurisBrain AI
+          </Link>
+          <Link
             href="/admin/ai-writer"
             className="btn-primary bg-purple-600 hover:bg-purple-700"
           >

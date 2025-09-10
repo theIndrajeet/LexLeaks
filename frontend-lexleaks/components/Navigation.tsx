@@ -15,11 +15,13 @@ export default function Navigation({
   showSubmitButton = true, 
   className = '' 
 }: NavigationProps) {
+  // Navigation component with JurisBrain AI link
   const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/about', label: 'About' },
     { href: '/archive', label: 'Archive' },
     { href: '/find-case', label: 'Find Case' },
+    { href: '/legal-ai', label: 'JurisBrain AI' },
     { href: '/opportunities', label: 'Opportunities' }
   ]
 
