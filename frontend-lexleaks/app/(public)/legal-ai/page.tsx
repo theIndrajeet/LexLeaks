@@ -110,7 +110,7 @@ export default function JurisBrainAIPage() {
   const handleFollowUpClick = (followUpText: string) => {
     // Map follow-up text to structured actions
     let action = "RETRY_LAST"
-    let type = "FOLLOWUP"
+    let type: 'USER_QUERY' | 'FOLLOWUP' | 'SCOPE_UPDATE' | 'UI_EVENT' | 'META' = "FOLLOWUP"
     
     if (followUpText.toLowerCase().includes("try again")) {
       action = "RETRY_LAST"
@@ -128,7 +128,7 @@ export default function JurisBrainAIPage() {
     handleStructuredAction(type, action, followUpText)
   }
 
-  const handleStructuredAction = async (type: string, action: string, displayText: string) => {
+  const handleStructuredAction = async (type: 'USER_QUERY' | 'FOLLOWUP' | 'SCOPE_UPDATE' | 'UI_EVENT' | 'META', action: string, displayText: string) => {
     setIsLoading(true)
     
     try {
