@@ -135,6 +135,7 @@ export default function JurisBrainAIPage() {
       // Add user message for display
       const userMessage: UserMsg = {
         id: Date.now().toString(),
+        type: 'user',
         content: displayText,
         timestamp: new Date().toISOString()
       }
@@ -158,14 +159,17 @@ export default function JurisBrainAIPage() {
       if (response.success) {
         const aiMessage: AIMsg = {
           id: response.turn_id,
-          content: response.answer.text,
-          summary: response.answer.summary,
-          confidence: response.answer.confidence,
+          type: 'ai',
+          turn_id: response.turn_id,
+          answer: {
+            summary: response.answer.summary,
+            text: response.answer.text,
+            confidence: response.answer.confidence
+          },
           reasoning_trail: response.reasoning_trail,
           citations: response.citations,
           followups: response.followups,
-          timestamp: response.timestamp,
-          isStreaming: false
+          timestamp: response.timestamp
         }
         
         setChatState(prev => ({
@@ -181,14 +185,17 @@ export default function JurisBrainAIPage() {
         // Handle error
         const errorMessage: AIMsg = {
           id: Date.now().toString(),
-          content: response.error || "Sorry, I encountered an error processing your request.",
-          summary: "Error occurred",
-          confidence: "low",
+          type: 'ai',
+          turn_id: `error_${Date.now()}`,
+          answer: {
+            summary: "Error occurred",
+            text: response.error || "Sorry, I encountered an error processing your request.",
+            confidence: "low"
+          },
           reasoning_trail: [],
           citations: [],
           followups: ["Try again", "Simplify your question"],
-          timestamp: new Date().toISOString(),
-          isStreaming: false
+          timestamp: new Date().toISOString()
         }
         
         setChatState(prev => ({
