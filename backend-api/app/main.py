@@ -2,11 +2,14 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import logging
+import asyncio
 
 from .database import engine
 from . import models
-from .routers import posts, auth, impacts, ai, google_auth, kanoon, opportunities, legal_ai
+from .routers import posts, auth, impacts, ai, google_auth, kanoon, opportunities, legal_ai, deep_research, chat, multi_agent_research, event_driven_research, trends, scheduler, pipeline
 from .smart_automation import start_automation
+from .event_driven_agent_system import event_driven_system
+from .scheduler_service import scheduler_service
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -16,7 +19,7 @@ logger = logging.getLogger(__name__)
 def create_tables():
     try:
         models.Base.metadata.create_all(bind=engine)
-        logger.info("✅ Database tables created/verified successfully")
+        logger.info(" Database tables created/verified successfully")
     except Exception as e:
         logger.error(f"❌ Database connection failed: {e}")
         logger.warning("⚠️  Server will continue without database features")
@@ -30,6 +33,12 @@ async def lifespan(app: FastAPI):
     create_tables()
     # Start smart automation
     await start_automation()
+    # Start event-driven agent system
+    asyncio.create_task(event_driven_system.start())
+    logger.info(" Event-driven agent system started")
+    # Start scheduler service
+    await scheduler_service.start_scheduler()
+    logger.info("  Article scheduler service started")
     yield
     # Shutdown (if needed)
 
@@ -48,12 +57,13 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",  # Next.js development server
         "http://localhost:3001",  # Next.js development server (alternative port)
+        "http://localhost:3100",  # Stagewise development server
         "https://lexleaks.com",   # Production domain
         "https://www.lexleaks.com",  # Production domain with www
         "https://lexleaks.netlify.app",  # Your main Netlify domain
         "https://glittery-dragon-d3e69b.netlify.app",  # Current Netlify deployment
     ],
-    allow_origin_regex=r"https://.*\.netlify\.app",  # All Netlify preview deployments
+    allow_origin_regex=r"https://.*\.netlify\.app|http://localhost:\d+",  # All Netlify preview deployments and localhost ports
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
@@ -68,6 +78,13 @@ app.include_router(google_auth.router, prefix="/api/auth")
 app.include_router(kanoon.router, prefix="/api/kanoon")
 app.include_router(opportunities.router, prefix="/api")
 app.include_router(legal_ai.router, prefix="/api/legal-ai")
+app.include_router(deep_research.router, prefix="/api")
+app.include_router(chat.router, prefix="/api")
+app.include_router(multi_agent_research.router)
+app.include_router(event_driven_research.router)
+app.include_router(trends.router, prefix="/api", tags=["trends"])
+app.include_router(scheduler.router, prefix="/api", tags=["scheduler"])
+app.include_router(pipeline.router, prefix="/api", tags=["pipeline"])
 # app.include_router(notifications.router, prefix="/api/notifications")  # TODO: Add notifications module
 
 
@@ -101,6 +118,7 @@ async def api_info():
             "kanoon": "/api/kanoon",
             "ai": "/api/ai",
             "jurisbrain-ai": "/api/legal-ai",
+            "deep-research": "/api/deep-research",
             "notifications": "/api/notifications",
             "documentation": "/docs"
         }

@@ -21,7 +21,7 @@ export default function Navigation({
     { href: '/about', label: 'About' },
     { href: '/archive', label: 'Archive' },
     { href: '/find-case', label: 'Find Case' },
-    { href: '/legal-ai', label: 'JurisBrain AI' },
+    { href: '/legal-ai', label: 'Deep Research' },
     { href: '/opportunities', label: 'Opportunities' }
   ]
 

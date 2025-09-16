@@ -78,7 +78,7 @@ class ConversationRouter:
                     context="Retrying previous query"
                 )
             else:
-                return self._error_response("No previous query to retry", session["id"])
+                return self._error_response("No previous query to retry. Please ask a new question first.", session["id"])
                 
         elif action == "NARROW_TO_SC":
             # Update scope to Supreme Court only
@@ -95,7 +95,7 @@ class ConversationRouter:
                     context="Narrowed scope to Supreme Court cases"
                 )
             else:
-                return self._error_response("No previous query to re-run with narrowed scope", session["id"])
+                return self._error_response("No previous query to re-run with narrowed scope. Please ask a new question first.", session["id"])
                 
         elif action == "WIDEN_SCOPE":
             # Widen the scope to all courts

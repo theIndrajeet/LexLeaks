@@ -195,7 +195,7 @@ export default function OpportunitiesPage() {
           disabled={loading}
           className="brand-button disabled:opacity-50"
         >
-          {loading ? 'Refreshing...' : '🔄 Refresh Jobs'}
+          {loading ? 'Refreshing...' : ' Refresh Jobs'}
         </button>
         <button
           onClick={loadMarketTrends}
@@ -460,7 +460,7 @@ export default function OpportunitiesPage() {
                   
                   <div className="flex flex-wrap gap-4 text-sm text-gray-500 dark:text-gray-400 mb-4">
                     {job.practice_area && (
-                      <span>📋 {job.practice_area}</span>
+                      <span> {job.practice_area}</span>
                     )}
                     {job.experience_level && (
                       <span>👤 {job.experience_level}</span>

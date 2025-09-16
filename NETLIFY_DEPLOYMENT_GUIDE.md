@@ -1,11 +1,11 @@
 # LexLeaks Netlify Deployment Guide
 
-## ✅ Completed Steps
-1. ✅ Removed old Netlify configuration files
-2. ✅ Created new clean Netlify configuration in `frontend-lexleaks/netlify.toml`
-3. ✅ Committed and pushed changes to GitHub
+##  Completed Steps
+1.  Removed old Netlify configuration files
+2.  Created new clean Netlify configuration in `frontend-lexleaks/netlify.toml`
+3.  Committed and pushed changes to GitHub
 
-## 🚀 Next Steps - Deploy on Netlify
+##  Next Steps - Deploy on Netlify
 
 ### 1. Create New Site on Netlify
 1. Go to [app.netlify.com](https://app.netlify.com)
@@ -31,7 +31,7 @@ Click on **"Show advanced"** and add:
 ### 4. Deploy Site
 Click **"Deploy site"** and wait for the build to complete (usually 2-5 minutes).
 
-## 📋 Post-Deployment Testing
+##  Post-Deployment Testing
 
 ### Test Public Pages
 - [ ] Visit your Netlify URL (e.g., `https://amazing-site-123.netlify.app`)
@@ -94,7 +94,7 @@ If you have a custom domain:
 - [Next.js on Netlify Guide](https://docs.netlify.com/integrations/frameworks/next-js/)
 - [Netlify Support Forum](https://answers.netlify.com/)
 
-## 🎉 Success!
+##  Success!
 Once deployed, your LexLeaks site will be live with:
 - Automatic HTTPS
 - Global CDN

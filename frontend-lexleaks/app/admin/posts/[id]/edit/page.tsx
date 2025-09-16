@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { getPost, updatePost, Post } from '@/lib/api'
+import RichTextEditor from '@/components/RichTextEditor'
+import SimpleRichTextEditor from '@/components/SimpleRichTextEditor'
 
 export default function EditPostPage({ params }: { params: { id: string } }) {
   const router = useRouter()
@@ -173,40 +175,36 @@ export default function EditPostPage({ params }: { params: { id: string } }) {
               </p>
             </div>
 
-            {/* Excerpt */}
+            {/* Excerpt - Simple Rich Text Editor */}
             <div>
-              <label htmlFor="excerpt" className="block text-sm font-bold font-mono-special uppercase tracking-wide mb-2">
+              <label className="block text-sm font-bold font-mono-special uppercase tracking-wide mb-2">
                 Excerpt
               </label>
-              <textarea
-                id="excerpt"
-                value={formData.excerpt}
-                onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                className="admin-input w-full"
-                rows={3}
+              <SimpleRichTextEditor
+                content={formData.excerpt}
+                onChange={(excerpt) => setFormData({ ...formData, excerpt })}
                 placeholder="Brief summary of the article..."
+                rows={3}
+                className="mb-2"
               />
               <p className="text-sm text-gray-500 mt-1">
-                This appears on the homepage and in search results
+                This appears on the homepage and in search results. Use basic formatting for better presentation.
               </p>
             </div>
 
-            {/* Content */}
+            {/* Content - Rich Text Editor */}
             <div>
-              <label htmlFor="content" className="block text-sm font-bold font-mono-special uppercase tracking-wide mb-2">
+              <label className="block text-sm font-bold font-mono-special uppercase tracking-wide mb-2">
                 Content *
               </label>
-              <textarea
-                id="content"
-                value={formData.content}
-                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                className="admin-input w-full font-mono-special text-sm"
-                rows={20}
-                required
-                placeholder="Write your article content here. You can use HTML tags for formatting..."
+              <RichTextEditor
+                content={formData.content}
+                onChange={(content) => setFormData({ ...formData, content })}
+                placeholder="Start writing your article..."
+                className="mb-2"
               />
               <p className="text-sm text-gray-500 mt-1">
-                HTML tags supported: &lt;p&gt;, &lt;h2&gt;, &lt;h3&gt;, &lt;ul&gt;, &lt;ol&gt;, &lt;li&gt;, &lt;blockquote&gt;, &lt;strong&gt;, &lt;em&gt;
+                Use the toolbar above to format your content. Supports headings, lists, links, images, and more.
               </p>
             </div>
 

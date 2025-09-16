@@ -149,20 +149,7 @@ const apiRequest = async (
     ...options,
   }
 
-  let response = await fetch(`${API_BASE_URL}${endpoint}`, config)
-
-  // If token expired, try to refresh it
-  if (response.status === 401 && token) {
-    const newToken = await refreshToken()
-    if (newToken) {
-      // Retry the request with new token
-      config.headers = {
-        ...config.headers,
-        'Authorization': `Bearer ${newToken}`
-      }
-      response = await fetch(`${API_BASE_URL}${endpoint}`, config)
-    }
-  }
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, config)
   
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}))
@@ -759,7 +746,6 @@ export interface TrendingTopic {
   suggested_template: string
   generated_by: string
   confidence_score: number
-  source_links?: string[]
 }
 
 export interface PipelineResponse {
@@ -792,29 +778,3 @@ export const getGeminiStats = async (): Promise<any> => {
     method: 'GET',
   })
 } 
-export const refreshToken = async (): Promise<string | null> => {
-  try {
-    const token = getAuthToken()
-    if (!token) return null
-
-    const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    })
-
-    if (!response.ok) {
-      removeAuthToken()
-      return null
-    }
-
-    const data = await response.json()
-    setAuthToken(data.access_token)
-    return data.access_token
-  } catch (error) {
-    removeAuthToken()
-    return null
-  }
-}

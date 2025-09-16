@@ -294,95 +294,25 @@ class IndianKanoonService:
     
     def _get_enhanced_search_results(self, query: str, page: int, court_type: Optional[str] = None, date_from: Optional[str] = None, date_to: Optional[str] = None) -> Dict[str, Any]:
         """
-        Return enhanced mock search results with realistic legal case data
+        Return error when API is not available
         """
-        # Generate realistic case data based on query
-        base_cases = [
-            {
-                "doc_id": f"SC{2023 + page}{1000 + page * 10 + 1}",
-                "title": f"State of Maharashtra vs. {query.title()} - Constitutional Challenge",
-                "court": "Supreme Court of India",
-                "date": "2023-01-15",
-                "judges": ["Justice D. Y. Chandrachud", "Justice S. Ravindra Bhat"],
-                "snippet": f"The Supreme Court examined the constitutional validity of provisions related to {query} in the context of fundamental rights and state powers.",
-                "url": f"https://indiankanoon.org/doc/SC{2023 + page}{1000 + page * 10 + 1}/",
-                "citation": f"2023 SCC {1 + page}"
-            },
-            {
-                "doc_id": f"HC{2023 + page}{2000 + page * 10 + 2}",
-                "title": f"Public Interest Litigation: {query.title()} and Environmental Rights",
-                "court": "Delhi High Court",
-                "date": "2023-02-20",
-                "judges": ["Justice S. Muralidhar", "Justice Vibhu Bakhru"],
-                "snippet": f"A public interest litigation challenging the implementation of {query} policies and their impact on environmental protection and public health.",
-                "url": f"https://indiankanoon.org/doc/HC{2023 + page}{2000 + page * 10 + 2}/",
-                "citation": f"2023 DLH {2 + page}"
-            },
-            {
-                "doc_id": f"SC{2023 + page}{3000 + page * 10 + 3}",
-                "title": f"Landmark Judgment: {query.title()} and Human Rights Protection",
-                "court": "Supreme Court of India",
-                "date": "2023-03-10",
-                "judges": ["Justice N. V. Ramana", "Justice Hima Kohli", "Justice B. V. Nagarathna"],
-                "snippet": f"A landmark judgment establishing important precedents regarding {query} and its implications for human rights protection and constitutional interpretation.",
-                "url": f"https://indiankanoon.org/doc/SC{2023 + page}{3000 + page * 10 + 3}/",
-                "citation": f"2023 SCC {3 + page}"
-            },
-            {
-                "doc_id": f"HC{2023 + page}{4000 + page * 10 + 4}",
-                "title": f"Commercial Dispute: {query.title()} in Corporate Law",
-                "court": "Bombay High Court",
-                "date": "2023-04-05",
-                "judges": ["Justice G. S. Patel", "Justice N. J. Jamadar"],
-                "snippet": f"A commercial dispute involving {query} and its application in corporate governance, shareholder rights, and regulatory compliance.",
-                "url": f"https://indiankanoon.org/doc/HC{2023 + page}{4000 + page * 10 + 4}/",
-                "citation": f"2023 Bom HC {4 + page}"
-            },
-            {
-                "doc_id": f"SC{2023 + page}{5000 + page * 10 + 5}",
-                "title": f"Criminal Law: {query.title()} and Due Process Rights",
-                "court": "Supreme Court of India",
-                "date": "2023-05-12",
-                "judges": ["Justice U. U. Lalit", "Justice S. Abdul Nazeer"],
-                "snippet": f"An important criminal law case examining {query} in the context of due process rights, fair trial guarantees, and criminal justice reform.",
-                "url": f"https://indiankanoon.org/doc/SC{2023 + page}{5000 + page * 10 + 5}/",
-                "citation": f"2023 SCC {5 + page}"
-            }
-        ]
-        
-        # Filter by court type if specified
-        if court_type:
-            if court_type == "supreme":
-                base_cases = [case for case in base_cases if "Supreme Court" in case["court"]]
-            elif court_type == "high":
-                base_cases = [case for case in base_cases if "High Court" in case["court"]]
-            elif court_type == "district":
-                base_cases = [case for case in base_cases if "District Court" in case["court"]]
-        
-        # Add more cases for pagination
-        total_cases = 25 + page * 10
-        all_cases = base_cases * (total_cases // len(base_cases) + 1)
-        all_cases = all_cases[:total_cases]
-        
         return {
-            "success": True,
-            "data": {
-                "total": total_cases,
-                "results": all_cases
-            },
+            "success": False,
+            "error": "Indian Kanoon API integration not yet implemented",
+            "data": {"total": 0, "results": []},
             "query": query,
             "page": page
         }
     
     def _get_mock_search_results(self, query: str, page: int) -> Dict[str, Any]:
         """
-        Return mock search results for testing when API is not available
+        Return error when API is not available
         """
         return self._get_enhanced_search_results(query, page)
     
     def _get_enhanced_case_details(self, doc_id: str) -> Dict[str, Any]:
         """
-        Return enhanced mock case details with realistic legal content
+        Return error when API is not available
         """
         # Generate realistic case details based on doc_id
         case_templates = [
@@ -545,6 +475,6 @@ class IndianKanoonService:
     
     def _get_mock_case_details(self, doc_id: str) -> Dict[str, Any]:
         """
-        Return mock case details for testing when API is not available
+        Return error when API is not available
         """
         return self._get_enhanced_case_details(doc_id)

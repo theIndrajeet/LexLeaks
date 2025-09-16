@@ -76,6 +76,12 @@ export default function DashboardPage() {
             🤖 AI Writer
           </Link>
           <Link
+            href="/admin/scheduler"
+            className="btn-primary bg-orange-600 hover:bg-orange-700"
+          >
+            ⏰ Scheduler
+          </Link>
+          <Link
             href="/admin/posts/new"
             className="btn-primary"
           >

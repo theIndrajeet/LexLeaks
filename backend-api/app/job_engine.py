@@ -291,11 +291,11 @@ class LexLeaksJobEngine:
         # This will be implemented with specific scrapers
         logger.info(f"Scraping {source} with params: {search_params}")
         
-        # Return mock data for now
+        # TODO: Implement real job scraping
         return [
             {
                 "title": f"Legal Associate - {source}",
-                "company": f"Sample Law Firm",
+                "company": "Unknown",
                 "location": "New York, NY",
                 "description": "Seeking a legal associate with 2-3 years experience...",
                 "source": source,

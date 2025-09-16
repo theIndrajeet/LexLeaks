@@ -1,6 +1,6 @@
 from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm, HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from .. import crud, schemas, auth
@@ -67,46 +67,6 @@ async def read_users_me(current_user = Depends(auth.get_current_user)):
     return current_user
 
 
-@router.post("/refresh", response_model=schemas.Token)
-async def refresh_token(
-    credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer()),
-    db: Session = Depends(get_db)
-):
-    """
-    Refresh JWT token to extend session
-    """
-    try:
-        # Verify current token
-        payload = auth.verify_token(credentials.credentials)
-        if not payload:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid token"
-            )
-        
-        # Get user
-        user = crud.get_user_by_username(db, username=payload)
-        if not user:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="User not found"
-            )
-        
-        # Create new token
-        access_token_expires = timedelta(minutes=auth.ACCESS_TOKEN_EXPIRE_MINUTES)
-        access_token = auth.create_access_token(
-            data={"sub": user.username}, expires_delta=access_token_expires
-        )
-        
-        return {"access_token": access_token, "token_type": "bearer"}
-        
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token refresh failed"
-        )
-
-
 @router.post("/register", response_model=schemas.UserResponse)
 async def register(
     user: schemas.UserCreate,
@@ -126,4 +86,4 @@ async def register(
         )
     
     # Create user
-    return crud.create_user(db=db, user=user)
+    return crud.create_user(db=db, user=user) 

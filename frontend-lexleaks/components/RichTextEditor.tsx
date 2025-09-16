@@ -692,7 +692,7 @@ const MenuBar = ({ editor, isHtmlMode, setIsHtmlMode }: { editor: any, isHtmlMod
           className="px-3 py-1.5 rounded-sm transition-colors hover:bg-[#eee8d5] dark:hover:bg-[#3a352f] text-sm font-mono-special"
           title="Paste as Plain Text"
         >
-          📋 Plain Text
+           Plain Text
         </button>
 
         {/* Character count */}

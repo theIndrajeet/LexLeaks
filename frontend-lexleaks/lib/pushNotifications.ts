@@ -151,7 +151,7 @@ export class PushNotificationManager {
     const registration = await navigator.serviceWorker.ready
     
     await registration.showNotification('LexLeaks Test', {
-      body: 'Push notifications are working! 🎉',
+      body: 'Push notifications are working! ',
       icon: '/icon-192x192.png',
       badge: '/icon-96x96.png'
     })

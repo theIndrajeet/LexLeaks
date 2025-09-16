@@ -3,7 +3,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { generateAIArticle, getPost, AIGenerateRequest, AIGenerateResponse } from '@/lib/api'
+import { generateAIArticle, getPost, AIGenerateRequest, AIGenerateResponse, TrendingTopic } from '@/lib/api'
+import TrendingTopics from '@/components/TrendingTopics'
+import SimpleRichTextEditor from '@/components/SimpleRichTextEditor'
 
 type GenerationResult = AIGenerateResponse
 
@@ -84,28 +86,45 @@ export default function AIWriterPage() {
     }
   }
 
+  const handleTopicSelect = (trendingTopic: TrendingTopic) => {
+    setTopic(trendingTopic.topic)
+    setArticleType(trendingTopic.suggested_article_type)
+    setTemplate(trendingTopic.suggested_template)
+    setCategory(trendingTopic.category)
+    
+    // Scroll to the form
+    document.getElementById('article-form')?.scrollIntoView({ behavior: 'smooth' })
+  }
+
   return (
     <div className="min-h-screen brand-bg p-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold brand-text">🤖 AI Article Generator</h1>
-          <p className="text-gray-600 mt-2">Generate high-quality articles using AI</p>
+          <h1 className="text-3xl font-bold brand-text"> AI Article Generator</h1>
+          <p className="text-gray-600 mt-2">Generate high-quality articles using AI with trending topic suggestions</p>
         </div>
 
-        {/* Main Form */}
-        <div className="bg-white rounded-lg shadow-sm p-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Trending Topics Sidebar */}
+          <div className="lg:col-span-1">
+            <TrendingTopics onTopicSelect={handleTopicSelect} />
+          </div>
+
+          {/* Main Form */}
+          <div className="lg:col-span-2">
+            <div id="article-form" className="bg-white rounded-lg shadow-sm p-8">
           <div className="space-y-6">
-            {/* Topic Input */}
+            {/* Topic Input - Simple Rich Text Editor */}
             <div>
               <label className="block text-sm font-bold font-mono-special uppercase tracking-wide mb-2">
                 Topic / Prompt *
               </label>
-              <textarea
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-                className="admin-input w-full"
+              <SimpleRichTextEditor
+                content={topic}
+                onChange={setTopic}
                 rows={3}
+                className="mb-2"
                 placeholder={
                   template === 'internship' 
                     ? "e.g., 'Internship at Amarchand Mangaldas: Corporate Law Experience' or 'Summer Associate Program at Khaitan & Co'"
@@ -114,8 +133,8 @@ export default function AIWriterPage() {
               />
               <p className="text-sm text-gray-500 mt-1">
                 {template === 'internship' 
-                  ? "Be specific about the firm, role, or career path. Include company names, practice areas, or specific experiences."
-                  : "Be specific for better results. Include context, companies, or legal areas you want covered."
+                  ? "Be specific about the firm, role, or career path. Include company names, practice areas, or specific experiences. Use basic formatting for better structure."
+                  : "Be specific for better results. Include context, companies, or legal areas you want covered. Use basic formatting for better structure."
                 }
               </p>
             </div>
@@ -134,7 +153,7 @@ export default function AIWriterPage() {
                   }`}
                   onClick={() => setArticleType('quick')}
                 >
-                  <div className="font-semibold">📰 Quick Take</div>
+                  <div className="font-semibold"> Quick Take</div>
                   <div className="text-sm text-gray-600 mt-1">300-500 words</div>
                   <div className="text-xs text-gray-500 mt-1">1-2 minute read</div>
                 </div>
@@ -147,7 +166,7 @@ export default function AIWriterPage() {
                   }`}
                   onClick={() => setArticleType('standard')}
                 >
-                  <div className="font-semibold">📄 Standard</div>
+                  <div className="font-semibold"> Standard</div>
                   <div className="text-sm text-gray-600 mt-1">800-1200 words</div>
                   <div className="text-xs text-gray-500 mt-1">5 minute read</div>
                 </div>
@@ -160,7 +179,7 @@ export default function AIWriterPage() {
                   }`}
                   onClick={() => setArticleType('deep')}
                 >
-                  <div className="font-semibold">📚 Deep Dive</div>
+                  <div className="font-semibold"> Deep Dive</div>
                   <div className="text-sm text-gray-600 mt-1">1500-2000 words</div>
                   <div className="text-xs text-gray-500 mt-1">10 minute read</div>
                 </div>
@@ -181,7 +200,7 @@ export default function AIWriterPage() {
                   }`}
                   onClick={() => setTemplate('legal_explainer')}
                 >
-                  <div className="font-semibold">⚖️ Legal Explainer</div>
+                  <div className="font-semibold"> Legal Explainer</div>
                   <div className="text-sm text-gray-600 mt-1">Legal analysis & policy breakdown</div>
                   <div className="text-xs text-gray-500 mt-1">Background, framework, impact, debates</div>
                 </div>
@@ -194,7 +213,7 @@ export default function AIWriterPage() {
                   }`}
                   onClick={() => setTemplate('internship')}
                 >
-                  <div className="font-semibold">🎓 Internship Experience</div>
+                  <div className="font-semibold"> Internship Experience</div>
                   <div className="text-sm text-gray-600 mt-1">Career & internship insights</div>
                   <div className="text-xs text-gray-500 mt-1">Application, experience, takeaways</div>
                 </div>
@@ -215,9 +234,9 @@ export default function AIWriterPage() {
                 className="admin-input w-full"
                 aria-label="AI Provider"
               >
-                <option value="gemini">🤖 Gemini (Fast & Creative)</option>
-                <option value="perplexity">🔍 Perplexity (Research-Heavy)</option>
-                <option value="both">⚡ Both (Gemini first, Perplexity fallback)</option>
+                <option value="gemini"> Gemini (Fast & Creative)</option>
+                <option value="perplexity"> Perplexity (Research-Heavy)</option>
+                <option value="both"> Both (Gemini first, Perplexity fallback)</option>
               </select>
             </div>
 
@@ -237,7 +256,7 @@ export default function AIWriterPage() {
                     onChange={(e) => setPublishOption(e.target.value as any)}
                     className="mr-3"
                   />
-                  <label htmlFor="publish-now">🚀 Publish immediately</label>
+                  <label htmlFor="publish-now"> Publish immediately</label>
                 </div>
                 
                 <div className="flex items-center">
@@ -250,7 +269,7 @@ export default function AIWriterPage() {
                     onChange={(e) => setPublishOption(e.target.value as any)}
                     className="mr-3"
                   />
-                  <label htmlFor="save-draft">📝 Save as draft</label>
+                  <label htmlFor="save-draft"> Save as draft</label>
                 </div>
                 
                 <div className="flex items-center">
@@ -263,7 +282,7 @@ export default function AIWriterPage() {
                     onChange={(e) => setPublishOption(e.target.value as any)}
                     className="mr-3"
                   />
-                  <label htmlFor="schedule">⏰ Schedule for later</label>
+                  <label htmlFor="schedule"> Schedule for later</label>
                 </div>
                 
                 {publishOption === 'schedule' && (
@@ -319,7 +338,7 @@ export default function AIWriterPage() {
               disabled={loading || !topic.trim()}
               className="admin-button disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? '🤖 Generating...' : '✨ Generate Article'}
+              {loading ? ' Generating...' : ' Generate Article'}
             </button>
           </div>
         </div>
@@ -327,7 +346,7 @@ export default function AIWriterPage() {
         {/* Success Result */}
         {result && (
           <div className="mt-8 bg-green-50 border border-green-200 rounded-lg p-6">
-            <h3 className="text-lg font-bold text-green-800 mb-4">✅ Article Generated Successfully!</h3>
+            <h3 className="text-lg font-bold text-green-800 mb-4"> Article Generated Successfully!</h3>
             <div className="space-y-2 text-sm">
               <p><strong>Title:</strong> {result.title}</p>
               <p><strong>Status:</strong> {result.status}</p>
@@ -370,6 +389,8 @@ export default function AIWriterPage() {
             </div>
           </div>
         )}
+          </div>
+        </div>
       </div>
     </div>
   )

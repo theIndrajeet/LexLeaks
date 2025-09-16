@@ -140,6 +140,48 @@ export default function HomePage() {
 
       <Navigation currentPage="/" />
 
+            {/* Deep Research Promotion */}
+            <div className="mb-12">
+              <div className="article-card bg-gradient-to-r from-[#C46A5A]/10 to-[#C46A5A]/5 border-2 border-[#C46A5A]/30">
+                <div className="p-8 text-center">
+                  <div className="flex items-center justify-center mb-4">
+                    <div className="text-4xl mr-3"></div>
+                    <div>
+                      <h2 className="text-2xl font-display font-bold text-brand-dark dark:text-brand-light">
+                        Deep Research by JurisBrain
+                      </h2>
+                      <p className="text-sm text-brand-muted dark:text-brand-light/70">
+                        Commission 50-100+ page legal reports
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-lg leading-relaxed mb-6 text-brand-dark dark:text-brand-light">
+                    Plan → Source → Extract → Write → QA → Export. Fully cited. Reproducible.
+                    Professional legal research reports with real-time progress tracking.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Link href="/legal-ai" className="bg-[#C46A5A] hover:bg-[#B85A4A] text-white px-8 py-3 rounded-lg font-semibold transition-all duration-200 shadow-lg hover:shadow-xl">
+                       Start Deep Research
+                    </Link>
+                    <div className="flex items-center justify-center space-x-4 text-sm text-brand-muted dark:text-brand-light/70">
+                      <span className="flex items-center">
+                        <span className="w-2 h-2 bg-[#3FA796] rounded-full mr-2"></span>
+                        Fully Cited
+                      </span>
+                      <span className="flex items-center">
+                        <span className="w-2 h-2 bg-[#D97706] rounded-full mr-2"></span>
+                        Real-time Progress
+                      </span>
+                      <span className="flex items-center">
+                        <span className="w-2 h-2 bg-[#64748B] rounded-full mr-2"></span>
+                        Professional Quality
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
       {/* Search and Filter Section */}
       {posts.length > 0 && (
         <div className="mb-12">

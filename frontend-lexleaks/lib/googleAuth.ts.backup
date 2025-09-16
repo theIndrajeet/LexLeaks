@@ -57,25 +57,12 @@ export class GoogleAuthService {
       }
 
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      let response = await fetch(`${apiUrl}/api/auth/google/user-info`, {
+      const response = await fetch(`${apiUrl}/api/auth/google/user-info`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
-
-      // If token expired, try to refresh
-      if (response.status === 401) {
-        const newToken = await this.refreshToken();
-        if (newToken) {
-          response = await fetch(`${apiUrl}/api/auth/google/user-info`, {
-            headers: {
-              'Authorization': `Bearer ${newToken}`,
-              'Content-Type': 'application/json'
-            }
-          });
-        }
-      }
 
       if (!response.ok) {
         throw new Error('Failed to get user info');
@@ -85,36 +72,6 @@ export class GoogleAuthService {
     } catch (error) {
       console.error('Failed to get Google user info:', error);
       throw error;
-    }
-  }
-
-  private async refreshToken(): Promise<string | null> {
-    try {
-      const token = localStorage.getItem('auth_token');
-      if (!token) return null;
-
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      const response = await fetch(`${apiUrl}/api/auth/refresh`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        localStorage.removeItem('auth_token');
-        localStorage.removeItem('user_id');
-        return null;
-      }
-
-      const data = await response.json();
-      localStorage.setItem('auth_token', data.access_token);
-      return data.access_token;
-    } catch (error) {
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('user_id');
-      return null;
     }
   }
 

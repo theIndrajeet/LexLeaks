@@ -3,8 +3,10 @@
 import { ReactNode, useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { checkAuthStatus } from '@/lib/api'
+import { useAuth } from '@/hooks/useAuth'
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
+  useAuth() // Add automatic token refresh
   const router = useRouter()
   const pathname = usePathname()
   const [loading, setLoading] = useState(true)

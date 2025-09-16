@@ -22,8 +22,8 @@ interface ImpactTrackerProps {
 
 const impactTypeIcons = {
   legal_action: '⚖️',
-  policy_change: '📋',
-  investigation: '🔍',
+  policy_change: '',
+  investigation: '',
   resignation: '🚪',
   reform: '🛠️'
 }

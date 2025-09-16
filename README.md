@@ -1,27 +1,27 @@
-# 🗞️ LexLeaks
+#  LexLeaks
 
-> **A vintage-styled document leak platform built in just 13 hours** ⚡
+> **A vintage-styled document leak platform built in just 13 hours** 
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Built with](https://img.shields.io/badge/built%20with-Next.js%20%2B%20FastAPI-black)
 ![Time to Build](https://img.shields.io/badge/built%20in-13%20hours-ff69b4)
 
-## 🎯 What is LexLeaks?
+##  What is LexLeaks?
 
 LexLeaks is a modern document leak platform with a vintage newspaper aesthetic. Think WikiLeaks meets The New York Times circa 1920. Features include:
 
-- 📰 **Vintage Newspaper Theme** - Complete with sepia tones, drop caps, and typewriter animations
-- 🌓 **Dark Mode** - Elegant dark theme with parchment-like colors
-- 📄 **Document Viewer** - Built-in PDF viewer with redaction tools
-- 📊 **Impact Tracking** - Track real-world outcomes from leaked documents
-- 🔍 **Advanced Search** - Filter by date, category, verification status
-- 🌍 **Multi-language Support** - 10 languages out of the box
-- 🔐 **Admin Dashboard** - Secure content management system
-- ✨ **Beautiful Animations** - Typewriter effects, smooth transitions
+-  **Vintage Newspaper Theme** - Complete with sepia tones, drop caps, and typewriter animations
+-  **Dark Mode** - Elegant dark theme with parchment-like colors
+-  **Document Viewer** - Built-in PDF viewer with redaction tools
+-  **Impact Tracking** - Track real-world outcomes from leaked documents
+-  **Advanced Search** - Filter by date, category, verification status
+-  **Multi-language Support** - 10 languages out of the box
+-  **Admin Dashboard** - Secure content management system
+-  **Beautiful Animations** - Typewriter effects, smooth transitions
 
 **Live Demo**: [https://lexleaks.com](https://lexleaks.com)
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Prerequisites
 
@@ -45,7 +45,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Visit `http://localhost:3000` 🎉
+Visit `http://localhost:3000` 
 
 ### Backend Setup
 
@@ -70,9 +70,9 @@ alembic upgrade head
 uvicorn app.main:app --reload
 ```
 
-API available at `http://localhost:8000` 🚀
+API available at `http://localhost:8000` 
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 ### Frontend
 - **Framework**: Next.js 14.2.30 with TypeScript
@@ -95,7 +95,7 @@ API available at `http://localhost:8000` 🚀
 - **Database**: Supabase
 - **CDN**: Netlify Edge
 
-## ⚡ The 13-Hour Sprint
+##  The 13-Hour Sprint
 
 Yes, this entire platform was built in a single 13-hour coding session. Here's what was accomplished:
 
@@ -107,17 +107,17 @@ Yes, this entire platform was built in a single 13-hour coding session. Here's w
 
 ### Features Built in Those 13 Hours:
 
-- ✅ Complete authentication system
-- ✅ Admin dashboard with CRUD operations
-- ✅ Vintage newspaper theme with dark mode
-- ✅ Typewriter animations
-- ✅ Advanced search with filters
-- ✅ Document viewer with redaction tools
-- ✅ Impact tracking system
-- ✅ Multi-language support (10 languages)
-- ✅ Responsive design
-- ✅ SEO optimization
-- ✅ Production deployment
+-  Complete authentication system
+-  Admin dashboard with CRUD operations
+-  Vintage newspaper theme with dark mode
+-  Typewriter animations
+-  Advanced search with filters
+-  Document viewer with redaction tools
+-  Impact tracking system
+-  Multi-language support (10 languages)
+-  Responsive design
+-  SEO optimization
+-  Production deployment
 
 ## 🎨 Design Philosophy
 
@@ -184,7 +184,7 @@ gcloud run deploy backend-api \
   --allow-unauthenticated
 ```
 
-## 📝 API Documentation
+##  API Documentation
 
 FastAPI provides automatic API documentation:
 
@@ -195,7 +195,7 @@ FastAPI provides automatic API documentation:
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 📄 License
+##  License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 

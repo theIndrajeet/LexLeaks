@@ -4,6 +4,10 @@ from google.auth.transport import requests
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
 import httpx
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 class GoogleOAuthService:
     def __init__(self):
@@ -19,8 +23,8 @@ class GoogleOAuthService:
     
     @property
     def redirect_uri(self):
-        # HARDCODED: Using backend callback URL for OAuth flow
-        return "https://lexleaks-api-563011146464.asia-south1.run.app/api/auth/google/callback"
+        # Use environment variable for redirect URI
+        return os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:3000/auth/callback")
         
     @property
     def scopes(self):

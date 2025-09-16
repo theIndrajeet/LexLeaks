@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createPost } from '@/lib/api'
 import RichTextEditor from '@/components/RichTextEditor'
+import SimpleRichTextEditor from '@/components/SimpleRichTextEditor'
 
 export default function NewPostPage() {
   const router = useRouter()
@@ -197,21 +198,20 @@ export default function NewPostPage() {
               </p>
             </div>
 
-            {/* Excerpt */}
+            {/* Excerpt - Simple Rich Text Editor */}
             <div>
-              <label htmlFor="excerpt" className="block text-sm font-bold font-mono-special uppercase tracking-wide mb-2">
+              <label className="block text-sm font-bold font-mono-special uppercase tracking-wide mb-2">
                 Excerpt
               </label>
-              <textarea
-                id="excerpt"
-                value={formData.excerpt}
-                onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                className="admin-input w-full"
-                rows={3}
+              <SimpleRichTextEditor
+                content={formData.excerpt}
+                onChange={(excerpt) => setFormData({ ...formData, excerpt })}
                 placeholder="Brief summary of the article..."
+                rows={3}
+                className="mb-2"
               />
               <p className="text-sm text-gray-500 mt-1">
-                This appears on the homepage and in search results
+                This appears on the homepage and in search results. Use basic formatting for better presentation.
               </p>
             </div>
 

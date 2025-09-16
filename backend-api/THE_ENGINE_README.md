@@ -1,4 +1,4 @@
-# 🚀 THE ENGINE - Smart Legal Job Scraping System
+#  THE ENGINE - Smart Legal Job Scraping System
 
 ## Overview
 THE ENGINE is a sophisticated, AI-powered job scraping system designed specifically for the legal industry. It intelligently scrapes, enhances, and manages legal job opportunities with advanced automation features.
@@ -18,7 +18,7 @@ THE ENGINE is a sophisticated, AI-powered job scraping system designed specifica
 - **Quality Scoring**: Rates job postings from 1-10 based on completeness and quality
 - **Duplicate Detection**: AI-powered duplicate removal across sources
 
-### 🎯 Legal-Specific Features
+###  Legal-Specific Features
 - **Practice Area Classification**: Corporate, Criminal, IP, Family Law, etc.
 - **Experience Level Detection**: Entry, Mid, Senior level identification
 - **Firm Size Analysis**: Boutique, Mid-size, Big Law categorization
@@ -46,7 +46,7 @@ THE ENGINE is a sophisticated, AI-powered job scraping system designed specifica
 - **USAJobs**: Government legal positions
 - **Generic Legal Sites**: LawJobs, LegalJobs, etc.
 
-## 🚀 API Endpoints
+##  API Endpoints
 
 ### Search & Discovery
 - `GET /api/opportunities/search` - Search jobs with filters
@@ -95,7 +95,7 @@ curl -X POST "http://localhost:8000/api/opportunities/smart-scrape?query=corpora
 curl "http://localhost:8000/api/opportunities/trends"
 ```
 
-## 🎯 Smart Features in Action
+##  Smart Features in Action
 
 ### 1. Intelligent Scraping
 - Checks for recent data before scraping
@@ -114,7 +114,7 @@ curl "http://localhost:8000/api/opportunities/trends"
 - Rate limiting prevents API abuse
 - Duplicate detection improves data quality
 
-## 🚀 Production Ready
+##  Production Ready
 
 THE ENGINE is designed for production use with:
 - **Error Handling**: Comprehensive error handling and logging
@@ -123,7 +123,7 @@ THE ENGINE is designed for production use with:
 - **Monitoring**: Detailed logging and statistics
 - **Reliability**: Automatic retry logic and fallback mechanisms
 
-## 🎉 Demo Results
+##  Demo Results
 
 ```
 📊 Database Stats:
@@ -133,7 +133,7 @@ THE ENGINE is designed for production use with:
    • Office Jobs: 10
    • Average Quality Score: 6.33/10
 
-✅ Features Working:
+ Features Working:
    • Smart scraping on demand
    • AI-powered job enhancement
    • Market trend analysis
@@ -155,4 +155,4 @@ THE ENGINE is designed for production use with:
 
 ---
 
-**THE ENGINE is now live and ready to revolutionize legal job searching! 🚀**
+**THE ENGINE is now live and ready to revolutionize legal job searching! **
