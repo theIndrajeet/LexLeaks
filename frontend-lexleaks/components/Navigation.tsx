@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import GoogleAuthButton from './GoogleAuthButton'
+import SupabaseAuthButton from './SupabaseAuthButton'
 import ThemeToggle from './ThemeToggle'
 
 interface NavigationProps {
@@ -39,7 +39,7 @@ export default function Navigation({
         ))}
       </nav>
       <div className="flex items-center gap-3">
-        <GoogleAuthButton />
+            <SupabaseAuthButton />
         {showSubmitButton && (
           <Link href="/submit" className="brand-button">
             Submit a Leak

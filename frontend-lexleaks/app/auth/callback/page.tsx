@@ -1,91 +1,45 @@
 'use client'
 
-import { useEffect, useState, Suspense } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { GoogleAuthService } from '@/lib/googleAuth'
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { supabase } from '@/lib/supabaseAuth'
 
-function AuthCallbackContent() {
+export default function AuthCallback() {
   const router = useRouter()
-  const searchParams = useSearchParams()
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading')
-  const [message, setMessage] = useState('')
 
   useEffect(() => {
-    const handleCallback = async () => {
+    const handleAuthCallback = async () => {
       try {
-        const googleAuth = GoogleAuthService.getInstance()
-        const result = googleAuth.handleAuthCallback()
+        const { data, error } = await supabase.auth.getSession()
         
-        if (result) {
-          setStatus('success')
-          setMessage('Login successful! Redirecting...')
-          
-          // Redirect to home page for all users
-          setTimeout(() => {
-            router.push('/')
-          }, 2000)
-        } else {
-          setStatus('error')
-          setMessage('Authentication failed. Please try again.')
+        if (error) {
+          console.error('Auth callback error:', error)
+          router.push('/auth/error?message=' + encodeURIComponent(error.message))
+          return
         }
-      } catch (error: any) {
-        setStatus('error')
-        setMessage('Authentication error: ' + error.message)
+
+        if (data.session) {
+          // Successfully authenticated
+          router.push('/')
+        } else {
+          // No session found
+          router.push('/auth/error?message=' + encodeURIComponent('No session found'))
+        }
+      } catch (error) {
+        console.error('Auth callback error:', error)
+        router.push('/auth/error?message=' + encodeURIComponent('Authentication failed'))
       }
     }
 
-    handleCallback()
+    handleAuthCallback()
   }, [router])
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 text-center">
-          {status === 'loading' && (
-            <>
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600">Completing authentication...</p>
-            </>
-          )}
-          
-          {status === 'success' && (
-            <>
-              <div className="text-green-600 text-4xl mb-4">✓</div>
-              <p className="text-green-600 font-medium">{message}</p>
-            </>
-          )}
-          
-          {status === 'error' && (
-            <>
-              <div className="text-red-600 text-4xl mb-4">✗</div>
-              <p className="text-red-600 font-medium">{message}</p>
-              <button
-                onClick={() => router.push('/admin/login')}
-                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
-                Try Again
-              </button>
-            </>
-          )}
-        </div>
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+        <p className="mt-4 text-gray-600">Completing authentication...</p>
       </div>
     </div>
-  )
-}
-
-export default function AuthCallbackPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-md">
-          <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading...</p>
-          </div>
-        </div>
-      </div>
-    }>
-      <AuthCallbackContent />
-    </Suspense>
   )
 }

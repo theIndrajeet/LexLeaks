@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { login } from '@/lib/api'
-import { GoogleAuthService } from '@/lib/googleAuth'
+import { SupabaseAuthService } from '@/lib/supabaseAuth'
 
 export default function AdminLoginPage() {
   const router = useRouter()
@@ -31,8 +31,8 @@ export default function AdminLoginPage() {
   const handleGoogleLogin = async () => {
     try {
       setLoading(true)
-      const googleAuth = GoogleAuthService.getInstance()
-      await googleAuth.initiateGoogleLogin()
+      const supabaseAuth = SupabaseAuthService.getInstance()
+      await supabaseAuth.signInWithGoogle()
     } catch (err: any) {
       setError('Google login failed: ' + err.message)
       setLoading(false)
