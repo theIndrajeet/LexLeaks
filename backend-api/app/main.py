@@ -7,7 +7,7 @@ import os
 
 from .database import engine
 from . import models
-from .routers import posts, auth, impacts, ai, google_auth, kanoon, opportunities, legal_ai, deep_research, chat, multi_agent_research, event_driven_research, trends, scheduler, pipeline
+from .routers import posts, auth, impacts, ai, google_auth, kanoon, opportunities, legal_ai, deep_research, chat, multi_agent_research, event_driven_research, trends, scheduler, pipeline, test_scheduler
 from .smart_automation import start_automation
 from .event_driven_agent_system import event_driven_system
 from .scheduler_service import scheduler_service
@@ -118,6 +118,7 @@ app.include_router(event_driven_research.router)
 app.include_router(trends.router, prefix="/api", tags=["trends"])
 app.include_router(scheduler.router, prefix="/api", tags=["scheduler"])
 app.include_router(pipeline.router, prefix="/api", tags=["pipeline"])
+app.include_router(test_scheduler.router, prefix="/api", tags=["test"])
 # app.include_router(notifications.router, prefix="/api/notifications")  # TODO: Add notifications module
 
 
