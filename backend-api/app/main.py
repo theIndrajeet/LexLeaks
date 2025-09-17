@@ -58,7 +58,7 @@ app.add_middleware(
         "http://localhost:3000",  # Next.js development server
         "http://localhost:3001",  # Next.js development server (alternative port)
         "http://localhost:3100",  # Stagewise development server
-        "https://lexleaks.com",   # Production domain
+        "https://lexleaks.com",   # Production domain - OAuth fix
         "https://www.lexleaks.com",  # Production domain with www
         "https://lexleaks.netlify.app",  # Your main Netlify domain
         "https://glittery-dragon-d3e69b.netlify.app",  # Current Netlify deployment
