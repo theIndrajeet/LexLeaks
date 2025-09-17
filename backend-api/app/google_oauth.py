@@ -23,9 +23,14 @@ class GoogleOAuthService:
     
     @property
     def redirect_uri(self):
-        # Use environment variable for redirect URI
-        # Default to production URL if not specified
-        return os.getenv("GOOGLE_REDIRECT_URI", "https://lexleaks-api-563011146464.asia-south1.run.app/api/auth/google/callback")
+        # Auto-detect environment and use appropriate redirect URI
+        # Check if we're running in production (Cloud Run)
+        if os.getenv("K_SERVICE") or os.getenv("GOOGLE_CLOUD_PROJECT"):
+            # Production environment - use production redirect URI
+            return "https://lexleaks-api-563011146464.asia-south1.run.app/api/auth/google/callback"
+        else:
+            # Development environment - use localhost
+            return "http://localhost:8000/api/auth/google/callback"
         
     @property
     def scopes(self):

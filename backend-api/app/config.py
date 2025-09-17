@@ -16,8 +16,13 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30")
 ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
 ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "LexLeaks2024!")
 
-# CORS configuration
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
+# CORS configuration - Auto-detect environment
+if os.getenv("K_SERVICE") or os.getenv("GOOGLE_CLOUD_PROJECT"):
+    # Production environment
+    FRONTEND_URL = "https://lexleaks.com"
+else:
+    # Development environment
+    FRONTEND_URL = "http://localhost:3000"
 
 # AI API Keys
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
