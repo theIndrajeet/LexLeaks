@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import logging
 import asyncio
+import os
 
 from .database import engine
 from . import models
@@ -25,22 +26,54 @@ def create_tables():
         logger.warning("⚠️  Server will continue without database features")
         logger.warning("⚠️  Some features may not work properly")
 
+async def start_background_services():
+    """Start heavy services in background for production"""
+    try:
+        await asyncio.sleep(5)  # Let the server start first
+        await start_automation()
+        asyncio.create_task(event_driven_system.start())
+        logger.info("🔧 Event-driven agent system started")
+        await scheduler_service.start_scheduler()
+        logger.info("📅 Article scheduler service started")
+    except Exception as e:
+        logger.error(f"❌ Background services failed: {e}")
+
 
 # Lifespan event handler
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
     create_tables()
-    # Start smart automation
-    await start_automation()
-    # Start event-driven agent system
-    asyncio.create_task(event_driven_system.start())
-    logger.info(" Event-driven agent system started")
-    # Start scheduler service
-    await scheduler_service.start_scheduler()
-    logger.info("  Article scheduler service started")
+    
+    # Check if we're in production (Cloud Run)
+    is_production = os.getenv("K_SERVICE") or os.getenv("GOOGLE_CLOUD_PROJECT")
+    
+    if is_production:
+        # Production: Start services in background to avoid timeout
+        logger.info("🚀 Production mode: Starting services in background")
+        asyncio.create_task(start_background_services())
+    else:
+        # Development: Start services normally
+        await start_automation()
+        asyncio.create_task(event_driven_system.start())
+        logger.info("🔧 Event-driven agent system started")
+        await scheduler_service.start_scheduler()
+        logger.info("📅 Article scheduler service started")
+    
     yield
     # Shutdown (if needed)
+
+async def start_background_services():
+    """Start heavy services in background for production"""
+    try:
+        await asyncio.sleep(5)  # Let the server start first
+        await start_automation()
+        asyncio.create_task(event_driven_system.start())
+        logger.info("🔧 Event-driven agent system started")
+        await scheduler_service.start_scheduler()
+        logger.info("📅 Article scheduler service started")
+    except Exception as e:
+        logger.error(f"❌ Background services failed: {e}")
 
 
 # Create FastAPI application
