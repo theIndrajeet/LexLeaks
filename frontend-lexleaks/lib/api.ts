@@ -591,6 +591,13 @@ export const manualPublishScheduled = async (): Promise<any> => {
   })
 }
 
+export const runAutomationNow = async (mode: 'generate' | 'generate_and_publish' = 'generate'): Promise<any> => {
+  return apiRequest('/api/scheduler/run-now', {
+    method: 'POST',
+    body: JSON.stringify({ mode }),
+  })
+}
+
 export const getScheduledPosts = async (): Promise<{ scheduled_posts: ScheduledPost[], total_count: number }> => {
   return apiRequest('/api/scheduler/scheduled-posts', {
     method: 'GET',

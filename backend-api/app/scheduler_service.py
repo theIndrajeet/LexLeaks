@@ -51,6 +51,46 @@ class SchedulerService:
                 pass
         logger.info("🛑 Stopped Article Scheduler Service")
         
+    async def run_automation_now(self, mode: str = 'generate') -> Dict[str, Any]:
+        """Run the automation immediately.
+
+        mode options:
+        - 'generate': run generation pipeline now (default)
+        - 'generate_and_publish': run generation, then attempt publish now
+        """
+        start_time = datetime.now(self.timezone)
+        try:
+            generated = False
+            published = False
+
+            # Always run generation first
+            await self._generate_trending_articles()
+            generated = True
+
+            if mode == 'generate_and_publish':
+                await self._publish_scheduled_articles()
+                published = True
+
+            end_time = datetime.now(self.timezone)
+            duration = (end_time - start_time).total_seconds()
+
+            return {
+                'success': True,
+                'message': 'Automation run completed',
+                'actions': {
+                    'generated': generated,
+                    'published': published,
+                },
+                'duration_seconds': duration,
+                'ran_at': start_time.isoformat()
+            }
+        except Exception as e:
+            logger.error(f"Error running automation now: {e}")
+            return {
+                'success': False,
+                'message': f'Error running automation: {str(e)}'
+            }
+        
     async def _scheduler_loop(self):
         """Main scheduler loop that runs every minute"""
         while self.is_running:

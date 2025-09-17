@@ -30,6 +30,9 @@ class ManualGenerateRequest(BaseModel):
     template: str = 'legal_explainer'
     publish_option: str = 'draft'  # 'draft' or 'live'
 
+class RunNowRequest(BaseModel):
+    mode: str = 'generate'  # 'generate' | 'generate_and_publish'
+
 @router.get("/scheduler/status", response_model=SchedulerStatusResponse)
 async def get_scheduler_status():
     """Get current scheduler status"""
@@ -112,6 +115,17 @@ async def manual_publish_scheduled():
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error publishing articles: {str(e)}")
+
+@router.post("/scheduler/run-now")
+async def run_now(request: RunNowRequest):
+    """Run automation immediately (generate or generate+publish)."""
+    try:
+        result = await scheduler_service.run_automation_now(mode=request.mode)
+        if not result['success']:
+            raise HTTPException(status_code=400, detail=result['message'])
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error running automation now: {str(e)}")
 
 @router.get("/scheduler/scheduled-posts")
 async def get_scheduled_posts(db: Session = Depends(get_db)):

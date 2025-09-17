@@ -12,6 +12,7 @@ import {
   refreshTrendingTopics,
   getTrendingTopics,
   runManualPipeline,
+  runAutomationNow,
   SchedulerStatus,
   SchedulerStats,
   ScheduledPost,
@@ -206,9 +207,40 @@ export default function SchedulerPage() {
     <div className="min-h-screen brand-bg p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold brand-text">Article Scheduler</h1>
-          <p className="text-gray-600 mt-2">Automated article generation and publishing</p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold brand-text">Article Scheduler</h1>
+            <p className="text-gray-600 mt-2">Automated article generation and publishing</p>
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={() => {
+                if (window.history.length > 1) window.history.back();
+                else window.location.href = '/admin/dashboard'
+              }}
+              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+            >
+              ← Back
+            </button>
+            <button
+              onClick={async () => {
+                try {
+                  setPipelineLoading(true)
+                  await runAutomationNow('generate')
+                  await fetchData()
+                  alert('Automation run started: generation triggered.')
+                } catch (err: any) {
+                  setError('Failed to run automation: ' + err.message)
+                } finally {
+                  setPipelineLoading(false)
+                }
+              }}
+              className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50"
+              disabled={pipelineLoading}
+            >
+              {pipelineLoading ? 'Running…' : 'Run Now'}
+            </button>
+          </div>
         </div>
 
         {error && (
@@ -274,6 +306,24 @@ export default function SchedulerPage() {
               }`}
             >
               {status?.automation_enabled ? 'Pause Automation' : 'Start Automation'}
+            </button>
+            <button
+              onClick={async () => {
+                try {
+                  setPipelineLoading(true)
+                  await runAutomationNow('generate_and_publish')
+                  await fetchData()
+                  alert('Automation ran: generated and published due items.')
+                } catch (err: any) {
+                  setError('Failed to run automation now: ' + err.message)
+                } finally {
+                  setPipelineLoading(false)
+                }
+              }}
+              className="px-4 py-2 bg-emerald-700 text-white rounded-lg font-medium hover:bg-emerald-800 disabled:opacity-50"
+              disabled={pipelineLoading}
+            >
+              {pipelineLoading ? 'Running…' : 'Run Now (Gen+Publish)'}
             </button>
             <button
               onClick={handleRefreshTrends}
