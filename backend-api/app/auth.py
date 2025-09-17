@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 
 from . import crud, schemas
 from .database import get_db
+from .supabase_auth import supabase_auth
 
 load_dotenv()
 
@@ -54,15 +55,36 @@ async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
     db: Session = Depends(get_db)
 ):
-    """Dependency to get the current authenticated user"""
+    """Dependency to get the current authenticated user - supports both Supabase and legacy auth"""
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
     
+    token = credentials.credentials
+    
+    # First, try Supabase authentication
     try:
-        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        supabase_user = supabase_auth.verify_token(token)
+        if supabase_user:
+            # Create a user object that matches the expected format
+            class SupabaseUser:
+                def __init__(self, user_data):
+                    self.id = user_data["id"]
+                    self.email = user_data["email"]
+                    self.name = user_data["name"]
+                    self.is_admin = user_data["is_admin"]
+                    self.username = user_data["email"]  # Use email as username
+            
+            return SupabaseUser(supabase_user)
+    except Exception as e:
+        print(f"Supabase auth failed: {e}")
+        # Fall back to legacy auth
+    
+    # Fallback to legacy JWT authentication
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: Optional[str] = payload.get("sub")
         if user_id is None:
             raise credentials_exception

@@ -2,28 +2,33 @@
 
 import { ReactNode, useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import { checkAuthStatus } from '@/lib/api'
-import { useAuth } from '@/hooks/useAuth'
+import { supabase } from '@/lib/supabaseAuth'
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
-  useAuth() // Add automatic token refresh
   const router = useRouter()
   const pathname = usePathname()
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const verifyAuth = async () => {
-      const user = await checkAuthStatus()
-      
-      // If not logged in and not on login page, redirect to login
-      if (!user && pathname !== '/admin/login') {
-        router.push('/admin/login')
+      const { data } = await supabase.auth.getUser()
+      const supaUser = data?.user
+      const isAdmin = Boolean(supaUser?.user_metadata?.is_admin)
+
+      // Not logged in or not admin → only allow /admin/login
+      if ((!supaUser || !isAdmin) && pathname !== '/admin/login') {
+        router.replace('/admin/login')
+        setLoading(false)
+        return
       }
-      // If logged in and on login page, redirect to dashboard
-      else if (user && pathname === '/admin/login') {
-        router.push('/admin/dashboard')
+
+      // Logged in + admin → prevent seeing login page
+      if (supaUser && isAdmin && pathname === '/admin/login') {
+        router.replace('/admin/dashboard')
+        setLoading(false)
+        return
       }
-      
+
       setLoading(false)
     }
 

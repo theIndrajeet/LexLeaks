@@ -33,6 +33,13 @@ export default function AdminLoginPage() {
       setLoading(true)
       const supabaseAuth = SupabaseAuthService.getInstance()
       await supabaseAuth.signInWithGoogle()
+      // After redirect back, if already logged in and admin, go to dashboard
+      setTimeout(async () => {
+        const user = await supabaseAuth.getCurrentUser()
+        if (user?.is_admin) {
+          router.replace('/admin/dashboard')
+        }
+      }, 300)
     } catch (err: any) {
       setError('Google login failed: ' + err.message)
       setLoading(false)

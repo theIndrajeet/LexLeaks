@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { createPost } from '@/lib/api'
 import RichTextEditor from '@/components/RichTextEditor'
 import SimpleRichTextEditor from '@/components/SimpleRichTextEditor'
 
-export default function NewPostPage() {
+function NewPostContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const isAIEdit = searchParams.get('ai_edit') === 'true'
@@ -299,5 +299,20 @@ export default function NewPostPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function NewPostPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center brand-bg">
+        <div className="text-center">
+          <div className="loading-skeleton h-8 w-32 mx-auto mb-4 rounded"></div>
+          <div className="loading-skeleton h-4 w-24 mx-auto rounded"></div>
+        </div>
+      </div>
+    }>
+      <NewPostContent />
+    </Suspense>
   )
 }

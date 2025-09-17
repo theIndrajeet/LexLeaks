@@ -1,5 +1,8 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
+// Import Supabase client
+import { supabase } from './supabaseAuth'
+
 // Types
 export interface User {
   id: number
@@ -116,9 +119,22 @@ export interface ImpactCreateData {
 export interface ImpactUpdateData extends Partial<Omit<ImpactCreateData, 'post_id'>> {}
 
 // Auth utilities
-const getAuthToken = (): string | null => {
+const getAuthToken = async (): Promise<string | null> => {
   if (typeof window === 'undefined') return null
-  return localStorage.getItem('auth_token')
+  
+  try {
+    // First try to get Supabase token
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session?.access_token) {
+      return session.access_token
+    }
+    
+    // Fallback to legacy token
+    return localStorage.getItem('auth_token')
+  } catch (error) {
+    console.error('Error getting auth token:', error)
+    return localStorage.getItem('auth_token')
+  }
 }
 
 const setAuthToken = (token: string): void => {
@@ -138,7 +154,7 @@ const apiRequest = async (
   endpoint: string,
   options: RequestInit = {}
 ): Promise<any> => {
-  const token = getAuthToken()
+  const token = await getAuthToken()
   
   const config: RequestInit = {
     headers: {
@@ -274,7 +290,7 @@ export const updatePost = async (id: number, data: PostUpdateData): Promise<Post
 }
 
 export const deletePost = async (id: number): Promise<void> => {
-  const token = getAuthToken()
+  const token = await getAuthToken()
   
   const response = await fetch(`${API_BASE_URL}/api/posts/${id}`, {
     method: 'DELETE',
@@ -293,13 +309,15 @@ export const deletePost = async (id: number): Promise<void> => {
 }
 
 // Admin utilities
-export const isLoggedIn = (): boolean => {
-  return getAuthToken() !== null
+export const isLoggedIn = async (): Promise<boolean> => {
+  const token = await getAuthToken()
+  return token !== null
 }
 
 export const checkAuthStatus = async (): Promise<User | null> => {
   try {
-    if (!getAuthToken()) return null
+    const token = await getAuthToken()
+    if (!token) return null
     return await getCurrentUser()
   } catch (error) {
     removeAuthToken()
@@ -794,7 +812,7 @@ export const getGeminiStats = async (): Promise<any> => {
 } 
 export const refreshToken = async (): Promise<string | null> => {
   try {
-    const token = getAuthToken()
+    const token = await getAuthToken()
     if (!token) return null
 
     const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
