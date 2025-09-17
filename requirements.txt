@@ -22,4 +22,5 @@ pytz==2024.1
 aiohttp==3.9.1
 atoma==0.0.17
 google-generativeai==0.3.2
-supabase==2.18.1requests
+supabase==2.18.1
+requests==2.31.0
