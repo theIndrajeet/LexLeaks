@@ -3,6 +3,46 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 // Import Supabase client
 import { supabase } from './supabaseAuth'
 
+// Debug function to test Supabase session
+export const testSupabaseSession = async () => {
+  if (typeof window === 'undefined') return null
+  
+  try {
+    console.log('🧪 Testing Supabase session...')
+    const { data: { session }, error } = await supabase.auth.getSession()
+    console.log('🧪 Session result:', { session, error })
+    return session
+  } catch (err) {
+    console.error('🧪 Session test error:', err)
+    return null
+  }
+}
+
+// Debug function to test token retrieval
+export const testTokenRetrieval = async () => {
+  if (typeof window === 'undefined') return null
+  
+  try {
+    console.log('🧪 Testing token retrieval...')
+    const token = await getAuthToken()
+    console.log('🧪 Token result:', { token, hasToken: !!token })
+    return token
+  } catch (err) {
+    console.error('🧪 Token test error:', err)
+    return null
+  }
+}
+
+// Make functions available globally for testing
+if (typeof window !== 'undefined') {
+  (window as any).testSupabaseSession = testSupabaseSession
+  ;(window as any).testTokenRetrieval = testTokenRetrieval
+  ;(window as any).debugAPI = () => {
+    console.log('🔧 DEBUG API: Global functions loaded!')
+    console.log('🔧 Available functions:', Object.keys(window).filter(k => k.startsWith('test')))
+  }
+}
+
 // Types
 export interface User {
   id: number
@@ -123,14 +163,37 @@ const getAuthToken = async (): Promise<string | null> => {
   if (typeof window === 'undefined') return null
   
   try {
+    console.log(`🔑 Starting token retrieval...`)
+    
     // First try to get Supabase token
-    const { data: { session } } = await supabase.auth.getSession()
+    const { data: { session }, error } = await supabase.auth.getSession()
+    console.log(`🔑 Supabase Session Debug:`, {
+      hasSession: !!session,
+      hasAccessToken: !!session?.access_token,
+      tokenLength: session?.access_token?.length || 0,
+      error: error?.message || 'none',
+      sessionKeys: session ? Object.keys(session) : 'no session'
+    })
+    
     if (session?.access_token) {
+      console.log(`🔑 Using Supabase token: ${session.access_token.substring(0, 20)}...`)
       return session.access_token
     }
     
     // Fallback to legacy token
-    return localStorage.getItem('auth_token')
+    const legacyToken = localStorage.getItem('auth_token')
+    console.log(`🔑 Legacy Token Debug:`, {
+      hasLegacyToken: !!legacyToken,
+      legacyTokenLength: legacyToken?.length || 0
+    })
+    
+    if (legacyToken) {
+      console.log(`🔑 Using legacy token: ${legacyToken.substring(0, 20)}...`)
+      return legacyToken
+    }
+    
+    console.log(`🔑 No token found!`)
+    return null
   } catch (error) {
     console.error('Error getting auth token:', error)
     return localStorage.getItem('auth_token')
@@ -154,7 +217,16 @@ const apiRequest = async (
   endpoint: string,
   options: RequestInit = {}
 ): Promise<any> => {
+  console.log(`🚀 API REQUEST STARTED: ${endpoint}`)
+  
   const token = await getAuthToken()
+  
+  console.log(`🔍 API Request Debug:`, {
+    endpoint,
+    hasToken: !!token,
+    tokenLength: token?.length || 0,
+    tokenStart: token?.substring(0, 20) + '...' || 'none'
+  })
   
   const config: RequestInit = {
     headers: {
@@ -166,6 +238,13 @@ const apiRequest = async (
   }
 
   let response = await fetch(`${API_BASE_URL}${endpoint}`, config)
+
+  console.log(`🔍 API Response Debug:`, {
+    endpoint,
+    status: response.status,
+    statusText: response.statusText,
+    ok: response.ok
+  })
 
   // If token expired, try to refresh it
   if (response.status === 401 && token) {
@@ -182,6 +261,12 @@ const apiRequest = async (
   
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}))
+    console.error(`❌ API Error:`, {
+      endpoint,
+      status: response.status,
+      statusText: response.statusText,
+      errorData
+    })
     throw new Error(errorData.detail || `HTTP error! status: ${response.status}`)
   }
 

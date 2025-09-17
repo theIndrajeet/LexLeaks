@@ -1,15 +1,14 @@
-from datetime import datetime, timedelta
-from typing import Optional
+import os
+from typing import Optional, Dict, Any
 from jose import JWTError, jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
-import os
 from dotenv import load_dotenv
+import requests
 
 from . import crud, schemas
 from .database import get_db
-from .supabase_auth import supabase_auth
 
 load_dotenv()
 
@@ -25,6 +24,38 @@ if not SECRET_KEY:
 # Security scheme
 security = HTTPBearer()
 
+# Supabase configuration
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_SERVICE_ROLE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+
+def verify_supabase_token(token: str) -> Optional[Dict[str, Any]]:
+    """Verify Supabase JWT token"""
+    if not SUPABASE_URL or not SUPABASE_SERVICE_ROLE_KEY:
+        print("Warning: Supabase configuration missing")
+        return None
+    
+    try:
+        # Use Supabase's user verification endpoint
+        response = requests.get(
+            f"{SUPABASE_URL}/auth/v1/user",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "apikey": SUPABASE_SERVICE_ROLE_KEY
+            }
+        )
+        
+        if response.status_code == 200:
+            user_data = response.json()
+            return {
+                "id": user_data.get("id"),
+                "email": user_data.get("email"),
+                "name": user_data.get("user_metadata", {}).get("full_name", user_data.get("email")),
+                "is_admin": user_data.get("user_metadata", {}).get("is_admin", False)
+            }
+        return None
+    except Exception as e:
+        print(f"Supabase token verification failed: {e}")
+        return None
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     """Create a JWT access token"""
@@ -38,7 +69,6 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-
 def verify_token(token: str) -> Optional[str]:
     """Verify and decode JWT token"""
     try:
@@ -49,7 +79,6 @@ def verify_token(token: str) -> Optional[str]:
         return username
     except JWTError:
         return None
-
 
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
@@ -65,22 +94,18 @@ async def get_current_user(
     token = credentials.credentials
     
     # First, try Supabase authentication
-    try:
-        supabase_user = supabase_auth.verify_token(token)
-        if supabase_user:
-            # Create a user object that matches the expected format
-            class SupabaseUser:
-                def __init__(self, user_data):
-                    self.id = user_data["id"]
-                    self.email = user_data["email"]
-                    self.name = user_data["name"]
-                    self.is_admin = user_data["is_admin"]
-                    self.username = user_data["email"]  # Use email as username
-            
-            return SupabaseUser(supabase_user)
-    except Exception as e:
-        print(f"Supabase auth failed: {e}")
-        # Fall back to legacy auth
+    supabase_user = verify_supabase_token(token)
+    if supabase_user:
+        # Create a user object that matches the expected format
+        class SupabaseUser:
+            def __init__(self, user_data):
+                self.id = user_data["id"]
+                self.email = user_data["email"]
+                self.name = user_data["name"]
+                self.is_admin = user_data["is_admin"]
+                self.username = user_data["email"]  # Use email as username
+        
+        return SupabaseUser(supabase_user)
     
     # Fallback to legacy JWT authentication
     try:
@@ -94,9 +119,9 @@ async def get_current_user(
     # Try to find user by ID (for OAuth users)
     user = crud.get_user_by_id(db, user_id=int(user_id))
     
-    # If not found by ID, try by username (for traditional users, though username might be None for OAuth)
+    # If not found by ID, try by username (for traditional users)
     if user is None:
-        username: Optional[str] = payload.get("username") # Fallback for traditional users
+        username: Optional[str] = payload.get("username")
         if username:
             user = crud.get_user_by_username(db, username=username)
     
@@ -104,7 +129,6 @@ async def get_current_user(
         raise credentials_exception
     
     return user
-
 
 # Optional: Admin-only dependency
 async def get_current_admin_user(
@@ -117,4 +141,4 @@ async def get_current_admin_user(
             detail="Not enough permissions"
         )
     
-    return current_user 
+    return current_user

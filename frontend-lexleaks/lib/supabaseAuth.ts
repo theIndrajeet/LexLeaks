@@ -42,18 +42,18 @@ export class SupabaseAuthService {
   }
 
   async getCurrentUser(): Promise<SupabaseUser | null> {
-    const { data: { user }, error } = await supabase.auth.getUser()
+    const { data: { session }, error } = await supabase.auth.getSession()
     
-    if (error || !user) {
+    if (error || !session?.user) {
       return null
     }
 
     return {
-      id: user.id,
-      email: user.email!,
-      name: user.user_metadata.full_name || user.email!,
-      picture: user.user_metadata.avatar_url,
-      is_admin: user.user_metadata.is_admin || false
+      id: session.user.id,
+      email: session.user.email!,
+      name: session.user.user_metadata.full_name || session.user.email!,
+      picture: session.user.user_metadata.avatar_url,
+      is_admin: session.user.user_metadata.is_admin || false
     }
   }
 

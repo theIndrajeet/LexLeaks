@@ -14,6 +14,7 @@
   # Supabase Configuration for Production
   NEXT_PUBLIC_SUPABASE_URL = "https://whvehlnbrsopxxxtlbql.supabase.co"
   NEXT_PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndodmVobG5icnNvcHh4eHRsYnFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczMjM1MTQsImV4cCI6MjA3Mjg5OTUxNH0.2Ah4pbsn83Pc9ekMGuWAx5O9EGkdfHQ0hIqh4RIXIgI"
+  NEXT_PUBLIC_SITE_URL = "https://lexleaks.com"
   
   # Node version (optional but recommended)
   NODE_VERSION = "18"
@@ -95,4 +96,4 @@
   from = "https://www.lexleaks.com/*"
   to = "https://lexleaks.com/:splat"
   status = 301
-  force = true 
+  force = true

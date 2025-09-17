@@ -4,6 +4,7 @@ from typing import Dict, Any
 from pydantic import BaseModel
 
 from ..database import get_db
+from ..auth import get_current_admin_user
 from ..scheduler_service import scheduler_service
 
 router = APIRouter()
@@ -31,7 +32,9 @@ class ManualGenerateRequest(BaseModel):
     publish_option: str = 'draft'  # 'draft' or 'live'
 
 @router.get("/scheduler/status", response_model=SchedulerStatusResponse)
-async def get_scheduler_status():
+async def get_scheduler_status(
+    current_user = Depends(get_current_admin_user)
+):
     """Get current scheduler status"""
     try:
         status = scheduler_service.get_scheduler_status()
@@ -40,7 +43,9 @@ async def get_scheduler_status():
         raise HTTPException(status_code=500, detail=f"Error getting scheduler status: {str(e)}")
 
 @router.post("/scheduler/start")
-async def start_scheduler():
+async def start_scheduler(
+    current_user = Depends(get_current_admin_user)
+):
     """Start the scheduler service"""
     try:
         await scheduler_service.start_scheduler()
@@ -52,7 +57,9 @@ async def start_scheduler():
         raise HTTPException(status_code=500, detail=f"Error starting scheduler: {str(e)}")
 
 @router.post("/scheduler/stop")
-async def stop_scheduler():
+async def stop_scheduler(
+    current_user = Depends(get_current_admin_user)
+):
     """Stop the scheduler service"""
     try:
         await scheduler_service.stop_scheduler()
@@ -64,7 +71,10 @@ async def stop_scheduler():
         raise HTTPException(status_code=500, detail=f"Error stopping scheduler: {str(e)}")
 
 @router.post("/scheduler/toggle-automation")
-async def toggle_automation(request: ToggleAutomationRequest):
+async def toggle_automation(
+    request: ToggleAutomationRequest,
+    current_user = Depends(get_current_admin_user)
+):
     """Toggle automation on/off"""
     try:
         result = scheduler_service.toggle_automation(request.enabled)
@@ -73,7 +83,10 @@ async def toggle_automation(request: ToggleAutomationRequest):
         raise HTTPException(status_code=500, detail=f"Error toggling automation: {str(e)}")
 
 @router.post("/scheduler/update-schedule")
-async def update_schedule(request: UpdateScheduleRequest):
+async def update_schedule(
+    request: UpdateScheduleRequest,
+    current_user = Depends(get_current_admin_user)
+):
     """Update the schedule times"""
     try:
         result = scheduler_service.update_schedule(
@@ -87,7 +100,10 @@ async def update_schedule(request: UpdateScheduleRequest):
         raise HTTPException(status_code=500, detail=f"Error updating schedule: {str(e)}")
 
 @router.post("/scheduler/manual-generate")
-async def manual_generate_article(request: ManualGenerateRequest):
+async def manual_generate_article(
+    request: ManualGenerateRequest,
+    current_user = Depends(get_current_admin_user)
+):
     """Manually generate an article"""
     try:
         result = await scheduler_service.manual_generate_article(
@@ -103,7 +119,9 @@ async def manual_generate_article(request: ManualGenerateRequest):
         raise HTTPException(status_code=500, detail=f"Error generating article: {str(e)}")
 
 @router.post("/scheduler/manual-publish")
-async def manual_publish_scheduled():
+async def manual_publish_scheduled(
+    current_user = Depends(get_current_admin_user)
+):
     """Manually publish all scheduled articles"""
     try:
         result = await scheduler_service.manual_publish_scheduled()
@@ -114,7 +132,10 @@ async def manual_publish_scheduled():
         raise HTTPException(status_code=500, detail=f"Error publishing articles: {str(e)}")
 
 @router.get("/scheduler/scheduled-posts")
-async def get_scheduled_posts(db: Session = Depends(get_db)):
+async def get_scheduled_posts(
+    current_user = Depends(get_current_admin_user),
+    db: Session = Depends(get_db)
+):
     """Get all scheduled posts"""
     try:
         from ..models import Post
@@ -149,7 +170,10 @@ async def get_scheduled_posts(db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=f"Error getting scheduled posts: {str(e)}")
 
 @router.get("/scheduler/stats")
-async def get_scheduler_stats(db: Session = Depends(get_db)):
+async def get_scheduler_stats(
+    current_user = Depends(get_current_admin_user),
+    db: Session = Depends(get_db)
+):
     """Get scheduler statistics"""
     try:
         from ..models import Post
