@@ -755,8 +755,8 @@ export interface TrendingTopic {
   angle: string
   target_audience: string
   trending_reason: string
-  suggested_article_type: string
-  suggested_template: string
+  suggested_article_type: 'quick' | 'standard' | 'deep'
+  suggested_template: 'internship' | 'legal_explainer'
   generated_by: string
   confidence_score: number
   source_links?: string[]
