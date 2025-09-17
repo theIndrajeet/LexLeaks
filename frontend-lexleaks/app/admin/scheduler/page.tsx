@@ -207,39 +207,92 @@ export default function SchedulerPage() {
     <div className="min-h-screen brand-bg p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold brand-text">Article Scheduler</h1>
-            <p className="text-gray-600 mt-2">Automated article generation and publishing</p>
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-3xl font-bold brand-text">Article Scheduler</h1>
+              <p className="text-gray-600 mt-2">Automated article generation and publishing</p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  if (window.history.length > 1) window.history.back();
+                  else window.location.href = '/admin/dashboard'
+                }}
+                className="px-6 py-3 border-2 border-gray-400 text-gray-700 rounded-lg hover:bg-gray-50 hover:border-gray-500 font-medium flex items-center gap-2"
+              >
+                ← Back to Dashboard
+              </button>
+              <button
+                onClick={async () => {
+                  try {
+                    setPipelineLoading(true)
+                    await runAutomationNow('generate')
+                    await fetchData()
+                    alert('Automation run started: generation triggered.')
+                  } catch (err: any) {
+                    setError('Failed to run automation: ' + err.message)
+                  } finally {
+                    setPipelineLoading(false)
+                  }
+                }}
+                className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 font-medium flex items-center gap-2 shadow-lg"
+                disabled={pipelineLoading}
+              >
+                {pipelineLoading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    ⚡ Generate Now
+                  </>
+                )}
+              </button>
+            </div>
           </div>
-          <div className="flex gap-3">
-            <button
-              onClick={() => {
-                if (window.history.length > 1) window.history.back();
-                else window.location.href = '/admin/dashboard'
-              }}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-            >
-              ← Back
-            </button>
-            <button
-              onClick={async () => {
-                try {
-                  setPipelineLoading(true)
-                  await runAutomationNow('generate')
-                  await fetchData()
-                  alert('Automation run started: generation triggered.')
-                } catch (err: any) {
-                  setError('Failed to run automation: ' + err.message)
-                } finally {
-                  setPipelineLoading(false)
-                }
-              }}
-              className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50"
-              disabled={pipelineLoading}
-            >
-              {pipelineLoading ? 'Running…' : 'Run Now'}
-            </button>
+          
+          {/* Quick Actions Bar */}
+          <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 border border-blue-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-semibold text-gray-800">Quick Actions</h3>
+                <p className="text-sm text-gray-600">Common tasks at your fingertips</p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={async () => {
+                    try {
+                      setPipelineLoading(true)
+                      await runAutomationNow('generate')
+                      await fetchData()
+                      alert('Article generation started!')
+                    } catch (err: any) {
+                      setError('Failed to generate: ' + err.message)
+                    } finally {
+                      setPipelineLoading(false)
+                    }
+                  }}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm font-medium"
+                  disabled={pipelineLoading}
+                >
+                  {pipelineLoading ? 'Generating...' : '🚀 Generate Article'}
+                </button>
+                <button
+                  onClick={handleRefreshTrends}
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm font-medium"
+                >
+                  📈 Refresh Trends
+                </button>
+                <button
+                  onClick={handleManualPublish}
+                  className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 text-sm font-medium"
+                >
+                  📤 Publish All
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -295,17 +348,25 @@ export default function SchedulerPage() {
 
         {/* Controls */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-4">Controls</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <h2 className="text-xl font-semibold mb-4">System Controls</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <button
               onClick={handleToggleAutomation}
-              className={`px-4 py-2 rounded-lg font-medium ${
+              className={`px-6 py-3 rounded-lg font-medium text-lg flex items-center justify-center gap-2 ${
                 status?.automation_enabled 
-                  ? 'bg-red-600 text-white hover:bg-red-700' 
-                  : 'bg-green-600 text-white hover:bg-green-700'
+                  ? 'bg-red-600 text-white hover:bg-red-700 shadow-lg' 
+                  : 'bg-green-600 text-white hover:bg-green-700 shadow-lg'
               }`}
             >
-              {status?.automation_enabled ? 'Pause Automation' : 'Start Automation'}
+              {status?.automation_enabled ? (
+                <>
+                  ⏸️ Pause Automation
+                </>
+              ) : (
+                <>
+                  ▶️ Start Automation
+                </>
+              )}
             </button>
             <button
               onClick={async () => {
@@ -320,28 +381,64 @@ export default function SchedulerPage() {
                   setPipelineLoading(false)
                 }
               }}
-              className="px-4 py-2 bg-emerald-700 text-white rounded-lg font-medium hover:bg-emerald-800 disabled:opacity-50"
+              className="px-6 py-3 bg-emerald-700 text-white rounded-lg font-medium hover:bg-emerald-800 disabled:opacity-50 text-lg flex items-center justify-center gap-2 shadow-lg"
               disabled={pipelineLoading}
             >
-              {pipelineLoading ? 'Running…' : 'Run Now (Gen+Publish)'}
+              {pipelineLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  Running...
+                </>
+              ) : (
+                <>
+                  ⚡ Run Now (Gen+Publish)
+                </>
+              )}
             </button>
             <button
               onClick={handleRefreshTrends}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700"
+              className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 text-lg flex items-center justify-center gap-2 shadow-lg"
             >
-              Refresh Trends
+              📈 Refresh Trends
             </button>
             <button
               onClick={handleManualPublish}
-              className="px-4 py-2 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700"
+              className="px-6 py-3 bg-orange-600 text-white rounded-lg font-medium hover:bg-orange-700 text-lg flex items-center justify-center gap-2 shadow-lg"
             >
-              Manual Publish All
+              📤 Manual Publish All
             </button>
             <button
               onClick={() => window.location.reload()}
-              className="px-4 py-2 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700"
+              className="px-6 py-3 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700 text-lg flex items-center justify-center gap-2 shadow-lg"
             >
-              Refresh Data
+              🔄 Refresh Data
+            </button>
+            <button
+              onClick={async () => {
+                try {
+                  setPipelineLoading(true)
+                  await runAutomationNow('generate')
+                  await fetchData()
+                  alert('Article generation started!')
+                } catch (err: any) {
+                  setError('Failed to generate: ' + err.message)
+                } finally {
+                  setPipelineLoading(false)
+                }
+              }}
+              className="px-6 py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 disabled:opacity-50 text-lg flex items-center justify-center gap-2 shadow-lg"
+              disabled={pipelineLoading}
+            >
+              {pipelineLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  Generating...
+                </>
+              ) : (
+                <>
+                  🚀 Generate Now
+                </>
+              )}
             </button>
           </div>
         </div>
