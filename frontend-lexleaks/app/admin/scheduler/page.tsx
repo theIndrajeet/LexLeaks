@@ -116,16 +116,24 @@ export default function SchedulerPage() {
       setPipelineLoading(true)
       setError(null)
       
+      console.log('🚀 Starting Enhanced Pipeline...')
+      
       // Step 1: Get trending topics
+      console.log('📡 Calling getTrendingTopics API...')
       const topicsResponse = await getTrendingTopics()
       
+      console.log('📡 API Response:', topicsResponse)
+      
       if (topicsResponse.success && topicsResponse.topics) {
+        console.log('✅ Topics received:', topicsResponse.topics.length)
         setTrendingTopics(topicsResponse.topics)
         setShowTopicSelection(true)
       } else {
-        setError('Failed to generate trending topics')
+        console.error('❌ Failed to generate trending topics:', topicsResponse)
+        setError('Failed to generate trending topics: ' + (topicsResponse.message || 'Unknown error'))
       }
     } catch (err: any) {
+      console.error('❌ Enhanced Pipeline Error:', err)
       setError('Failed to run enhanced pipeline: ' + err.message)
     } finally {
       setPipelineLoading(false)
