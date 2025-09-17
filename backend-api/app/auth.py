@@ -1,5 +1,6 @@
 import os
 from typing import Optional, Dict, Any
+from datetime import timedelta
 from jose import JWTError, jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
