@@ -45,9 +45,10 @@ if (typeof window !== 'undefined') {
 
 // Types
 export interface User {
-  id: number
+  id: string | number  // Support both string (Supabase) and number (legacy)
   username: string
   email: string
+  full_name?: string
   is_admin: boolean
   created_at: string
 }
@@ -77,7 +78,7 @@ export interface Post extends PostSummary {
 export interface AuthResponse {
   access_token: string
   token_type: string
-  user: User
+  user?: User  // Make user optional for Supabase auth
 }
 
 export interface PostCreateData {
