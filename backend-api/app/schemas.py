@@ -95,7 +95,7 @@ class PostSummary(BaseModel):
     document_url: Optional[str]
     published_at: Optional[datetime]
     created_at: datetime
-    author: UserResponse
+    author: Optional[UserResponse] = None
     
     class Config:
         from_attributes = True
