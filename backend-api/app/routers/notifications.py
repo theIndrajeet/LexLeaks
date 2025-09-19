@@ -496,6 +496,9 @@ async def trigger_post_notification(
         if not post:
             raise HTTPException(status_code=404, detail="Post not found")
         
+        if post.status != 'published':
+            raise HTTPException(status_code=400, detail="Post must be published to send notifications")
+        
         # Convert post to dict format
         post_data = {
             'id': post.id,
@@ -511,7 +514,9 @@ async def trigger_post_notification(
         return {
             "success": True,
             "message": f"Notification triggered for post: {post.title}",
-            "post_id": post_id
+            "post_id": post_id,
+            "post_title": post.title,
+            "verification_status": post.verification_status
         }
         
     except HTTPException:

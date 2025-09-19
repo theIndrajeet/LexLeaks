@@ -81,8 +81,9 @@ class PostNotificationIntegration:
         if post.status != 'published':
             return False
         
-        # Only send for verified posts (or high-impact unverified)
-        if post.verification_status not in ['verified', 'high_impact']:
+        # Send for verified, high-impact, or unverified posts
+        # (You can modify this logic based on your needs)
+        if post.verification_status not in ['verified', 'high_impact', 'unverified']:
             return False
         
         # Don't send for very old posts (older than 24 hours)
