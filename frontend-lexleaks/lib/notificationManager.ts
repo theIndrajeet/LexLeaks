@@ -3,7 +3,7 @@
  * Handles push notification registration, subscription, and management
  */
 
-interface PushSubscription {
+interface PushSubscriptionData {
   endpoint: string
   keys: {
     p256dh: string
@@ -20,7 +20,7 @@ interface NotificationPermission {
 class NotificationManager {
   private static instance: NotificationManager
   private registration: ServiceWorkerRegistration | null = null
-  private subscription: PushSubscription | null = null
+  private subscription: globalThis.PushSubscription | null = null
 
   private constructor() {}
 
@@ -186,7 +186,7 @@ class NotificationManager {
   /**
    * Get current subscription info
    */
-  async getSubscriptionInfo(): Promise<PushSubscription | null> {
+  async getSubscriptionInfo(): Promise<globalThis.PushSubscription | null> {
     try {
       if (!this.registration) {
         return null
@@ -228,7 +228,7 @@ class NotificationManager {
   /**
    * Update subscription on server
    */
-  private async updateSubscriptionOnServer(subscription: PushSubscription): Promise<void> {
+  private async updateSubscriptionOnServer(subscription: globalThis.PushSubscription): Promise<void> {
     try {
       const token = localStorage.getItem('auth_token')
       if (!token) {
@@ -244,8 +244,8 @@ class NotificationManager {
         },
         body: JSON.stringify({
           endpoint: subscription.endpoint,
-          p256dh: this.arrayBufferToBase64(subscription.getKey('p256dh')),
-          auth: this.arrayBufferToBase64(subscription.getKey('auth')),
+          p256dh: this.arrayBufferToBase64(subscription.getKey('p256dh')!),
+          auth: this.arrayBufferToBase64(subscription.getKey('auth')!),
           user_agent: navigator.userAgent
         })
       })
@@ -363,4 +363,4 @@ class NotificationManager {
 export const notificationManager = NotificationManager.getInstance()
 
 // Export types
-export type { PushSubscription, NotificationPermission }
+export type { PushSubscriptionData, NotificationPermission }
