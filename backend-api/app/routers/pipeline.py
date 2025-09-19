@@ -130,6 +130,83 @@ async def get_gemini_stats():
         logger.error(f"Error getting Gemini stats: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to get Gemini stats: {str(e)}")
 
+@router.get("/test-gemini-api")
+async def test_gemini_api():
+    """Test Gemini API connectivity and configuration"""
+    try:
+        import os
+        import google.generativeai as genai
+        
+        # Check API key
+        api_key = os.getenv("GEMINI_API_KEY")
+        api_key_status = "Found" if api_key else "NOT FOUND"
+        
+        # Test API call if key is available
+        test_result = None
+        if api_key:
+            try:
+                genai.configure(api_key=api_key)
+                model = genai.GenerativeModel('gemini-1.5-flash')
+                response = model.generate_content("Test connection - respond with 'OK'")
+                test_result = {
+                    "status": "success",
+                    "response": response.text[:100] if response.text else "No response"
+                }
+            except Exception as e:
+                test_result = {
+                    "status": "error",
+                    "error": str(e)
+                }
+        
+        return {
+            "success": True,
+            "api_key_status": api_key_status,
+            "api_key_length": len(api_key) if api_key else 0,
+            "gemini_available": gemini_topic_agent.gemini_available,
+            "test_result": test_result,
+            "environment": "production" if os.getenv("K_SERVICE") else "development"
+        }
+    except Exception as e:
+        logger.error(f"Error testing Gemini API: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to test Gemini API: {str(e)}")
+
+@router.get("/test-simple-gemini")
+async def test_simple_gemini():
+    """Test simple Gemini API call"""
+    try:
+        import os
+        import google.generativeai as genai
+        
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            return {
+                "success": False,
+                "error": "No Gemini API key found",
+                "api_key_status": "NOT FOUND"
+            }
+        
+        # Test simple API call
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        response = model.generate_content("Say 'Hello from Gemini'")
+        
+        return {
+            "success": True,
+            "api_key_status": "FOUND",
+            "api_key_length": len(api_key),
+            "response": response.text if response.text else "No response",
+            "environment": "production" if os.getenv("K_SERVICE") else "development"
+        }
+        
+    except Exception as e:
+        logger.error(f"Simple Gemini test failed: {e}")
+        return {
+            "success": False,
+            "error": str(e),
+            "error_type": type(e).__name__,
+            "api_key_status": "FOUND" if os.getenv("GEMINI_API_KEY") else "NOT FOUND"
+        }
+
 @router.post("/manual-pipeline-run")
 async def manual_pipeline_run():
     """Manually run the complete pipeline (same as scheduler would do)"""

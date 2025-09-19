@@ -5,6 +5,9 @@ from typing import Optional, Dict, Any, Literal, List
 import re
 from datetime import datetime
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 class AIContentGenerator:
     def __init__(self):
@@ -12,9 +15,20 @@ class AIContentGenerator:
         self.gemini_api_key = os.getenv("GEMINI_API_KEY")
         self.perplexity_api_key = os.getenv("PERPLEXITY_API_KEY")
         
+        logger.info(f"🔑 AI Service - Gemini API Key: {'Found' if self.gemini_api_key else 'NOT FOUND'}")
+        logger.info(f"🔑 AI Service - Perplexity API Key: {'Found' if self.perplexity_api_key else 'NOT FOUND'}")
+        
         if self.gemini_api_key:
-            genai.configure(api_key=self.gemini_api_key)
-            self.gemini_model = genai.GenerativeModel('gemini-1.5-flash')
+            try:
+                genai.configure(api_key=self.gemini_api_key)
+                self.gemini_model = genai.GenerativeModel('gemini-1.5-flash')
+                logger.info("✅ AI Service - Gemini configured successfully")
+            except Exception as e:
+                logger.error(f"❌ AI Service - Failed to configure Gemini: {e}")
+                self.gemini_model = None
+        else:
+            self.gemini_model = None
+            logger.warning("⚠️ AI Service - No Gemini API key, article generation will use fallback")
         
         self.perplexity_url = "https://api.perplexity.ai/chat/completions"
     

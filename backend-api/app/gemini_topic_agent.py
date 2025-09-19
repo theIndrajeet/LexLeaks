@@ -15,12 +15,20 @@ class GeminiTopicAgent:
     def __init__(self):
         # Configure Gemini API
         api_key = os.getenv("GEMINI_API_KEY")
+        logger.info(f"🔑 Gemini API Key Status: {'Found' if api_key else 'NOT FOUND'}")
+        
         if not api_key:
-            logger.warning("GEMINI_API_KEY not found. Using fallback topic generation.")
+            logger.warning("❌ GEMINI_API_KEY not found. Using fallback topic generation.")
+            logger.warning("🔧 Environment variables available: " + str(list(os.environ.keys())))
             self.gemini_available = False
         else:
-            genai.configure(api_key=api_key)
-            self.gemini_available = True
+            try:
+                genai.configure(api_key=api_key)
+                self.gemini_available = True
+                logger.info("✅ Gemini API configured successfully")
+            except Exception as e:
+                logger.error(f"❌ Failed to configure Gemini API: {e}")
+                self.gemini_available = False
         
         self.model = genai.GenerativeModel('gemini-1.5-flash') if self.gemini_available else None
         # Add non-determinism so repeated runs over the same input vary a bit
@@ -88,6 +96,8 @@ class GeminiTopicAgent:
             
         except Exception as e:
             logger.error(f"❌ Error generating topics with Gemini: {e}")
+            logger.error(f"❌ Error type: {type(e).__name__}")
+            logger.error(f"❌ Error details: {str(e)}")
             logger.info("Falling back to rule-based topic generation")
             return self._filter_new_topics(
                 self._generate_fallback_topics_from_articles(scraped_articles, num_topics),
@@ -164,7 +174,9 @@ Generate exactly {num_topics} topics in JSON format.
             )
             return response.text
         except Exception as e:
-            logger.error(f"Gemini API call failed: {e}")
+            logger.error(f"❌ Gemini API call failed: {e}")
+            logger.error(f"❌ API call error type: {type(e).__name__}")
+            logger.error(f"❌ API call error details: {str(e)}")
             raise
 
     def _parse_gemini_response(self, response: str, num_topics: int) -> List[Dict[str, Any]]:
