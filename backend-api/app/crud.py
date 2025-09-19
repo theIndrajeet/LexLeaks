@@ -26,13 +26,23 @@ def get_user_by_username(db: Session, username: str) -> Optional[models.User]:
     return db.query(models.User).filter(models.User.username == username).first()
 
 
+def get_user_by_email(db: Session, email: str) -> Optional[models.User]:
+    """Get user by email"""
+    return db.query(models.User).filter(models.User.email == email).first()
+
+
 def create_user(db: Session, user: schemas.UserCreate) -> models.User:
     """Create a new user"""
-    hashed_password = pwd_context.hash(user.password)
+    # Handle password hashing (for Supabase users, password might be None)
+    hashed_password = None
+    if user.password:
+        hashed_password = pwd_context.hash(user.password)
+    
     db_user = models.User(
         username=user.username,
         email=user.email,
-        hashed_password=hashed_password
+        hashed_password=hashed_password,
+        is_admin=getattr(user, 'is_admin', False)  # Set admin status if provided
     )
     db.add(db_user)
     db.commit()

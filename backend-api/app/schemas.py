@@ -10,7 +10,8 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
-    password: str = Field(..., min_length=8)
+    password: Optional[str] = Field(None, min_length=8)
+    is_admin: bool = False
 
 
 class UserResponse(BaseModel):

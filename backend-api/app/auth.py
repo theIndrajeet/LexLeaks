@@ -78,16 +78,30 @@ async def get_current_user(
     if not supabase_user:
         raise credentials_exception
     
+    # Look up the user in our database by email to get the integer ID
+    db_user = crud.get_user_by_email(db, email=supabase_user["email"])
+    
+    if not db_user:
+        # If user doesn't exist in our database, create them
+        from ..schemas import UserCreate
+        user_create = UserCreate(
+            username=supabase_user["email"],
+            email=supabase_user["email"],
+            is_admin=supabase_user["is_admin"]
+        )
+        db_user = crud.create_user(db=db, user=user_create)
+    
     # Create a user object that matches the expected format
     class SupabaseUser:
-        def __init__(self, user_data):
-            self.id = user_data["id"]
+        def __init__(self, user_data, db_user):
+            self.id = db_user.id  # Use database integer ID
             self.email = user_data["email"]
             self.name = user_data["name"]
-            self.is_admin = user_data["is_admin"]
-            self.username = user_data["email"]  # Use email as username
+            self.is_admin = db_user.is_admin  # Use database admin status
+            self.username = db_user.username or user_data["email"]
+            self.supabase_id = user_data["id"]  # Keep original Supabase ID
     
-    return SupabaseUser(supabase_user)
+    return SupabaseUser(supabase_user, db_user)
 
 # Optional: Admin-only dependency
 async def get_current_admin_user(
