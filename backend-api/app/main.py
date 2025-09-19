@@ -8,7 +8,7 @@ from datetime import datetime
 
 from .database import engine
 from . import models
-from .routers import posts, auth, impacts, ai, google_auth, kanoon, opportunities, legal_ai, deep_research, chat, multi_agent_research, event_driven_research, trends, scheduler, pipeline, test_scheduler
+from .routers import posts, impacts, ai, google_auth, kanoon, opportunities, legal_ai, deep_research, chat, multi_agent_research, event_driven_research, trends, scheduler, pipeline, test_scheduler, supabase_auth
 from .smart_automation import start_automation
 from .event_driven_agent_system import event_driven_system
 from .scheduler_service import scheduler_service
@@ -121,7 +121,7 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(auth.router, prefix="/api")
+app.include_router(supabase_auth.router, prefix="/api")
 app.include_router(posts.router, prefix="/api")
 app.include_router(impacts.router, prefix="/api")
 app.include_router(ai.router, prefix="/api")

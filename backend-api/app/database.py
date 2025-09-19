@@ -7,13 +7,11 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-# Database URL from environment
+# Database URL from environment - MUST be set for Supabase
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 if not DATABASE_URL:
-    # Use a default database URL for development/testing
-    DATABASE_URL = "sqlite:///./test.db"
-    print("Warning: Using default SQLite database. Set DATABASE_URL environment variable for production.")
+    raise ValueError("DATABASE_URL environment variable is required. Please set it to your Supabase PostgreSQL connection string.")
 
 # Create engine with absolute minimal configuration to avoid connection issues
 engine = create_engine(DATABASE_URL)

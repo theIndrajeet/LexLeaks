@@ -58,34 +58,13 @@ def verify_supabase_token(token: str) -> Optional[Dict[str, Any]]:
         print(f"Supabase token verification failed: {e}")
         return None
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
-    """Create a JWT access token"""
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
-
-def verify_token(token: str) -> Optional[str]:
-    """Verify and decode JWT token"""
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
-            return None
-        return username
-    except JWTError:
-        return None
+# Legacy JWT functions removed - using Supabase Auth exclusively
 
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
     db: Session = Depends(get_db)
 ):
-    """Dependency to get the current authenticated user - supports both Supabase and legacy auth"""
+    """Dependency to get the current authenticated user - Supabase Auth only"""
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -94,42 +73,21 @@ async def get_current_user(
     
     token = credentials.credentials
     
-    # First, try Supabase authentication
+    # Use Supabase authentication exclusively
     supabase_user = verify_supabase_token(token)
-    if supabase_user:
-        # Create a user object that matches the expected format
-        class SupabaseUser:
-            def __init__(self, user_data):
-                self.id = user_data["id"]
-                self.email = user_data["email"]
-                self.name = user_data["name"]
-                self.is_admin = user_data["is_admin"]
-                self.username = user_data["email"]  # Use email as username
-        
-        return SupabaseUser(supabase_user)
-    
-    # Fallback to legacy JWT authentication
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id: Optional[str] = payload.get("sub")
-        if user_id is None:
-            raise credentials_exception
-    except JWTError:
+    if not supabase_user:
         raise credentials_exception
     
-    # Try to find user by ID (for OAuth users)
-    user = crud.get_user_by_id(db, user_id=int(user_id))
+    # Create a user object that matches the expected format
+    class SupabaseUser:
+        def __init__(self, user_data):
+            self.id = user_data["id"]
+            self.email = user_data["email"]
+            self.name = user_data["name"]
+            self.is_admin = user_data["is_admin"]
+            self.username = user_data["email"]  # Use email as username
     
-    # If not found by ID, try by username (for traditional users)
-    if user is None:
-        username: Optional[str] = payload.get("username")
-        if username:
-            user = crud.get_user_by_username(db, username=username)
-    
-    if user is None:
-        raise credentials_exception
-    
-    return user
+    return SupabaseUser(supabase_user)
 
 # Optional: Admin-only dependency
 async def get_current_admin_user(

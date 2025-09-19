@@ -270,33 +270,56 @@ const apiRequest = async (
   }
 }
 
-// Auth API
-export const login = async (username: string, password: string): Promise<AuthResponse> => {
-  const formData = new FormData()
-  formData.append('username', username)
-  formData.append('password', password)
-
-  const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-    method: 'POST',
-    body: formData,
+// Auth API - Using Supabase Auth exclusively
+export const login = async (email: string, password: string): Promise<AuthResponse> => {
+  // Use Supabase auth instead of custom login
+  const { supabase } = await import('./supabaseAuth')
+  
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
   })
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}))
-    throw new Error(errorData.detail || 'Login failed')
+  if (error) {
+    throw new Error(error.message || 'Login failed')
   }
 
-  const data = await response.json()
-  setAuthToken(data.access_token)
-  return data
+  if (data.session?.access_token) {
+    setAuthToken(data.session.access_token)
+    return {
+      access_token: data.session.access_token,
+      token_type: 'bearer'
+    }
+  }
+
+  throw new Error('No access token received')
 }
 
-export const logout = (): void => {
+export const logout = async (): Promise<void> => {
+  // Use Supabase auth logout
+  const { supabase } = await import('./supabaseAuth')
+  await supabase.auth.signOut()
   removeAuthToken()
 }
 
 export const getCurrentUser = async (): Promise<User> => {
-  return apiRequest('/api/auth/me')
+  // Use Supabase auth to get current user
+  const { supabase } = await import('./supabaseAuth')
+  
+  const { data: { session }, error } = await supabase.auth.getSession()
+  
+  if (error || !session?.user) {
+    throw new Error('No authenticated user')
+  }
+
+  return {
+    id: session.user.id,
+    username: session.user.email!,
+    email: session.user.email!,
+    full_name: session.user.user_metadata.full_name || session.user.email!,
+    is_admin: session.user.user_metadata.is_admin || false,
+    created_at: session.user.created_at
+  }
 }
 
 // Posts API
