@@ -261,7 +261,7 @@ const apiRequest = async (
     }
 
     return response.json()
-  } catch (error) {
+  } catch (error: any) {
     clearTimeout(timeoutId)
     if (error.name === 'AbortError') {
       throw new Error('Request timeout - please try again')

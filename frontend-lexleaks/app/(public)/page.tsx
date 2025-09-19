@@ -41,7 +41,7 @@ export default function HomePage() {
       
       const fetchedPosts = await getPublishedPosts(params)
       setPosts(fetchedPosts || []) // Handle null/undefined responses
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error fetching posts:', err)
       // Don't show error for empty database, just show empty state
       if (err.message?.includes('timeout') || err.message?.includes('Failed to fetch')) {
