@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from .. import crud, schemas, auth, models
 from ..database import get_db
+from ..post_notification_integration import post_notification_integration
 
 router = APIRouter(
     prefix="/posts",
@@ -144,6 +145,26 @@ def update_post(
     updated_post = crud.update_post(db=db, post_id=post_id, post_update=post)
     if updated_post is None:
         raise HTTPException(status_code=404, detail="Post not found")
+    
+    # Check if post was just published (status changed to 'published')
+    if (post.status == 'published' and 
+        db_post.status != 'published' and 
+        updated_post.status == 'published'):
+        
+        # Trigger notification for newly published post
+        import asyncio
+        post_data = {
+            'id': updated_post.id,
+            'title': updated_post.title,
+            'content': updated_post.content,
+            'category': updated_post.category,
+            'verification_status': updated_post.verification_status
+        }
+        
+        # Run notification trigger in background
+        asyncio.create_task(
+            post_notification_integration.on_post_published(db, updated_post.id, post_data)
+        )
     
     return updated_post
 

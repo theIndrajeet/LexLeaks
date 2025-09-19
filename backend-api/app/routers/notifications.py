@@ -11,10 +11,11 @@ from sqlalchemy import and_
 from pydantic import BaseModel
 import os
 
-from .. import auth, models
+from .. import auth, models, crud
 from ..database import get_db
 from ..notification_service import notification_service
 from ..notification_ai_agent import notification_ai_agent
+from ..post_notification_integration import post_notification_integration
 
 router = APIRouter(
     prefix="/notifications",
@@ -420,3 +421,80 @@ def test_ai_agent(
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error testing AI agent: {str(e)}")
+
+# Post Integration Endpoints
+@router.get("/posts", response_model=List[Dict])
+async def get_posts_for_notification(
+    limit: int = Query(50, ge=1, le=100),
+    db: Session = Depends(get_db),
+    current_user = Depends(auth.get_current_admin_user)
+):
+    """Get posts available for notification sending"""
+    try:
+        posts = await post_notification_integration.get_posts_for_notification(db, limit)
+        return posts
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching posts: {str(e)}")
+
+@router.post("/send-manual", response_model=Dict)
+async def send_manual_notification(
+    post_id: int,
+    style: str,
+    target_user_ids: Optional[List[int]] = None,
+    db: Session = Depends(get_db),
+    current_user = Depends(auth.get_current_admin_user)
+):
+    """Send manual notification for a specific post"""
+    try:
+        result = await post_notification_integration.send_manual_notification(
+            db=db,
+            post_id=post_id,
+            style=style,
+            target_user_ids=target_user_ids
+        )
+        
+        if result.get("success"):
+            return result
+        else:
+            raise HTTPException(status_code=400, detail=result.get("error", "Failed to send notification"))
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error sending manual notification: {str(e)}")
+
+@router.post("/trigger-post/{post_id}", response_model=Dict)
+async def trigger_post_notification(
+    post_id: int,
+    db: Session = Depends(get_db),
+    current_user = Depends(auth.get_current_admin_user)
+):
+    """Manually trigger notification for a specific post"""
+    try:
+        # Get post data
+        post = crud.get_post(db, post_id=post_id)
+        if not post:
+            raise HTTPException(status_code=404, detail="Post not found")
+        
+        # Convert post to dict format
+        post_data = {
+            'id': post.id,
+            'title': post.title,
+            'content': post.content,
+            'category': post.category,
+            'verification_status': post.verification_status
+        }
+        
+        # Trigger notification
+        await post_notification_integration.on_post_published(db, post_id, post_data)
+        
+        return {
+            "success": True,
+            "message": f"Notification triggered for post: {post.title}",
+            "post_id": post_id
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error triggering post notification: {str(e)}")

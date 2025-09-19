@@ -73,6 +73,8 @@ export default function NotificationDashboard() {
   const [selectedPost, setSelectedPost] = useState<number | null>(null)
   const [selectedStyle, setSelectedStyle] = useState('breaking')
   const [createLoading, setCreateLoading] = useState(false)
+  const [availablePosts, setAvailablePosts] = useState<Post[]>([])
+  const [postsLoading, setPostsLoading] = useState(false)
 
   useEffect(() => {
     if (user?.is_admin) {
@@ -83,7 +85,7 @@ export default function NotificationDashboard() {
   const fetchDashboardData = async () => {
     try {
       setLoading(true)
-      const [templatesRes, analyticsRes, abTestsRes, postsRes] = await Promise.all([
+      const [templatesRes, analyticsRes, abTestsRes, postsRes, availablePostsRes] = await Promise.all([
         fetch('/api/notifications/templates', {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` }
         }),
@@ -95,6 +97,9 @@ export default function NotificationDashboard() {
         }),
         fetch('/api/posts/?limit=50', {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` }
+        }),
+        fetch('/api/notifications/posts', {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` }
         })
       ])
 
@@ -105,6 +110,13 @@ export default function NotificationDashboard() {
         const postsData = await postsRes.json()
         setPosts(postsData)
         if (postsData.length > 0) setAiTestPost(postsData[0])
+      }
+      if (availablePostsRes.ok) {
+        const availablePostsData = await availablePostsRes.json()
+        setAvailablePosts(availablePostsData)
+        if (availablePostsData.length > 0 && !selectedPost) {
+          setSelectedPost(availablePostsData[0].id)
+        }
       }
     } catch (err) {
       setError('Failed to load dashboard data')
@@ -156,7 +168,7 @@ export default function NotificationDashboard() {
 
     try {
       setCreateLoading(true)
-      const response = await fetch('/api/notifications/create', {
+      const response = await fetch('/api/notifications/send-manual', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -170,10 +182,11 @@ export default function NotificationDashboard() {
 
       if (response.ok) {
         const result = await response.json()
-        alert(`Notification sent to ${result.users_count} users!`)
+        alert(`✅ Notification sent to ${result.sent_count} users!\n\nPost: ${result.post_title}\nStyle: ${result.style}`)
         fetchDashboardData() // Refresh data
       } else {
-        setError('Failed to create notification')
+        const errorData = await response.json()
+        setError(`Failed to create notification: ${errorData.error || 'Unknown error'}`)
       }
     } catch (err) {
       setError('Failed to create notification')
@@ -344,26 +357,68 @@ export default function NotificationDashboard() {
 
         {activeTab === 'create' && (
           <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-6">🎨 Create New Notification</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-6">🎨 Send Notification for Post</h3>
             
             <div className="space-y-6">
               {/* Post Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select Post
+                  📰 Select Post to Send Notification
                 </label>
-                <select
-                  value={selectedPost || ''}
-                  onChange={(e) => setSelectedPost(Number(e.target.value))}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Choose a post...</option>
-                  {posts.map((post) => (
-                    <option key={post.id} value={post.id}>
-                      {post.title} ({post.category})
-                    </option>
-                  ))}
-                </select>
+                {availablePosts.length > 0 ? (
+                  <div className="space-y-2">
+                    <select
+                      value={selectedPost || ''}
+                      onChange={(e) => setSelectedPost(Number(e.target.value))}
+                      className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">Choose a post...</option>
+                      {availablePosts.map((post) => (
+                        <option key={post.id} value={post.id}>
+                          {post.title} ({post.category}) - {post.verification_status}
+                        </option>
+                      ))}
+                    </select>
+                    
+                    {/* Selected Post Preview */}
+                    {selectedPost && (
+                      <div className="mt-4 p-4 bg-gray-50 rounded-lg border">
+                        {(() => {
+                          const post = availablePosts.find(p => p.id === selectedPost)
+                          return post ? (
+                            <div>
+                              <h4 className="font-medium text-gray-900 mb-2">{post.title}</h4>
+                              <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
+                                <span className={`px-2 py-1 rounded-full text-xs ${
+                                  post.category === 'corporate' ? 'bg-blue-100 text-blue-800' :
+                                  post.category === 'judicial' ? 'bg-purple-100 text-purple-800' :
+                                  post.category === 'government' ? 'bg-green-100 text-green-800' :
+                                  'bg-gray-100 text-gray-800'
+                                }`}>
+                                  {post.category}
+                                </span>
+                                <span className={`px-2 py-1 rounded-full text-xs ${
+                                  post.verification_status === 'verified' ? 'bg-green-100 text-green-800' :
+                                  post.verification_status === 'high_impact' ? 'bg-orange-100 text-orange-800' :
+                                  'bg-yellow-100 text-yellow-800'
+                                }`}>
+                                  {post.verification_status}
+                                </span>
+                                <span>By: {post.author}</span>
+                              </div>
+                              <p className="text-sm text-gray-700">{post.excerpt}</p>
+                            </div>
+                          ) : null
+                        })()}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <p>📭 No published posts available for notifications</p>
+                    <p className="text-sm mt-1">Publish some posts first to send notifications</p>
+                  </div>
+                )}
               </div>
 
               {/* Style Selection */}
