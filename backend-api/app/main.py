@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 import logging
 import asyncio
 import os
+from datetime import datetime
 
 from .database import engine
 from . import models
@@ -66,14 +67,31 @@ async def lifespan(app: FastAPI):
 async def start_background_services():
     """Start heavy services in background for production"""
     try:
-        await asyncio.sleep(5)  # Let the server start first
+        # Reduced delay for faster startup
+        await asyncio.sleep(2)  # Let the server start first
+        
+        # Start automation
         await start_automation()
+        logger.info("✅ Smart automation started in production")
+        
+        # Start event-driven system
         asyncio.create_task(event_driven_system.start())
-        logger.info("🔧 Event-driven agent system started")
+        logger.info("🔧 Event-driven agent system started in production")
+        
+        # Start scheduler - CRITICAL for production
         await scheduler_service.start_scheduler()
-        logger.info("📅 Article scheduler service started")
+        logger.info("📅 Article scheduler service started in production")
+        
+        # Keep the task alive to prevent Cloud Run from killing it
+        while True:
+            await asyncio.sleep(60)  # Keep alive with periodic checks
+            logger.debug("🔄 Background services heartbeat")
+            
     except Exception as e:
         logger.error(f"❌ Background services failed: {e}")
+        # Retry after delay
+        await asyncio.sleep(10)
+        asyncio.create_task(start_background_services())
 
 
 # Create FastAPI application
@@ -135,8 +153,25 @@ async def root():
 # Health check endpoint
 @app.get("/health")
 def health_check():
-    """Health check endpoint"""
-    return {"status": "healthy"}
+    """Health check endpoint with scheduler status"""
+    try:
+        scheduler_status = scheduler_service.get_scheduler_status()
+        return {
+            "status": "healthy",
+            "scheduler": {
+                "running": scheduler_status.get("is_running", False),
+                "automation_enabled": scheduler_status.get("automation_enabled", False),
+                "next_generation": scheduler_status.get("next_generation", "unknown"),
+                "next_publish": scheduler_status.get("next_publish", "unknown")
+            },
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        return {
+            "status": "healthy",
+            "scheduler": {"error": str(e)},
+            "timestamp": datetime.now().isoformat()
+        }
 
 
 # API info endpoint

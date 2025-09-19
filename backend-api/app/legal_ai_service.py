@@ -7,6 +7,10 @@ from datetime import datetime
 import re
 import asyncio
 import uuid
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 from .indian_kanoon_service import IndianKanoonService
 from .ai_service import AIContentGenerator

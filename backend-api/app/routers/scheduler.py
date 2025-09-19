@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import Dict, Any
 from pydantic import BaseModel
+import asyncio
 
 from ..database import get_db
 from ..scheduler_service import scheduler_service
@@ -209,3 +210,23 @@ async def get_scheduler_stats(db: Session = Depends(get_db)):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error getting scheduler stats: {str(e)}")
+
+@router.post("/scheduler/force-start")
+async def force_start_scheduler():
+    """Force start the scheduler (useful for production recovery)"""
+    try:
+        # Stop if running
+        if scheduler_service.is_running:
+            await scheduler_service.stop_scheduler()
+            await asyncio.sleep(2)  # Wait for cleanup
+        
+        # Start fresh
+        await scheduler_service.start_scheduler()
+        
+        return {
+            "success": True,
+            "message": "Scheduler force-started successfully",
+            "status": scheduler_service.get_scheduler_status()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error force-starting scheduler: {str(e)}")
