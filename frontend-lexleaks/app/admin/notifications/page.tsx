@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabaseAuth'
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+
 interface NotificationTemplate {
   id: number
   name: string
@@ -101,19 +103,19 @@ export default function NotificationDashboard() {
       }
       
       const [templatesRes, analyticsRes, abTestsRes, postsRes, availablePostsRes] = await Promise.all([
-        fetch('/api/notifications/templates', {
+        fetch(`${API_BASE_URL}/api/notifications/templates`, {
           headers: { 'Authorization': `Bearer ${authToken}` }
         }),
-        fetch('/api/notifications/analytics?days=7', {
+        fetch(`${API_BASE_URL}/api/notifications/analytics?days=7`, {
           headers: { 'Authorization': `Bearer ${authToken}` }
         }),
-        fetch('/api/notifications/ab-tests', {
+        fetch(`${API_BASE_URL}/api/notifications/ab-tests`, {
           headers: { 'Authorization': `Bearer ${authToken}` }
         }),
-        fetch('/api/posts/?limit=50', {
+        fetch(`${API_BASE_URL}/api/posts/?limit=50`, {
           headers: { 'Authorization': `Bearer ${authToken}` }
         }),
-        fetch('/api/notifications/posts', {
+        fetch(`${API_BASE_URL}/api/notifications/posts`, {
           headers: { 'Authorization': `Bearer ${authToken}` }
         })
       ])
@@ -155,7 +157,7 @@ export default function NotificationDashboard() {
         return
       }
       
-      const response = await fetch('/api/notifications/ai-agent/test', {
+      const response = await fetch(`${API_BASE_URL}/api/notifications/ai-agent/test`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -202,7 +204,7 @@ export default function NotificationDashboard() {
         return
       }
       
-      const response = await fetch('/api/notifications/send-manual', {
+      const response = await fetch(`${API_BASE_URL}/api/notifications/send-manual`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
