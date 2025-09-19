@@ -22,7 +22,6 @@ engine = create_engine(
     pool_size=5,         # Number of connections to maintain in pool
     max_overflow=10,     # Maximum overflow connections allowed
     connect_args={
-        "connect_timeout": 30,  # Connection timeout in seconds
         "options": "-c statement_timeout=30000"  # Query timeout in milliseconds
     }
 )
