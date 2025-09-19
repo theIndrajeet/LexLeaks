@@ -9,7 +9,7 @@ from urllib.parse import urlencode
 from ..database import get_db
 from ..models import User
 from ..google_oauth import google_oauth
-from ..auth import create_access_token, get_current_user
+from ..auth import get_current_user
 from ..schemas import UserResponse, TokenResponse
 
 router = APIRouter()
@@ -76,12 +76,9 @@ async def google_callback(
                     user.full_name = user_info["name"]
                 db.commit()
         
-        # Create JWT token
-        access_token = create_access_token(data={"sub": str(user.id)})
-        
-        # Redirect to frontend with token
+        # Redirect to frontend with user info (Supabase handles auth)
         frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
-        redirect_url = f"{frontend_url}/auth/callback?token={access_token}&user_id={user.id}"
+        redirect_url = f"{frontend_url}/auth/callback?user_id={user.id}&email={user.email}"
         
         return RedirectResponse(url=redirect_url)
         
