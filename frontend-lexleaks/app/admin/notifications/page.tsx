@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabaseAuth'
 
@@ -254,10 +255,38 @@ export default function NotificationDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
+        {/* Navigation Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">🔔 Notification Dashboard</h1>
-          <p className="text-gray-600 mt-2">Manage AI-powered notifications and analytics</p>
+          {/* Breadcrumbs */}
+          <nav className="flex items-center space-x-2 text-sm text-gray-500 mb-4">
+            <Link href="/admin/dashboard" className="hover:text-gray-700">
+              Dashboard
+            </Link>
+            <span>/</span>
+            <span className="text-gray-900 font-medium">Notifications</span>
+          </nav>
+
+          {/* Header with Back Button */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">🔔 Notification Dashboard</h1>
+              <p className="text-gray-600 mt-2">Manage AI-powered notifications and analytics</p>
+            </div>
+            <div className="flex items-center space-x-3">
+              <Link
+                href="/admin/dashboard"
+                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                ← Back to Dashboard
+              </Link>
+              <Link
+                href="/admin/posts"
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                📝 Manage Posts
+              </Link>
+            </div>
+          </div>
         </div>
 
         {/* Error Display */}
@@ -272,6 +301,51 @@ export default function NotificationDashboard() {
             </button>
           </div>
         )}
+
+        {/* Quick Actions */}
+        <div className="bg-white rounded-lg shadow p-6 mb-8">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">⚡ Quick Actions</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Link
+              href="/admin/posts"
+              className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <div className="p-2 bg-blue-100 rounded-lg mr-3">
+                <span className="text-xl">📝</span>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-900">Manage Posts</h4>
+                <p className="text-sm text-gray-600">Create, edit, and publish posts</p>
+              </div>
+            </Link>
+            
+            <button
+              onClick={() => setActiveTab('create')}
+              className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left w-full"
+            >
+              <div className="p-2 bg-green-100 rounded-lg mr-3">
+                <span className="text-xl">🚀</span>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-900">Send Notification</h4>
+                <p className="text-sm text-gray-600">Send notification for a post</p>
+              </div>
+            </button>
+            
+            <button
+              onClick={() => setActiveTab('ai-agent')}
+              className="flex items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-left w-full"
+            >
+              <div className="p-2 bg-purple-100 rounded-lg mr-3">
+                <span className="text-xl">🤖</span>
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-900">Test AI Agent</h4>
+                <p className="text-sm text-gray-600">Test notification generation</p>
+              </div>
+            </button>
+          </div>
+        </div>
 
         {/* Tabs */}
         <div className="border-b border-gray-200 mb-8">
