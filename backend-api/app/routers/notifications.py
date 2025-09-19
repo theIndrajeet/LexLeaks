@@ -7,7 +7,9 @@ from typing import List, Optional, Dict, Any
 from datetime import datetime, timedelta
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
+from sqlalchemy import and_
 from pydantic import BaseModel
+import os
 
 from .. import auth, models
 from ..database import get_db
@@ -316,6 +318,78 @@ def track_notification_engagement(
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error tracking engagement: {str(e)}")
+
+# Push Subscription Management
+@router.post("/subscribe", response_model=Dict)
+def subscribe_to_push(
+    subscription_data: Dict[str, Any],
+    db: Session = Depends(get_db),
+    current_user = Depends(auth.get_current_user)
+):
+    """Subscribe user to push notifications"""
+    try:
+        # Check if subscription already exists
+        existing = db.query(models.PushSubscription).filter(
+            and_(
+                models.PushSubscription.user_id == current_user.id,
+                models.PushSubscription.endpoint == subscription_data["endpoint"]
+            )
+        ).first()
+        
+        if existing:
+            # Update existing subscription
+            existing.p256dh = subscription_data.get("p256dh")
+            existing.auth = subscription_data.get("auth")
+            existing.user_agent = subscription_data.get("user_agent")
+            existing.is_active = True
+            existing.updated_at = datetime.now()
+        else:
+            # Create new subscription
+            subscription = models.PushSubscription(
+                user_id=current_user.id,
+                endpoint=subscription_data["endpoint"],
+                p256dh=subscription_data.get("p256dh"),
+                auth=subscription_data.get("auth"),
+                user_agent=subscription_data.get("user_agent"),
+                is_active=True
+            )
+            db.add(subscription)
+        
+        db.commit()
+        return {"message": "Successfully subscribed to push notifications"}
+        
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error subscribing to push: {str(e)}")
+
+@router.post("/unsubscribe", response_model=Dict)
+def unsubscribe_from_push(
+    db: Session = Depends(get_db),
+    current_user = Depends(auth.get_current_user)
+):
+    """Unsubscribe user from push notifications"""
+    try:
+        # Deactivate all subscriptions for user
+        db.query(models.PushSubscription).filter(
+            models.PushSubscription.user_id == current_user.id
+        ).update({"is_active": False, "updated_at": datetime.now()})
+        
+        db.commit()
+        return {"message": "Successfully unsubscribed from push notifications"}
+        
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error unsubscribing from push: {str(e)}")
+
+@router.get("/vapid-key", response_model=Dict)
+def get_vapid_key():
+    """Get VAPID public key for push notifications"""
+    try:
+        # In production, this should come from environment variables
+        vapid_public_key = os.getenv("VAPID_PUBLIC_KEY", "BEl62iUYgUivxIkv69yViEuiBIa40HI0X8QwV7VUyR8")
+        return {"publicKey": vapid_public_key}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error getting VAPID key: {str(e)}")
 
 # AI Agent Info
 @router.get("/ai-agent/styles", response_model=List[Dict])

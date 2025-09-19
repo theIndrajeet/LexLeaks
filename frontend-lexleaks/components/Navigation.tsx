@@ -22,7 +22,8 @@ export default function Navigation({
     { href: '/archive', label: 'Archive' },
     { href: '/find-case', label: 'Find Case' },
     { href: '/legal-ai', label: 'Deep Research' },
-    { href: '/opportunities', label: 'Opportunities' }
+    { href: '/opportunities', label: 'Opportunities' },
+    { href: '/settings/notifications', label: '🔔 Notifications' }
   ]
 
   return (
