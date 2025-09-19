@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks/useAuth'
+import { supabase } from '@/lib/supabaseAuth'
 
 interface NotificationTemplate {
   id: number
@@ -88,21 +89,31 @@ export default function NotificationDashboard() {
   const fetchDashboardData = async () => {
     try {
       setLoading(true)
+      
+      // Get Supabase session token
+      const { data: { session } } = await supabase.auth.getSession()
+      const authToken = session?.access_token
+      
+      if (!authToken) {
+        setError('Not authenticated')
+        return
+      }
+      
       const [templatesRes, analyticsRes, abTestsRes, postsRes, availablePostsRes] = await Promise.all([
         fetch('/api/notifications/templates', {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` }
+          headers: { 'Authorization': `Bearer ${authToken}` }
         }),
         fetch('/api/notifications/analytics?days=7', {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` }
+          headers: { 'Authorization': `Bearer ${authToken}` }
         }),
         fetch('/api/notifications/ab-tests', {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` }
+          headers: { 'Authorization': `Bearer ${authToken}` }
         }),
         fetch('/api/posts/?limit=50', {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` }
+          headers: { 'Authorization': `Bearer ${authToken}` }
         }),
         fetch('/api/notifications/posts', {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('auth_token')}` }
+          headers: { 'Authorization': `Bearer ${authToken}` }
         })
       ])
 
@@ -134,11 +145,20 @@ export default function NotificationDashboard() {
 
     try {
       setAiTestLoading(true)
+      // Get Supabase session token
+      const { data: { session } } = await supabase.auth.getSession()
+      const authToken = session?.access_token
+      
+      if (!authToken) {
+        setError('Not authenticated')
+        return
+      }
+      
       const response = await fetch('/api/notifications/ai-agent/test', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          'Authorization': `Bearer ${authToken}`
         },
         body: JSON.stringify({
           post_data: {
@@ -171,11 +191,21 @@ export default function NotificationDashboard() {
 
     try {
       setCreateLoading(true)
+      
+      // Get Supabase session token
+      const { data: { session } } = await supabase.auth.getSession()
+      const authToken = session?.access_token
+      
+      if (!authToken) {
+        setError('Not authenticated')
+        return
+      }
+      
       const response = await fetch('/api/notifications/send-manual', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
+          'Authorization': `Bearer ${authToken}`
         },
         body: JSON.stringify({
           post_id: selectedPost,

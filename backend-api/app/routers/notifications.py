@@ -431,8 +431,28 @@ async def get_posts_for_notification(
 ):
     """Get posts available for notification sending"""
     try:
-        posts = await post_notification_integration.get_posts_for_notification(db, limit)
-        return posts
+        # Get recent published posts
+        posts = db.query(models.Post).filter(
+            models.Post.status == 'published'
+        ).order_by(
+            models.Post.published_at.desc()
+        ).limit(limit).all()
+        
+        # Format for frontend
+        formatted_posts = []
+        for post in posts:
+            formatted_posts.append({
+                'id': post.id,
+                'title': post.title,
+                'category': post.category,
+                'verification_status': post.verification_status,
+                'published_at': post.published_at.isoformat() if post.published_at else None,
+                'author': post.author.username if post.author else 'Unknown',
+                'excerpt': post.content[:200] + '...' if len(post.content) > 200 else post.content
+            })
+        
+        return formatted_posts
+        
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching posts: {str(e)}")
 
