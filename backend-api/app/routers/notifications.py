@@ -456,11 +456,14 @@ async def get_posts_for_notification(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching posts: {str(e)}")
 
+class SendManualNotificationRequest(BaseModel):
+    post_id: int
+    style: str
+    target_user_ids: Optional[List[int]] = None
+
 @router.post("/send-manual", response_model=Dict)
 async def send_manual_notification(
-    post_id: int,
-    style: str,
-    target_user_ids: Optional[List[int]] = None,
+    request: SendManualNotificationRequest,
     db: Session = Depends(get_db),
     current_user = Depends(auth.get_current_admin_user)
 ):
@@ -468,9 +471,9 @@ async def send_manual_notification(
     try:
         result = await post_notification_integration.send_manual_notification(
             db=db,
-            post_id=post_id,
-            style=style,
-            target_user_ids=target_user_ids
+            post_id=request.post_id,
+            style=request.style,
+            target_user_ids=request.target_user_ids
         )
         
         if result.get("success"):
