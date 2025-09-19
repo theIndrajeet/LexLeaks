@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Boolean, Float
+from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, Boolean, Float, JSON
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from .database import Base
@@ -25,6 +25,10 @@ class User(Base):
     posts = relationship("Post", back_populates="author")
     # Relationship to push subscriptions
     push_subscriptions = relationship("PushSubscription", back_populates="user", cascade="all, delete-orphan")
+    # Relationship to notification preferences
+    notification_preferences = relationship("UserNotificationPreferences", back_populates="user", cascade="all, delete-orphan")
+    # Relationship to sent notifications
+    notifications_sent = relationship("NotificationSent", back_populates="user", cascade="all, delete-orphan")
 
 
 class Post(Base):
@@ -127,4 +131,76 @@ class JobOpportunity(Base):
     is_office = Column(Boolean, default=False, nullable=False)
     gemini_enhanced = Column(Boolean, default=False, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now()) 
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+
+class NotificationTemplate(Base):
+    """Template for notification styles and content"""
+    __tablename__ = "notification_templates"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(100), nullable=False)
+    style = Column(String(50), nullable=False)  # breaking, mystery, urgent, community
+    template_text = Column(Text, nullable=False)
+    emoji_set = Column(JSON, nullable=True)
+    tone = Column(String(50), nullable=True)  # professional, casual, edgy
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class UserNotificationPreferences(Base):
+    """User preferences for notifications"""
+    __tablename__ = "user_notification_preferences"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    categories = Column(JSON, nullable=True)  # ["corporate", "judicial", "government"]
+    frequency = Column(String(20), nullable=True, default="realtime")  # realtime, daily, weekly
+    quiet_hours = Column(JSON, nullable=True)  # {"start": "22:00", "end": "08:00"}
+    impact_level = Column(String(20), nullable=True, default="all")  # high, medium, low, all
+    enabled = Column(Boolean, default=True, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    
+    # Relationships
+    user = relationship("User", back_populates="notification_preferences")
+
+
+class NotificationSent(Base):
+    """Track sent notifications and engagement"""
+    __tablename__ = "notifications_sent"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    template_id = Column(Integer, ForeignKey("notification_templates.id"), nullable=True)
+    content = Column(Text, nullable=False)
+    style = Column(String(50), nullable=False)
+    post_id = Column(Integer, ForeignKey("posts.id"), nullable=True)
+    sent_at = Column(DateTime(timezone=True), server_default=func.now())
+    opened_at = Column(DateTime(timezone=True), nullable=True)
+    clicked_at = Column(DateTime(timezone=True), nullable=True)
+    engagement_score = Column(Float, default=0.0, nullable=True)
+    
+    # Relationships
+    user = relationship("User", back_populates="notifications_sent")
+    template = relationship("NotificationTemplate")
+    post = relationship("Post")
+
+
+class NotificationABTest(Base):
+    """A/B testing for notification content"""
+    __tablename__ = "notification_ab_tests"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    test_name = Column(String(100), nullable=False)
+    variant_a = Column(Text, nullable=False)
+    variant_b = Column(Text, nullable=False)
+    winner = Column(String(1), nullable=True)  # A or B
+    confidence_level = Column(Float, nullable=True)
+    test_duration = Column(Integer, nullable=True)  # hours
+    total_sends = Column(Integer, default=0, nullable=True)
+    variant_a_opens = Column(Integer, default=0, nullable=True)
+    variant_b_opens = Column(Integer, default=0, nullable=True)
+    variant_a_clicks = Column(Integer, default=0, nullable=True)
+    variant_b_clicks = Column(Integer, default=0, nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    completed_at = Column(DateTime(timezone=True), nullable=True) 

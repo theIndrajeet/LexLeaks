@@ -18,7 +18,17 @@ from app.config import DATABASE_URL
 config = context.config
 
 # Set the database URL from environment variable
-config.set_main_option('sqlalchemy.url', DATABASE_URL)
+# URL encode the password to handle special characters
+import urllib.parse
+if DATABASE_URL:
+    # Parse and re-encode the URL to handle special characters
+    parsed = urllib.parse.urlparse(DATABASE_URL)
+    if parsed.password:
+        encoded_password = urllib.parse.quote(parsed.password, safe='')
+        encoded_url = f"{parsed.scheme}://{parsed.username}:{encoded_password}@{parsed.hostname}:{parsed.port}{parsed.path}"
+        config.set_main_option('sqlalchemy.url', encoded_url)
+    else:
+        config.set_main_option('sqlalchemy.url', DATABASE_URL)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
