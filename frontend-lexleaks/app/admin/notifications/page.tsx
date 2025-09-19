@@ -51,6 +51,9 @@ interface Post {
   title: string
   category: string
   verification_status: string
+  author?: string
+  excerpt?: string
+  published_at?: string
 }
 
 export default function NotificationDashboard() {
@@ -404,9 +407,9 @@ export default function NotificationDashboard() {
                                 }`}>
                                   {post.verification_status}
                                 </span>
-                                <span>By: {post.author}</span>
+                                <span>By: {post.author || 'Unknown'}</span>
                               </div>
-                              <p className="text-sm text-gray-700">{post.excerpt}</p>
+                              <p className="text-sm text-gray-700">{post.excerpt || 'No excerpt available'}</p>
                             </div>
                           ) : null
                         })()}
