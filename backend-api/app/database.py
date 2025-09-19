@@ -15,14 +15,8 @@ if not DATABASE_URL:
     DATABASE_URL = "sqlite:///./test.db"
     print("Warning: Using default SQLite database. Set DATABASE_URL environment variable for production.")
 
-# Add connection pool and timeout settings for better reliability
-# Create engine with minimal configuration to avoid connection issues
-engine = create_engine(
-    DATABASE_URL,
-    pool_pre_ping=True,  # Verify connections before using them
-    pool_size=5,         # Number of connections to maintain in pool
-    max_overflow=10      # Maximum overflow connections allowed
-)
+# Create engine with absolute minimal configuration to avoid connection issues
+engine = create_engine(DATABASE_URL)
 
 # Create SessionLocal class for database sessions
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
