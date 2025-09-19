@@ -181,13 +181,16 @@ def get_posts_with_counts(
         .subquery()
     )
     
-    # Main query with impact count
+    # Main query with impact count and author
     query = db.query(
         models.Post,
         func.coalesce(impact_count_subquery.c.impact_count, 0).label('impact_count')
     ).outerjoin(
         impact_count_subquery,
         models.Post.id == impact_count_subquery.c.post_id
+    ).outerjoin(
+        models.User,
+        models.Post.author_id == models.User.id
     )
     
     # Join with User table for author filtering
@@ -254,7 +257,7 @@ def get_posts_with_counts(
             "document_url": post.document_url,
             "published_at": post.published_at,
             "created_at": post.created_at,
-            "author": post.author,
+            "author": post.author if post.author else None,
             "impact_count": impact_count
         }
         posts_with_counts.append(post_dict)
