@@ -1,12 +1,13 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import logging
 import asyncio
 import os
 from datetime import datetime
+from sqlalchemy.orm import Session
 
-from .database import engine
+from .database import engine, get_db
 from . import models
 from .routers import posts, auth, impacts, ai, google_auth, kanoon, opportunities, legal_ai, deep_research, chat, multi_agent_research, event_driven_research, trends, scheduler, pipeline, test_scheduler
 from .smart_automation import start_automation
@@ -119,6 +120,26 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
+
+# Debug endpoint to test database connectivity
+@app.get("/api/debug/posts")
+def debug_posts(db: Session = Depends(get_db)):
+    """Debug endpoint to check if database is working"""
+    try:
+        posts = db.query(models.Post).limit(5).all()
+        result = []
+        for post in posts:
+            result.append({
+                "id": post.id,
+                "title": post.title,
+                "slug": post.slug,
+                "status": post.status,
+                "author_id": post.author_id,
+                "created_at": post.created_at.isoformat() if post.created_at else None
+            })
+        return {"posts": result, "count": len(result)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
 # Include routers
 app.include_router(auth.router, prefix="/api")

@@ -12,26 +12,6 @@ router = APIRouter(
 )
 
 
-@router.get("/debug", response_model=List[dict])
-def debug_posts(db: Session = Depends(get_db)):
-    """Test endpoint to check if database is working"""
-    try:
-        posts = db.query(models.Post).limit(5).all()
-        result = []
-        for post in posts:
-            result.append({
-                "id": post.id,
-                "title": post.title,
-                "slug": post.slug,
-                "status": post.status,
-                "author_id": post.author_id,
-                "created_at": post.created_at.isoformat() if post.created_at else None
-            })
-        return result
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-
-
 @router.get("/", response_model=List[schemas.PostWithCounts])
 @router.get("", response_model=List[schemas.PostWithCounts], include_in_schema=False)
 def read_posts(
