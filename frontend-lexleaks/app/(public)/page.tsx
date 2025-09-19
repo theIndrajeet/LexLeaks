@@ -40,10 +40,15 @@ export default function HomePage() {
       }
       
       const fetchedPosts = await getPublishedPosts(params)
-      setPosts(fetchedPosts)
+      setPosts(fetchedPosts || []) // Handle null/undefined responses
     } catch (err) {
-      setError('Failed to load posts')
       console.error('Error fetching posts:', err)
+      // Don't show error for empty database, just show empty state
+      if (err.message?.includes('timeout') || err.message?.includes('Failed to fetch')) {
+        setError('Connection timeout - please check your internet connection')
+      } else {
+        setError('Failed to load posts')
+      }
     } finally {
       setLoading(false)
       setFilterLoading(false)
@@ -51,7 +56,12 @@ export default function HomePage() {
   }
 
   useEffect(() => {
-    fetchPosts()
+    // Add a small delay to prevent flash of loading state
+    const timer = setTimeout(() => {
+      fetchPosts()
+    }, 100)
+    
+    return () => clearTimeout(timer)
   }, [])
 
   const handleFilterChange = (filters: FilterState) => {

@@ -217,65 +217,57 @@ const apiRequest = async (
   endpoint: string,
   options: RequestInit = {}
 ): Promise<any> => {
-  console.log(`🚀 API REQUEST STARTED: ${endpoint}`)
+  // Add timeout to prevent hanging requests
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
   
-  const token = await getAuthToken()
-  
-  console.log(`🔍 API Request Debug:`, {
-    endpoint,
-    hasToken: !!token,
-    tokenLength: token?.length || 0,
-    tokenStart: token?.substring(0, 20) + '...' || 'none'
-  })
-  
-  const config: RequestInit = {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-      ...options.headers,
-    },
-    ...options,
-  }
-
-  let response = await fetch(`${API_BASE_URL}${endpoint}`, config)
-
-  console.log(`🔍 API Response Debug:`, {
-    endpoint,
-    status: response.status,
-    statusText: response.statusText,
-    ok: response.ok
-  })
-
-  // If token expired, try to refresh it
-  if (response.status === 401 && token) {
-    const newToken = await refreshToken()
-    if (newToken) {
-      // Retry the request with new token
-      config.headers = {
-        ...config.headers,
-        'Authorization': `Bearer ${newToken}`
-      }
-      response = await fetch(`${API_BASE_URL}${endpoint}`, config)
+  try {
+    const token = await getAuthToken()
+    
+    const config: RequestInit = {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token && { Authorization: `Bearer ${token}` }),
+        ...options.headers,
+      },
+      signal: controller.signal,
+      ...options,
     }
-  }
-  
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}))
-    console.error(`❌ API Error:`, {
-      endpoint,
-      status: response.status,
-      statusText: response.statusText,
-      errorData
-    })
-    throw new Error(errorData.detail || `HTTP error! status: ${response.status}`)
-  }
 
-  // Handle 204 No Content responses
-  if (response.status === 204) {
-    return null
-  }
+    let response = await fetch(`${API_BASE_URL}${endpoint}`, config)
+    clearTimeout(timeoutId)
 
-  return response.json()
+    // If token expired, try to refresh it
+    if (response.status === 401 && token) {
+      const newToken = await refreshToken()
+      if (newToken) {
+        // Retry the request with new token
+        config.headers = {
+          ...config.headers,
+          'Authorization': `Bearer ${newToken}`
+        }
+        response = await fetch(`${API_BASE_URL}${endpoint}`, config)
+      }
+    }
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      throw new Error(errorData.detail || `HTTP error! status: ${response.status}`)
+    }
+
+    // Handle 204 No Content responses
+    if (response.status === 204) {
+      return null
+    }
+
+    return response.json()
+  } catch (error) {
+    clearTimeout(timeoutId)
+    if (error.name === 'AbortError') {
+      throw new Error('Request timeout - please try again')
+    }
+    throw error
+  }
 }
 
 // Auth API
