@@ -12,8 +12,8 @@ router = APIRouter(
 )
 
 
-@router.get("/test", response_model=List[dict])
-def test_posts(db: Session = Depends(get_db)):
+@router.get("/debug", response_model=List[dict])
+def debug_posts(db: Session = Depends(get_db)):
     """Test endpoint to check if database is working"""
     try:
         posts = db.query(models.Post).limit(5).all()
