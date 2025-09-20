@@ -386,11 +386,42 @@ def unsubscribe_from_push(
 def get_vapid_key():
     """Get VAPID public key for push notifications"""
     try:
-        # In production, this should come from environment variables
-        vapid_public_key = os.getenv("VAPID_PUBLIC_KEY", "BEl62iUYgUivxIkv69yViEuiBIa40HI0X8QwV7VUyR8")
+        vapid_public_key = os.getenv("VAPID_PUBLIC_KEY")
+        if not vapid_public_key:
+            raise HTTPException(status_code=500, detail="VAPID public key not configured")
         return {"publicKey": vapid_public_key}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error getting VAPID key: {str(e)}")
+
+# Test Notification
+@router.post("/test/{user_id}", response_model=Dict)
+async def send_test_notification(
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user = Depends(auth.get_current_admin_user)
+):
+    """Send a test notification to a specific user"""
+    try:
+        result = await notification_service.send_test_notification(db, user_id)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error sending test notification: {str(e)}")
+
+# Cleanup Expired Subscriptions
+@router.post("/cleanup", response_model=Dict)
+def cleanup_expired_subscriptions(
+    db: Session = Depends(get_db),
+    current_user = Depends(auth.get_current_admin_user)
+):
+    """Clean up expired push subscriptions"""
+    try:
+        cleaned_count = notification_service.cleanup_expired_subscriptions(db)
+        return {
+            "message": f"Cleaned up {cleaned_count} expired subscriptions",
+            "cleaned_count": cleaned_count
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error cleaning up subscriptions: {str(e)}")
 
 # AI Agent Info
 @router.get("/ai-agent/styles", response_model=List[Dict])
