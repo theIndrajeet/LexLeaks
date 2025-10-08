@@ -7,8 +7,8 @@
   # Build command for Next.js
   command = "npm run build"
   
-  # Remove explicit publish directory - let Netlify handle it automatically for Next.js
-  # publish = ".next"  # REMOVED - this was causing issues
+  # Publish directory - must be different from base directory
+  publish = ".next"
 
 [build.environment]
   # Your Google Cloud Run backend API URL
