@@ -8,6 +8,7 @@ import TypewriterTitle from '@/components/TypewriterTitle'
 import Navigation from '@/components/Navigation'
 import StatusBadge from '@/components/StatusBadge'
 import InstallPWA from '@/components/InstallPWA'
+import { pushNotifications } from '@/lib/pushNotifications'
 
 import SearchFilter, { FilterState } from '@/components/SearchFilter'
 
@@ -16,6 +17,9 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [filterLoading, setFilterLoading] = useState(false)
+  const [notifSupported, setNotifSupported] = useState(false)
+  const [notifPermission, setNotifPermission] = useState<NotificationPermission>('default')
+  const [notifSubscribed, setNotifSubscribed] = useState(false)
 
   const fetchPosts = async (filters?: Partial<FilterState>) => {
     try {
@@ -40,15 +44,10 @@ export default function HomePage() {
       }
       
       const fetchedPosts = await getPublishedPosts(params)
-      setPosts(fetchedPosts || []) // Handle null/undefined responses
-    } catch (err: any) {
+      setPosts(fetchedPosts)
+    } catch (err) {
+      setError('Failed to load posts')
       console.error('Error fetching posts:', err)
-      // Don't show error for empty database, just show empty state
-      if (err.message?.includes('timeout') || err.message?.includes('Failed to fetch')) {
-        setError('Connection timeout - please check your internet connection')
-      } else {
-        setError('Failed to load posts')
-      }
     } finally {
       setLoading(false)
       setFilterLoading(false)
@@ -56,12 +55,16 @@ export default function HomePage() {
   }
 
   useEffect(() => {
-    // Add a small delay to prevent flash of loading state
-    const timer = setTimeout(() => {
-      fetchPosts()
-    }, 100)
-    
-    return () => clearTimeout(timer)
+    fetchPosts()
+    // Check notification support/status
+    const supported = pushNotifications.isSupported()
+    setNotifSupported(supported)
+    if (supported) {
+      pushNotifications.getSubscriptionStatus().then((s) => {
+        setNotifPermission(s.permission)
+        setNotifSubscribed(s.isSubscribed)
+      }).catch(() => {})
+    }
   }, [])
 
   const handleFilterChange = (filters: FilterState) => {
@@ -149,6 +152,31 @@ export default function HomePage() {
       </header>
 
       <Navigation currentPage="/" />
+
+      {/* Simple Push Notification Opt-in */}
+      {notifSupported && !notifSubscribed && notifPermission !== 'denied' && (
+        <div className="mb-6 border-2 brand-border rounded-lg p-4 bg-[#fdf6e3] dark:bg-[#1a1612] flex items-center justify-between">
+          <div className="text-sm brand-text pr-4">Enable notifications to get alerts when new stories are published.</div>
+          <button
+            onClick={async () => {
+              try {
+                const granted = await pushNotifications.init()
+                setNotifPermission(granted ? 'granted' : 'denied')
+                if (granted) {
+                  const sub = await pushNotifications.subscribe()
+                  if (sub) {
+                    setNotifSubscribed(true)
+                    await pushNotifications.showTestNotification()
+                  }
+                }
+              } catch {}
+            }}
+            className="brand-button whitespace-nowrap"
+          >
+            Enable Notifications
+          </button>
+        </div>
+      )}
 
             {/* Deep Research Promotion */}
             <div className="mb-12">

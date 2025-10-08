@@ -7,14 +7,29 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-# Database URL from environment - MUST be set for Supabase
+# Database URL from environment (mandatory)
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 if not DATABASE_URL:
-    raise ValueError("DATABASE_URL environment variable is required. Please set it to your Supabase PostgreSQL connection string.")
+    raise RuntimeError(
+        "DATABASE_URL is not set. Configure your Supabase Postgres connection string in the environment."
+    )
 
-# Create engine with absolute minimal configuration to avoid connection issues
-engine = create_engine(DATABASE_URL)
+# Add connection pool and timeout settings for better reliability
+# Use driver-specific connect_args
+is_sqlite = DATABASE_URL.startswith("sqlite")
+
+# Postgres or other drivers
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,  # Verify connections before using them
+    pool_size=5,         # Number of connections to maintain in pool
+    max_overflow=10,     # Maximum overflow connections allowed
+    connect_args={
+        "connect_timeout": 30,  # Connection timeout in seconds
+        "options": "-c statement_timeout=30000"  # Query timeout in milliseconds
+    }
+)
 
 # Create SessionLocal class for database sessions
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

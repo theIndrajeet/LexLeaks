@@ -4,11 +4,10 @@ from contextlib import asynccontextmanager
 import logging
 import asyncio
 import os
-from datetime import datetime
 
 from .database import engine
 from . import models
-from .routers import posts, impacts, ai, google_auth, kanoon, opportunities, legal_ai, deep_research, chat, multi_agent_research, event_driven_research, trends, scheduler, pipeline, test_scheduler, supabase_auth, notifications
+from .routers import posts, auth, impacts, ai, kanoon, opportunities, legal_ai, deep_research, chat, multi_agent_research, event_driven_research, trends, scheduler, pipeline, test_scheduler, notifications
 from .smart_automation import start_automation
 from .event_driven_agent_system import event_driven_system
 from .scheduler_service import scheduler_service
@@ -67,31 +66,14 @@ async def lifespan(app: FastAPI):
 async def start_background_services():
     """Start heavy services in background for production"""
     try:
-        # Reduced delay for faster startup
-        await asyncio.sleep(2)  # Let the server start first
-        
-        # Start automation
+        await asyncio.sleep(5)  # Let the server start first
         await start_automation()
-        logger.info("✅ Smart automation started in production")
-        
-        # Start event-driven system
         asyncio.create_task(event_driven_system.start())
-        logger.info("🔧 Event-driven agent system started in production")
-        
-        # Start scheduler - CRITICAL for production
+        logger.info("🔧 Event-driven agent system started")
         await scheduler_service.start_scheduler()
-        logger.info("📅 Article scheduler service started in production")
-        
-        # Keep the task alive to prevent Cloud Run from killing it
-        while True:
-            await asyncio.sleep(60)  # Keep alive with periodic checks
-            logger.debug("🔄 Background services heartbeat")
-            
+        logger.info("📅 Article scheduler service started")
     except Exception as e:
         logger.error(f"❌ Background services failed: {e}")
-        # Retry after delay
-        await asyncio.sleep(10)
-        asyncio.create_task(start_background_services())
 
 
 # Create FastAPI application
@@ -121,11 +103,11 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(supabase_auth.router, prefix="/api")
+app.include_router(auth.router, prefix="/api")
 app.include_router(posts.router, prefix="/api")
 app.include_router(impacts.router, prefix="/api")
 app.include_router(ai.router, prefix="/api")
-app.include_router(google_auth.router, prefix="/api/auth")
+# Google OAuth removed in favor of Supabase OAuth (frontend)
 app.include_router(kanoon.router, prefix="/api/kanoon")
 app.include_router(opportunities.router, prefix="/api")
 app.include_router(legal_ai.router, prefix="/api/legal-ai")
@@ -137,7 +119,7 @@ app.include_router(trends.router, prefix="/api", tags=["trends"])
 app.include_router(scheduler.router, prefix="/api", tags=["scheduler"])
 app.include_router(pipeline.router, prefix="/api", tags=["pipeline"])
 app.include_router(test_scheduler.router, prefix="/api", tags=["test"])
-app.include_router(notifications.router, prefix="/api", tags=["notifications"])
+app.include_router(notifications.router)
 
 
 # Root endpoint
@@ -153,25 +135,8 @@ async def root():
 # Health check endpoint
 @app.get("/health")
 def health_check():
-    """Health check endpoint with scheduler status"""
-    try:
-        scheduler_status = scheduler_service.get_scheduler_status()
-        return {
-            "status": "healthy",
-            "scheduler": {
-                "running": scheduler_status.get("is_running", False),
-                "automation_enabled": scheduler_status.get("automation_enabled", False),
-                "next_generation": scheduler_status.get("next_generation", "unknown"),
-                "next_publish": scheduler_status.get("next_publish", "unknown")
-            },
-            "timestamp": datetime.now().isoformat()
-        }
-    except Exception as e:
-        return {
-            "status": "healthy",
-            "scheduler": {"error": str(e)},
-            "timestamp": datetime.now().isoformat()
-        }
+    """Health check endpoint"""
+    return {"status": "healthy"}
 
 
 # API info endpoint

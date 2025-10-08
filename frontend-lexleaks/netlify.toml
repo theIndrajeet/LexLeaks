@@ -10,6 +10,7 @@
 [build.environment]
   # Your Google Cloud Run backend API URL
   NEXT_PUBLIC_API_URL = "https://lexleaks-api-563011146464.asia-south1.run.app"
+  NEXT_PUBLIC_VAPID_PUBLIC_KEY = "BJQd2exsafUwNVOXIngnK7CclA_NGWBDcllPA0JiM7rhBftt_vQHdRR59QVGGpieIuuOJVGvsfhb4kr6rV-wyXU"
   
   # Supabase Configuration for Production
   NEXT_PUBLIC_SUPABASE_URL = "https://whvehlnbrsopxxxtlbql.supabase.co"

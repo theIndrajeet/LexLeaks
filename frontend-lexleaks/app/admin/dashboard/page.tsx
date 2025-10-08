@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { format } from 'date-fns'
 import { getAllPosts, PostSummary } from '@/lib/api'
+import NotificationSettings from '@/components/NotificationSettings'
 
 export default function DashboardPage() {
   const [posts, setPosts] = useState<PostSummary[]>([])
@@ -168,6 +169,11 @@ export default function DashboardPage() {
             </div>
           </div>
         </Link>
+      </div>
+
+      {/* Notification Settings */}
+      <div className="mb-8">
+        <NotificationSettings />
       </div>
 
       {/* Recent Posts */}

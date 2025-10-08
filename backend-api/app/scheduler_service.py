@@ -152,6 +152,14 @@ class SchedulerService:
             
             # Step 3: Generate articles for top trending topics
             logger.info(" Step 3: Generating articles from trending topics...")
+
+            # Prepare a single DB session for this batch
+            db = next(get_db())
+            # Ensure we have a system author to attribute AI posts
+            system_author_id = self._get_or_create_system_user(db)
+            created_count = 0
+            scheduled_publish_time = self._get_next_publish_time()
+
             for i, topic in enumerate(trending_topics[:3]):
                 try:
                     logger.info(f"🤖 Generating article {i+1}/3: {topic['title']}")
@@ -171,18 +179,52 @@ class SchedulerService:
                         research_data=relevant_research_data,  # Pass filtered research data
                         category='ai-generated',
                         publish_option='schedule',  # Schedule for 7 AM
-                        scheduled_for=self._get_next_publish_time()
+                        scheduled_for=scheduled_publish_time
                     )
                     
-                    if article_data and 'post_id' in article_data:
-                        logger.info(f" Article generated successfully: {article_data['post_id']}")
+                    # Validate and persist to database
+                    if article_data and not article_data.get('error'):
+                        try:
+                            # Fallback slug generation if missing
+                            slug = article_data.get('slug')
+                            if not slug:
+                                slug = self._generate_slug_from_title(article_data.get('title', topic['title']))
+                            new_post = Post(
+                                title=article_data.get('title', topic['title']),
+                                slug=slug,
+                                content=article_data.get('content', ''),
+                                excerpt=article_data.get('excerpt', ''),
+                                status='draft',
+                                verification_status='unverified',
+                                category='ai-generated',
+                                author_id=system_author_id,
+                                published_at=scheduled_publish_time,  # time when it should go live
+                                ai_generated=True,
+                                ai_prompt=topic['title'],
+                                
+                                # Optional column present on model; keep in sync
+                                scheduled_for=scheduled_publish_time
+                            )
+                            db.add(new_post)
+                            db.commit()
+                            db.refresh(new_post)
+                            created_count += 1
+                            logger.info(f" 🗓️ Scheduled article saved (ID: {new_post.id}) for {scheduled_publish_time.isoformat()}")
+                        except Exception as db_err:
+                            logger.error(f"❌ Database error while saving article for topic '{topic['title']}': {db_err}")
+                            db.rollback()
                     else:
-                        logger.error(f"❌ Failed to generate article for topic: {topic['title']}")
+                        logger.error(f"❌ Failed to generate article for topic: {topic['title']} — {article_data.get('error') if article_data else 'Unknown error'}")
                         
                 except Exception as e:
                     logger.error(f"Error generating article for topic {topic['title']}: {e}")
                     
-            logger.info(" Article generation pipeline completed successfully.")
+            try:
+                db.close()
+            except Exception:
+                pass
+
+            logger.info(f" Article generation pipeline completed. Created {created_count} scheduled article(s).")
                     
         except Exception as e:
             logger.error(f"❌ Critical error in article generation pipeline: {e}")
@@ -296,6 +338,7 @@ class SchedulerService:
             # Save article to database
             db = next(get_db())
             try:
+                system_author_id = self._get_or_create_system_user(db)
                 # Determine status and published_at based on publish_option
                 if publish_option == 'live':
                     status = 'published'
@@ -313,7 +356,7 @@ class SchedulerService:
                     status=status,
                     verification_status='unverified',
                     category='ai-generated',
-                    author_id=1,  # Default admin user ID
+                    author_id=system_author_id,
                     published_at=published_at,
                     ai_generated=True,
                     ai_prompt=topic
@@ -495,6 +538,46 @@ class SchedulerService:
         except Exception as e:
             logger.error(f"Error filtering research data: {e}")
             return scraped_articles[:10] if scraped_articles else []  # Fallback to first 10
+
+    def _get_or_create_system_user(self, db: Session) -> int:
+        """Ensure a system/admin user exists and return its ID."""
+        try:
+            user = db.query(User).filter(
+                or_(User.username == 'system', User.is_admin == True)
+            ).order_by(User.is_admin.desc()).first()
+            if user:
+                return user.id
+            # Create a minimal system user
+            system_user = User(
+                username='system',
+                email='system@lexleaks.local',
+                is_admin=True,
+                oauth_provider='local'
+            )
+            db.add(system_user)
+            db.commit()
+            db.refresh(system_user)
+            return system_user.id
+        except Exception:
+            db.rollback()
+            # As a last resort, try again without admin flag
+            system_user = User(
+                username='system',
+                email='system@lexleaks.local',
+                oauth_provider='local',
+                is_admin=True
+            )
+            db.add(system_user)
+            db.commit()
+            db.refresh(system_user)
+            return system_user.id
+
+    def _generate_slug_from_title(self, title: str) -> str:
+        """Generate a URL-friendly slug from title."""
+        import re
+        slug = re.sub(r'[^\w\s-]', '', (title or 'article').lower())
+        slug = re.sub(r'[-\s]+', '-', slug).strip('-')
+        return slug or 'article'
 
 # Global scheduler instance
 scheduler_service = SchedulerService()

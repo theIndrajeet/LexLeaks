@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
-import { SupabaseAuthService, SupabaseUser } from '@/lib/supabaseAuth'
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth'
 
 interface SupabaseAuthButtonProps {
   className?: string
@@ -10,30 +10,15 @@ interface SupabaseAuthButtonProps {
 }
 
 export default function SupabaseAuthButton({ className = '', showUserInfo = true }: SupabaseAuthButtonProps) {
-  const [user, setUser] = useState<SupabaseUser | null>(null)
+  const { user, loading: authLoading, signInWithGoogle, signOut } = useSupabaseAuth()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    // Check if user is already logged in
-    const supabaseAuth = SupabaseAuthService.getInstance()
-    supabaseAuth.getCurrentUser().then(setUser)
-
-    // Listen for auth state changes
-    const { data: { subscription } } = supabaseAuth.onAuthStateChange((user) => {
-      setUser(user)
-    })
-
-    return () => subscription.unsubscribe()
-  }, [])
 
   const handleGoogleLogin = async () => {
     try {
       setLoading(true)
       setError(null)
-      
-      const supabaseAuth = SupabaseAuthService.getInstance()
-      await supabaseAuth.signInWithGoogle()
+      await signInWithGoogle()
     } catch (err: any) {
       setError(err.message || 'Login failed')
       setLoading(false)
@@ -42,9 +27,7 @@ export default function SupabaseAuthButton({ className = '', showUserInfo = true
 
   const handleLogout = async () => {
     try {
-      const supabaseAuth = SupabaseAuthService.getInstance()
-      await supabaseAuth.signOut()
-      setUser(null)
+      await signOut()
       // Redirect to home page
       window.location.href = '/'
     } catch (err: any) {
@@ -53,28 +36,32 @@ export default function SupabaseAuthButton({ className = '', showUserInfo = true
   }
 
   if (user) {
+    const isAdmin = user.user_metadata?.is_admin || false
+    const userName = user.user_metadata?.full_name || user.email || 'User'
+    const userPicture = user.user_metadata?.avatar_url || user.user_metadata?.picture
+
     return (
       <div className={`flex items-center gap-3 ${className}`}>
         {showUserInfo && (
           <div className="flex items-center gap-2">
-            {user.picture && (
+            {userPicture && (
               <img 
-                src={user.picture} 
-                alt={user.name} 
+                src={userPicture} 
+                alt={userName} 
                 className="w-8 h-8 rounded-full border-2 border-gray-300 dark:border-gray-600"
               />
             )}
             <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {user.name}
+              {userName}
             </span>
-            {user.is_admin && (
+            {isAdmin && (
               <span className="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full">
                 Admin
               </span>
             )}
           </div>
         )}
-        {user.is_admin && (
+        {isAdmin && (
           <Link
             href="/admin/dashboard"
             className="px-3 py-2 text-sm font-medium brand-button rounded-md transition-all duration-200 hover:shadow-md"
@@ -88,6 +75,17 @@ export default function SupabaseAuthButton({ className = '', showUserInfo = true
         >
           Logout
         </button>
+      </div>
+    )
+  }
+
+  if (authLoading) {
+    return (
+      <div className={className}>
+        <div className="flex items-center gap-3 px-6 py-3 text-sm font-medium brand-button border border-brand-accent/20 opacity-50">
+          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+          <span>Loading...</span>
+        </div>
       </div>
     )
   }

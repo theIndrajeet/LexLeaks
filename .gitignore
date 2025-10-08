@@ -66,3 +66,4 @@ tmp/
 temp/ 
 # Local Netlify folder
 .netlify
+SECRETS_LOCAL.md

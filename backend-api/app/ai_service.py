@@ -73,7 +73,26 @@ class AIContentGenerator:
     ) -> Dict[str, Any]:
         """Enhanced Gemini generation with research data"""
         if not self.gemini_api_key:
-            return {"error": "Gemini API key not configured"}
+            # Fallback minimal article so scheduler can proceed in dev without API keys
+            title = f"Explained: {topic}"
+            content = f"<h1>{title}</h1>\n<p>This is a placeholder article generated without Gemini API, intended for development/testing of the scheduler pipeline. Replace with real content once GEMINI_API_KEY is configured.</p>\n<h2>Overview</h2>\n<p>{topic}</p>"
+            excerpt = "Placeholder article generated for scheduler testing."
+            slug = self._generate_slug(title)
+            return {
+                "title": title,
+                "content": content,
+                "excerpt": excerpt,
+                "slug": slug,
+                "provider": "fallback",
+                "generated_at": datetime.utcnow().isoformat(),
+                "word_count": len(content.split()),
+                "topic": topic,
+                "post_id": f"fallback_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}",
+                "category": category or "ai-generated",
+                "publish_option": publish_option or "draft",
+                "scheduled_for": scheduled_for.isoformat() if scheduled_for else None,
+                "research_sources_count": len(research_data) if research_data else 0
+            }
         
         try:
             # Create enhanced prompt with research data
